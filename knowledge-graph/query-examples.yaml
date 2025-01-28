@@ -1,0 +1,115 @@
+# Knowledge Graph Query Examples
+version: "1.0"
+
+queries:
+  # Query 1: Find Phase2 ventures with AI modules
+  phase2_ai_ventures:
+    description: "List all ventures in Phase2 that utilize AI modules"
+    pattern:
+      match:
+        venture:
+          type: "DigitalVenture"
+          properties:
+            current_phase: "Phase2"
+            usesAIModule: true
+      return:
+        - venture.id
+        - venture.name
+        - venture.business_model
+        - venture.automationLevel
+    example_result:
+      ventures:
+        - id: "DV001"
+          name: "AI-Driven Analytics Platform"
+          business_model: "SaaS"
+          automationLevel: "Advanced"
+
+  # Query 2: Role collaboration on ventures
+  venture_role_collaboration:
+    description: "Find which roles collaborate on a specific digital venture"
+    pattern:
+      match:
+        venture:
+          type: "DigitalVenture"
+          properties:
+            id: "$venture_id"
+        roles:
+          relationship: "contributesTo"
+          target: "venture"
+      return:
+        - roles.id
+        - roles.title
+        - roles.responsibilities
+    example_result:
+      roles:
+        - id: "R001"
+          title: "EmergingTechSpecialist"
+          responsibilities: ["Evaluate emerging technologies", "Assess technical feasibility"]
+
+  # Query 3: AI process implementation patterns
+  ai_process_patterns:
+    description: "Analyze AI process implementation across venture types"
+    pattern:
+      match:
+        venture:
+          type: "DigitalVenture"
+        process:
+          type: "AIProcess"
+          relationship: "implementsAI"
+          source: "venture"
+      group_by:
+        - venture.business_model
+        - process.process_type
+      return:
+        - count(process)
+        - process.automation_level
+    example_result:
+      patterns:
+        - business_model: "SaaS"
+          process_type: "Predictive Analytics"
+          process_count: 5
+          automation_level: "Full"
+
+  # Query 4: Market segment analysis
+  venture_market_mapping:
+    description: "Map ventures to their target market segments"
+    pattern:
+      match:
+        venture:
+          type: "DigitalVenture"
+        segment:
+          type: "MarketSegment"
+          relationship: "targets"
+          source: "venture"
+      return:
+        - venture.business_model
+        - segment.segment_name
+        - segment.market_size
+        - segment.growth_potential
+    example_result:
+      mappings:
+        - business_model: "SaaS"
+          segment_name: "Enterprise Software"
+          market_size: 1000000000
+          growth_potential: 0.15
+
+  # Query 5: Risk profile assessment
+  venture_risk_analysis:
+    description: "Analyze risk profiles across different venture types"
+    pattern:
+      match:
+        venture:
+          type: "DigitalVenture"
+        risk:
+          type: "RiskProfile"
+          relationship: "assessedBy"
+          target: "venture"
+      return:
+        - venture.business_model
+        - risk.risk_level
+        - risk.mitigation_strategies
+    example_result:
+      risk_profiles:
+        - business_model: "Ecommerce"
+          risk_level: "Medium"
+          mitigation_strategies: ["Market diversification", "Agile scaling"]
