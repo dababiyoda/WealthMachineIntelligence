@@ -15,6 +15,9 @@ classes:
         type: array
       - name: ai_integration_points
         type: array
+      - name: usesAITools
+        type: array
+        description: "Specific AI tools used by this role"
 
   DigitalVenture:
     description: "Digital business initiative or project"
@@ -32,6 +35,36 @@ classes:
         type: object
       - name: market_segment
         type: object
+      - name: usesAIModule
+        type: array
+        description: "AI modules integrated into the venture"
+      - name: requiresMLModel
+        type: boolean
+        description: "Whether the venture requires machine learning models"
+      - name: preferredDataSource
+        type: array
+        description: "Preferred data sources for AI/ML operations"
+    subclasses:
+      SaaSVenture:
+        additional_properties:
+          - name: subscription_tiers
+            type: array
+          - name: ai_features
+            type: array
+
+      EcommerceVenture:
+        additional_properties:
+          - name: product_categories
+            type: array
+          - name: recommendation_engine
+            type: object
+
+      ContentPlatform:
+        additional_properties:
+          - name: content_types
+            type: array
+          - name: ai_content_generation
+            type: boolean
 
   AIProcess:
     description: "Automated process handled by AI agents"
@@ -47,6 +80,9 @@ classes:
       - name: automation_level
         type: string
         enum: [Full, Partial, Assisted]
+      - name: required_models
+        type: array
+        description: "Required AI/ML models for the process"
 
   RiskProfile:
     description: "Risk assessment and management framework"
@@ -74,6 +110,15 @@ classes:
       - name: growth_potential
         type: number
 
+constraints:
+  - name: phase2_ai_requirement
+    description: "Ventures in Phase2 or beyond must have at least one AIProcess"
+    rule: "DigitalVenture.current_phase >= 'Phase2' => COUNT(AIProcess) >= 1"
+
+  - name: saas_ml_requirement
+    description: "SaaS ventures must specify ML model requirements"
+    rule: "DigitalVenture.type == 'SaaS' => requiresMLModel != null"
+
 relationships:
   - name: contributesTo
     source: Role
@@ -99,3 +144,9 @@ relationships:
     source: DigitalVenture
     target: RiskProfile
     cardinality: "one-to-one"
+
+  - name: implementsAI
+    source: DigitalVenture
+    target: AIProcess
+    cardinality: "one-to-many"
+    constraints: "required_if_phase >= 2"
