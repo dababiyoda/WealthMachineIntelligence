@@ -1,7 +1,7 @@
 # Product Development Specialist & Business Planner
 
 ## Role Definition
-Expert in translating market opportunities into viable digital products and comprehensive business plans, leveraging AI for optimization and validation.
+Expert in translating market opportunities into viable digital products and comprehensive business plans.
 
 ## Primary Responsibilities
 - Design digital product specifications
@@ -9,25 +9,20 @@ Expert in translating market opportunities into viable digital products and comp
 - Develop MVP strategies
 - Define product roadmaps
 - Coordinate with development teams
-- Integrate AI capabilities into product design
 
 ## AI Integration Points
 
 ### Product Development
 - AI-assisted feature prioritization
 - Automated market fit analysis
-- User feedback processing with NLP
+- User feedback processing
 - Development timeline optimization
-- Prototype validation automation
-- Feature impact prediction
 
 ### Business Planning
 - Financial modeling automation
 - Resource allocation AI
 - Risk assessment algorithms
 - Market validation tools
-- Cost optimization models
-- Revenue projection systems
 
 ## Input/Output Specifications
 
@@ -37,8 +32,6 @@ Expert in translating market opportunities into viable digital products and comp
 - Resource availability
 - Budget constraints
 - User requirements
-- Competitor feature sets
-- AI capability assessments
 
 ### Outputs
 - Product specifications
@@ -46,17 +39,8 @@ Expert in translating market opportunities into viable digital products and comp
 - MVP strategies
 - Development roadmaps
 - Resource allocation plans
-- AI integration roadmaps
-- Feature prioritization matrices
 
 ## Ontology Mapping
 - Role → definesProduct → DigitalVenture
 - Role → createsPlans → BusinessStrategy
 - Role → coordinatesWith → TechInnovator
-- Role → integratesAI → AIProcess
-
-## AI Use Cases
-1. Coordinates with AI engineers to ensure MVP prototypes integrate essential AI features
-2. Uses machine learning for feature prioritization based on market data
-3. Employs automated testing and validation systems
-4. Leverages AI for resource allocation and timeline optimization

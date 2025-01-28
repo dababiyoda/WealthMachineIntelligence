@@ -1,7 +1,7 @@
 # Regulatory Expert & Legal Counsel
 
 ## Role Definition
-Specialist in digital business compliance, regulatory requirements, and legal risk management, utilizing AI for automated compliance monitoring and risk assessment.
+Specialist in digital business compliance, regulatory requirements, and legal risk management.
 
 ## Primary Responsibilities
 - Ensure regulatory compliance
@@ -10,7 +10,6 @@ Specialist in digital business compliance, regulatory requirements, and legal ri
 - Monitor regulatory changes
 - Provide legal guidance
 - Protect intellectual property
-- Automate compliance processes
 
 ## AI Integration Points
 
@@ -19,16 +18,12 @@ Specialist in digital business compliance, regulatory requirements, and legal ri
 - Regulatory update tracking
 - Risk assessment algorithms
 - Document analysis AI
-- Real-time compliance alerts
-- Pattern recognition systems
 
 ### Legal Analysis
 - AI-powered contract review
 - Legal requirement validation
 - Intellectual property monitoring
 - Automated risk flagging
-- Precedent analysis
-- Regulatory impact prediction
 
 ## Input/Output Specifications
 
@@ -38,8 +33,6 @@ Specialist in digital business compliance, regulatory requirements, and legal ri
 - Business operations data
 - Industry standards
 - Compliance reports
-- Historical legal data
-- Market regulations
 
 ### Outputs
 - Compliance strategies
@@ -47,18 +40,8 @@ Specialist in digital business compliance, regulatory requirements, and legal ri
 - Risk assessments
 - Advisory reports
 - Protection strategies
-- AI-driven alerts
-- Regulatory forecasts
 
 ## Ontology Mapping
 - Role → ensuresCompliance → RegulatoryFramework
 - Role → providesLegalGuidance → DigitalVenture
 - Role → protectsAssets → IntellectualProperty
-- Role → utilizesAI → AIProcess
-- Role → monitorsRisk → RiskProfile
-
-## AI Use Cases
-1. Uses AI to track changing digital compliance regulations
-2. Implements automated contract analysis and risk detection
-3. Employs machine learning for regulatory pattern recognition
-4. Utilizes natural language processing for legal document review

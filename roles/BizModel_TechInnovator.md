@@ -1,7 +1,7 @@
 # Business Model & Technology Innovator
 
 ## Role Definition
-Specialist in designing and implementing innovative digital business models leveraging cutting-edge technology and AI integration.
+Specialist in designing and implementing innovative digital business models leveraging cutting-edge technology.
 
 ## Primary Responsibilities
 - Design scalable business models
@@ -9,7 +9,6 @@ Specialist in designing and implementing innovative digital business models leve
 - Create innovation strategies
 - Develop technical architectures
 - Lead digital transformation initiatives
-- Integrate AI capabilities
 
 ## AI Integration Points
 
@@ -18,16 +17,12 @@ Specialist in designing and implementing innovative digital business models leve
 - Revenue stream optimization
 - Automated scalability analysis
 - Market fit prediction
-- Subscription model optimization
-- Performance analytics
 
 ### Technology Integration
 - Tech stack optimization
 - Integration complexity analysis
 - Performance prediction
 - Automation potential assessment
-- AI capability mapping
-- System architecture optimization
 
 ## Input/Output Specifications
 
@@ -37,8 +32,6 @@ Specialist in designing and implementing innovative digital business models leve
 - Resource constraints
 - Competition analysis
 - Industry standards
-- AI advancement metrics
-- Integration feasibility data
 
 ### Outputs
 - Business model designs
@@ -46,18 +39,8 @@ Specialist in designing and implementing innovative digital business models leve
 - Innovation roadmaps
 - Implementation strategies
 - Scalability plans
-- AI integration blueprints
-- Technology stack recommendations
 
 ## Ontology Mapping
 - Role → innovatesModel → BusinessModel
 - Role → implementsTech → TechnologyStack
 - Role → collaboratesWith → FinancialStrategist
-- Role → integratesAI → AIProcess
-- Role → optimizesArchitecture → SaaSVenture
-
-## AI Use Cases
-1. Designs revenue models that leverage subscription-based AI-driven personalization
-2. Implements automated decision-making systems for business processes
-3. Develops AI-powered optimization strategies for technical architecture
-4. Creates scalable integration patterns for machine learning models
