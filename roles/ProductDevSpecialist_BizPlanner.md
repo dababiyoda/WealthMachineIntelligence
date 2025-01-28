@@ -44,6 +44,10 @@ Expert in translating market opportunities into viable digital products and comp
 - Role → definesProduct → DigitalVenture
 - Role → createsPlans → BusinessStrategy
 - Role → coordinatesWith → TechInnovator
+- Role → developsSaaS → SaaSVenture
+- Role → plansEcommerce → EcommerceVenture
+- Role → structuresContent → ContentPlatform
+- Role → integratesAIFeatures → AIProcess
 
 ## AI Use Cases
 - Coordinates with AI engineers to ensure MVP prototypes integrate essential AI features

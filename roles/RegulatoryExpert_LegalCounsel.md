@@ -52,3 +52,7 @@ Specialist in digital business compliance, regulatory requirements, and legal ri
 - Role → ensuresCompliance → RegulatoryFramework
 - Role → providesLegalGuidance → DigitalVenture
 - Role → protectsAssets → IntellectualProperty
+- Role → validatesSaaSCompliance → SaaSVenture
+- Role → ensuresEcommerceRegulation → EcommerceVenture
+- Role → monitorsContentRights → ContentPlatform
+- Role → assessesAILiability → AIProcess

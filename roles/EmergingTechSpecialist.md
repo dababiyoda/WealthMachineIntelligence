@@ -5,9 +5,9 @@ An expert focused on identifying and evaluating emerging digital technologies an
 
 ## Primary Responsibilities
 - Scout new digital marketplaces and platforms
-- Evaluate emerging technologies for business potential
-- Assess technical feasibility of new ventures
-- Monitor technology trends and market dynamics
+- Evaluate emerging technologies
+- Assess technical feasibility
+- Monitor technology trends
 
 ## AI Integration Points
 
@@ -46,3 +46,7 @@ An expert focused on identifying and evaluating emerging digital technologies an
 - Role → analyzesMarket → TechnologyTrend
 - Role → evaluatesTech → EmergingTechnology
 - Role → collaboratesWith → ProductDevSpecialist
+- Role → exploresSaaSInnovations → SaaSVenture
+- Role → assessesEcommerceTech → EcommerceVenture
+- Role → evaluatesContentPlatforms → ContentPlatform
+- Role → researchesAICapabilities → AIProcess

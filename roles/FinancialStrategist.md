@@ -52,3 +52,7 @@ Expert in financial planning, resource allocation, and economic optimization for
 - Role → managesFinances → DigitalVenture
 - Role → assessesRisk → RiskProfile
 - Role → advisesOn → Investment
+- Role → modelsSaaSFinancials → SaaSVenture
+- Role → optimizesEcommerceRevenue → EcommerceVenture
+- Role → projectsContentROI → ContentPlatform
+- Role → evaluatesAICosts → AIProcess

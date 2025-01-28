@@ -48,3 +48,7 @@ Expert in analyzing market trends, consumer behavior, and competitive landscapes
 - Role → analyzesMarket → MarketSegment
 - Role → identifiesOpportunity → DigitalVenture
 - Role → collaboratesWith → ProductDevSpecialist
+- Role → analyzesSaaSMarket → SaaSVenture
+- Role → studiesEcommercePatterns → EcommerceVenture
+- Role → assessesContentDemand → ContentPlatform
+- Role → evaluatesAIMarket → AIProcess

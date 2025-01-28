@@ -74,10 +74,39 @@ preferredDataSource:
 - **Purpose**: Guarantees AI integration in mature ventures
 - **Validation**: Checked during phase advancement
 
-## Relationship Examples
+## Role-Venture Relationships
 
-### implementsAI Relationship
-- **Source**: DigitalVenture
-- **Target**: AIProcess
-- **Cardinality**: one-to-many
-- **Example**: A SaaS venture implementing multiple AI processes for different features
+### Specialization by Venture Type
+Each role in the system has specific relationships with different venture types:
+
+#### Strategic Roles
+- **EmergingTechSpecialist**: Evaluates technological fit for each venture type
+- **StrategicMarketTrendAnalyst**: Analyzes market opportunities across platforms
+- **ProductDevSpecialist**: Develops solutions for specific venture models
+
+#### Technical Roles
+- **BizModel_TechInnovator**: Architects solutions across venture types
+- **FinancialStrategist**: Models financials for different business models
+- **RegulatoryExpert**: Ensures compliance for each venture type
+
+#### Growth Roles
+- **Brand_MarketingStrategist**: Optimizes marketing for each platform
+- **NetworkingSpecialist**: Builds partnerships across venture types
+
+### Implementation Examples
+1. SaaS-specific mappings:
+```yaml
+Role → architectsSaaS → SaaSVenture
+Role → optimizesSaaS → SaaSVenture
+```
+
+2. E-commerce relationships:
+```yaml
+Role → managesEcommerce → EcommerceVenture
+Role → ensuresEcommerceRegulation → EcommerceVenture
+```
+
+3. Content platform connections:
+```yaml
+Role → structuresContent → ContentPlatform
+Role → promotesContent → ContentPlatform

@@ -52,3 +52,6 @@ Expert in digital brand development, marketing strategy, and customer acquisitio
 - Role → developsBrand → BrandIdentity
 - Role → executesMarketing → MarketingCampaign
 - Role → targetsAudience → MarketSegment
+- Role → optimizesSaaS → SaaSVenture
+- Role → managesEcommerce → EcommerceVenture
+- Role → promotesContent → ContentPlatform

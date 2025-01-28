@@ -51,3 +51,7 @@ Specialist in designing and implementing innovative digital business models leve
 - Role → innovatesModel → BusinessModel
 - Role → implementsTech → TechnologyStack
 - Role → collaboratesWith → FinancialStrategist
+- Role → architectsSaaS → SaaSVenture
+- Role → designsEcommerce → EcommerceVenture
+- Role → optimizesContent → ContentPlatform
+- Role → integratesAI → AIProcess
