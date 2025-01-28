@@ -40,6 +40,12 @@ Rules and logic for automated decision-making processes.
 ### /ai-integration
 Architecture and workflows for AI agent implementation.
 
+### /knowledge-graph
+Query patterns and examples for exploring relationships between ventures, roles, and processes. See:
+- `queries.md` for comprehensive documentation of query types and patterns
+- `query-examples.yaml` for practical implementation examples
+- Integration guidelines with graph databases like Neo4j, Apache Jena, and Stardog
+
 ## Getting Started
 1. Review the ontology schema in `/ontology/ontology-schema.yaml`
 2. Understand role definitions in the `/roles` directory
@@ -47,9 +53,11 @@ Architecture and workflows for AI agent implementation.
 4. Follow the phase progression in `/phases`
 5. Implement automation rules from `/automation`
 6. Deploy AI agents according to `/ai-integration` guidelines
+7. Explore knowledge graph capabilities in `/knowledge-graph`
 
 ## Future Development
 - Expansion of ontology with domain-specific extensions
 - Integration of advanced AI capabilities
 - Development of automated validation systems
 - Enhancement of multi-agent coordination
+- Implementation of live knowledge graph queries

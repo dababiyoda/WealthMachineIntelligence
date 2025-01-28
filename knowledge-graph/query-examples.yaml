@@ -23,6 +23,19 @@ queries:
           name: "AI-Driven Analytics Platform"
           business_model: "SaaS"
           automationLevel: "Advanced"
+    example_syntax:
+      cypher: |
+        MATCH (v:DigitalVenture)-[:IN_PHASE]->(p:Phase)
+        WHERE p.name = 'Phase2' AND v.usesAIModule = true
+        RETURN v.id, v.name, v.business_model, v.automationLevel;
+      sparql: |
+        PREFIX onto: <http://wmo-digital-ai.org/ontology#>
+        SELECT ?id ?name ?model ?level
+        WHERE {
+          ?venture a onto:DigitalVenture ;
+                   onto:currentPhase "Phase2" ;
+                   onto:usesAIModule true .
+        }
 
   # Query 2: Role collaboration on ventures
   venture_role_collaboration:
@@ -45,6 +58,21 @@ queries:
         - id: "R001"
           title: "EmergingTechSpecialist"
           responsibilities: ["Evaluate emerging technologies", "Assess technical feasibility"]
+    example_syntax:
+      cypher: |
+        MATCH (r:Role)-[:CONTRIBUTES_TO]->(v:DigitalVenture)
+        WHERE v.id = $venture_id
+        RETURN r.id, r.title, r.responsibilities;
+      sparql: |
+        SELECT ?roleId ?title ?resp
+        WHERE {
+          ?role a :Role ;
+                :contributesTo ?venture ;
+                :id ?roleId ;
+                :title ?title ;
+                :responsibilities ?resp .
+          ?venture :id "$venture_id" .
+        }
 
   # Query 3: AI process implementation patterns
   ai_process_patterns:
@@ -69,6 +97,12 @@ queries:
           process_type: "Predictive Analytics"
           process_count: 5
           automation_level: "Full"
+    example_syntax:
+      cypher: |
+        MATCH (v:DigitalVenture)-[:IMPLEMENTS_AI]->(p:AIProcess)
+        RETURN v.business_model, p.process_type, 
+               count(p) as process_count, p.automation_level
+        GROUP BY v.business_model, p.process_type, p.automation_level;
 
   # Query 4: Market segment analysis
   venture_market_mapping:
@@ -92,6 +126,11 @@ queries:
           segment_name: "Enterprise Software"
           market_size: 1000000000
           growth_potential: 0.15
+    example_syntax:
+      cypher: |
+        MATCH (v:DigitalVenture)-[:TARGETS]->(s:MarketSegment)
+        RETURN v.business_model, s.segment_name, 
+               s.market_size, s.growth_potential;
 
   # Query 5: Risk profile assessment
   venture_risk_analysis:
@@ -113,3 +152,7 @@ queries:
         - business_model: "Ecommerce"
           risk_level: "Medium"
           mitigation_strategies: ["Market diversification", "Agile scaling"]
+    example_syntax:
+      cypher: |
+        MATCH (v:DigitalVenture)-[:ASSESSED_BY]->(r:RiskProfile)
+        RETURN v.business_model, r.risk_level, r.mitigation_strategies;

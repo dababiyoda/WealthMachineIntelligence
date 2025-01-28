@@ -74,6 +74,32 @@ preferredDataSource:
 - **Purpose**: Guarantees AI integration in mature ventures
 - **Validation**: Checked during phase advancement
 
+## Knowledge Graph Integration
+
+### Query Capabilities
+The ontology supports sophisticated knowledge graph queries for real-time insights. Refer to the `/knowledge-graph` directory for:
+- Comprehensive query documentation in `queries.md`
+- Example query patterns in `query-examples.yaml`
+- Database integration guidelines
+
+### Key Query Types
+1. **Basic Retrieval**: List ventures, roles, and processes
+2. **Conditional Queries**: Filter by phase, AI capabilities
+3. **Relationship Traversal**: Map connections between entities
+
+### Usage Example
+```yaml
+# Find Phase3 ventures with ML models
+match:
+  venture:
+    type: "DigitalVenture"
+    properties:
+      current_phase: "Phase3"
+      requiresMLModel: true
+```
+
+For detailed documentation and examples, see the `/knowledge-graph` directory.
+
 ## Role-Venture Relationships
 
 ### Specialization by Venture Type
