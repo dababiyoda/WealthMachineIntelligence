@@ -32,6 +32,56 @@ classes:
         type: object
       - name: market_segment
         type: object
+      # New AI-specific properties
+      - name: usesAIModule
+        type: boolean
+        description: "Indicates if the venture uses AI components"
+      - name: requiresMLModel
+        type: array
+        description: "List of required machine learning models"
+      - name: preferredDataSource
+        type: array
+        description: "Preferred data sources for AI/ML operations"
+      - name: automationLevel
+        type: string
+        enum: [Basic, Advanced, Full]
+    constraints:
+      - rule: "IF current_phase IN ['Phase2', 'Phase3'] THEN usesAIModule MUST BE true"
+      - rule: "AT LEAST ONE AIProcess MUST BE LINKED IF current_phase IN ['Phase2', 'Phase3']"
+
+  # Sub-classes of DigitalVenture
+  SaaSVenture:
+    inherits: DigitalVenture
+    description: "Software-as-a-Service business model"
+    properties:
+      - name: subscription_tiers
+        type: array
+      - name: service_type
+        type: string
+      - name: api_integration
+        type: boolean
+
+  EcommerceVenture:
+    inherits: DigitalVenture
+    description: "E-commerce business model"
+    properties:
+      - name: product_categories
+        type: array
+      - name: fulfillment_type
+        type: string
+      - name: inventory_management
+        type: boolean
+
+  ContentPlatform:
+    inherits: DigitalVenture
+    description: "Content creation and distribution platform"
+    properties:
+      - name: content_types
+        type: array
+      - name: monetization_model
+        type: string
+      - name: creator_tools
+        type: array
 
   AIProcess:
     description: "Automated process handled by AI agents"
@@ -99,3 +149,10 @@ relationships:
     source: DigitalVenture
     target: RiskProfile
     cardinality: "one-to-one"
+
+  - name: implementsAI
+    source: DigitalVenture
+    target: AIProcess
+    cardinality: "one-to-many"
+    constraints:
+      - rule: "REQUIRED IF current_phase IN ['Phase2', 'Phase3']"
