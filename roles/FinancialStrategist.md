@@ -41,6 +41,13 @@ Expert in financial planning, resource allocation, and economic optimization for
 - Risk management plans
 - Investment recommendations
 
+## AI Use Cases
+- Analyzes real-time financial metrics with automated risk dashboards
+- Implements predictive analytics for revenue forecasting
+- Utilizes machine learning for optimal resource allocation
+- Employs AI-driven pricing optimization algorithms
+- Leverages automated risk assessment tools for investment decisions
+
 ## Ontology Mapping
 - Role → managesFinances → DigitalVenture
 - Role → assessesRisk → RiskProfile

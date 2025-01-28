@@ -41,6 +41,13 @@ Expert in digital brand development, marketing strategy, and customer acquisitio
 - Performance reports
 - Optimization recommendations
 
+## AI Use Cases
+- Employs AI-driven customer segmentation and funnel optimization
+- Utilizes machine learning for personalized content delivery
+- Implements automated A/B testing for campaign optimization
+- Leverages predictive analytics for customer behavior modeling
+- Uses AI-powered social media monitoring and engagement tools
+
 ## Ontology Mapping
 - Role → developsBrand → BrandIdentity
 - Role → executesMarketing → MarketingCampaign

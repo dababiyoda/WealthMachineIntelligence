@@ -44,3 +44,10 @@ Expert in translating market opportunities into viable digital products and comp
 - Role → definesProduct → DigitalVenture
 - Role → createsPlans → BusinessStrategy
 - Role → coordinatesWith → TechInnovator
+
+## AI Use Cases
+- Coordinates with AI engineers to ensure MVP prototypes integrate essential AI features
+- Utilizes machine learning for feature prioritization in product roadmaps
+- Implements AI-driven user feedback analysis for product iteration
+- Employs automated testing systems for MVP validation
+- Leverages predictive analytics for resource allocation and timeline planning

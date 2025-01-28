@@ -40,6 +40,13 @@ Specialist in designing and implementing innovative digital business models leve
 - Implementation strategies
 - Scalability plans
 
+## AI Use Cases
+- Designs revenue models that leverage subscription-based AI-driven personalization
+- Implements machine learning for automated business model validation
+- Utilizes AI for technology stack optimization and integration
+- Develops AI-powered scalability assessment frameworks
+- Creates innovative AI-driven customer engagement models
+
 ## Ontology Mapping
 - Role → innovatesModel → BusinessModel
 - Role → implementsTech → TechnologyStack
