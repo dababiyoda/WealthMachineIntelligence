@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "id": "marketing_budget_control",
+      "name": "Marketing Budget Control",
+      "condition": {
+        "metric": "CPC",
+        "operator": "greater_than",
+        "value": 2.5,
+        "AND": {
+          "metric": "conversion_rate",
+          "operator": "less_than",
+          "value": 0.02
+        }
+      },
+      "action": {
+        "type": "pause_campaign",
+        "parameters": {
+          "notification": true,
+          "grace_period_hours": 24
+        }
+      }
+    },
+    {
+      "id": "customer_satisfaction_alert",
+      "name": "Customer Satisfaction Monitor",
+      "condition": {
+        "metric": "satisfaction_score",
+        "operator": "less_than",
+        "value": 4.0,
+        "timeframe": "7d"
+      },
+      "action": {
+        "type": "trigger_review",
+        "parameters": {
+          "priority": "high",
+          "assign_to": "customer_success_team"
+        }
+      }
+    },
+    {
+      "id": "resource_scaling",
+      "name": "Automatic Resource Scaling",
+      "condition": {
+        "metric": "system_load",
+        "operator": "greater_than",
+        "value": 80,
+        "duration": "5m"
+      },
+      "action": {
+        "type": "scale_resources",
+        "parameters": {
+          "increment": 20,
+          "max_limit": 200
+        }
+      }
+    }
+  ]
+}

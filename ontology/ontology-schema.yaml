@@ -1,0 +1,101 @@
+version: "1.0"
+namespace: "wmo-digital-ai"
+
+classes:
+  Role:
+    description: "Specialized function within the digital business ecosystem"
+    properties:
+      - name: id
+        type: string
+      - name: title
+        type: string
+      - name: responsibilities
+        type: array
+      - name: required_skills
+        type: array
+      - name: ai_integration_points
+        type: array
+
+  DigitalVenture:
+    description: "Digital business initiative or project"
+    properties:
+      - name: id
+        type: string
+      - name: name
+        type: string
+      - name: business_model
+        type: string
+        enum: [SaaS, Ecommerce, Subscription, Marketplace]
+      - name: current_phase
+        type: string
+      - name: risk_profile
+        type: object
+      - name: market_segment
+        type: object
+
+  AIProcess:
+    description: "Automated process handled by AI agents"
+    properties:
+      - name: id
+        type: string
+      - name: process_type
+        type: string
+      - name: input_requirements
+        type: array
+      - name: output_specifications
+        type: array
+      - name: automation_level
+        type: string
+        enum: [Full, Partial, Assisted]
+
+  RiskProfile:
+    description: "Risk assessment and management framework"
+    properties:
+      - name: id
+        type: string
+      - name: risk_level
+        type: string
+      - name: mitigation_strategies
+        type: array
+      - name: monitoring_metrics
+        type: array
+
+  MarketSegment:
+    description: "Target market definition and characteristics"
+    properties:
+      - name: id
+        type: string
+      - name: segment_name
+        type: string
+      - name: demographic_data
+        type: object
+      - name: market_size
+        type: number
+      - name: growth_potential
+        type: number
+
+relationships:
+  - name: contributesTo
+    source: Role
+    target: DigitalVenture
+    cardinality: "many-to-many"
+
+  - name: automates
+    source: AIProcess
+    target: Role
+    cardinality: "many-to-many"
+
+  - name: hasPhase
+    source: DigitalVenture
+    target: Phase
+    cardinality: "one-to-many"
+
+  - name: targets
+    source: DigitalVenture
+    target: MarketSegment
+    cardinality: "many-to-many"
+
+  - name: assessedBy
+    source: DigitalVenture
+    target: RiskProfile
+    cardinality: "one-to-one"
