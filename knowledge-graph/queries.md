@@ -3,6 +3,13 @@
 ## Overview
 This document outlines the structure and usage of knowledge graph queries within the WealthMachineOntology_DigitalAI framework. The queries are designed to extract meaningful insights from our ontological model of digital ventures, roles, and AI processes.
 
+Knowledge graph queries are essential for:
+1. Real-time decision support (e.g., checking venture compliance status)
+2. Resource allocation optimization (e.g., role assignments)
+3. Risk assessment and monitoring
+4. Performance tracking and optimization
+5. Compliance verification and reporting
+
 ## Query Structure
 
 ### Basic Components
@@ -27,27 +34,174 @@ This document outlines the structure and usage of knowledge graph queries within
 
 ## Query Types
 
-### 1. Venture Queries
-- Filter ventures by phase and AI capabilities
-- Identify ventures with specific market segments
-- Find ventures by risk profile
+### 1. Basic Retrieval Queries
+- List all active digital ventures
+- Retrieve all roles in the system
+- Get all AI processes
+Example:
+```yaml
+# List all ventures
+match:
+  venture:
+    type: "DigitalVenture"
+return:
+  - venture.id
+  - venture.name
+  - venture.business_model
+```
 
-### 2. Role Analysis
-- List roles contributing to a specific venture
-- Find collaboration patterns between roles
-- Identify roles with AI automation
+### 2. Conditional/Filter Queries
+- Find ventures in specific phases
+- Identify ventures with ML requirements
+- List roles with specific AI capabilities
+Example:
+```yaml
+# Find Phase3 ventures with ML models
+match:
+  venture:
+    type: "DigitalVenture"
+    properties:
+      current_phase: "Phase3"
+      requiresMLModel: true
+return:
+  - venture.id
+  - venture.name
+  - venture.automationLevel
+```
 
-### 3. AI Process Mapping
-- Track AI implementation across ventures
-- Analyze automation levels by venture type
-- Map AI processes to business outcomes
+### 3. Relationship Traversal Queries
+- Map role collaborations across ventures
+- Track AI process implementations
+- Analyze venture-market relationships
+Example:
+```yaml
+# Find all roles and processes for a venture
+match:
+  venture:
+    type: "DigitalVenture"
+    id: "$venture_id"
+  roles:
+    relationship: "contributesTo"
+    target: "venture"
+  processes:
+    relationship: "implementsAI"
+    source: "venture"
+return:
+  - roles.*
+  - processes.*
+```
 
-## Usage Examples
-See `query-examples.yaml` for practical implementations of these query patterns. The examples demonstrate how to:
-1. List Phase2 ventures with AI modules
-2. Find role collaborations on ventures
-3. Analyze AI process distribution
-4. Map market segments to venture types
+## Ontology Schema Integration
+### Direct Mappings to ontology-schema.yaml
+1. **Class Mappings**
+   ```yaml
+   # From ontology-schema.yaml
+   classes:
+     DigitalVenture:
+       properties:
+         - usesAIModule
+         - requiresMLModel
+
+   # Query Implementation
+   match:
+     venture:
+       type: "DigitalVenture"
+       properties:
+         usesAIModule: true
+   ```
+
+2. **Relationship Mappings**
+   ```yaml
+   # From ontology-schema.yaml
+   relationships:
+     - name: implementsAI
+       source: DigitalVenture
+       target: AIProcess
+
+   # Query Usage
+   match:
+     venture:
+       type: "DigitalVenture"
+     process:
+       type: "AIProcess"
+       relationship: "implementsAI"
+   ```
+
+### Property Validation
+Queries automatically validate against schema constraints:
+- Enum validations (e.g., business_model types)
+- Cardinality rules (e.g., one-to-many relationships)
+- Required properties based on phase
+
+## Future Graph Database Integration
+### Implementation Steps
+
+1. **Graph Database Selection**
+   - Neo4j: For enterprise-scale graph operations
+   - Apache Jena: For RDF/OWL compatibility
+   - Stardog: For advanced reasoning capabilities
+
+2. **Data Migration Strategy**
+   ```python
+   # Example Neo4j migration
+   def migrate_to_neo4j():
+       # Load ontology schema
+       schema = load_yaml("ontology-schema.yaml")
+
+       # Create node constraints
+       create_unique_constraints()
+
+       # Import class hierarchies
+       import_class_hierarchies()
+
+       # Import relationships
+       import_relationships()
+   ```
+
+3. **Query Adaptation**
+   - Convert YAML patterns to native query language
+   - Implement query builders for each database
+   - Maintain schema validation layer
+
+4. **Integration Architecture**
+   ```plaintext
+   [Ontology Schema]
+         ↓
+   [Query Translator]
+         ↓
+   [Database Adapter]
+         ↓
+   [Graph Database]
+   ```
+
+### Database-Specific Implementations
+
+1. **Neo4j (Cypher)**
+   ```cypher
+   MATCH (v:DigitalVenture)-[:IMPLEMENTS_AI]->(p:AIProcess)
+   WHERE v.current_phase = 'Phase2'
+   RETURN v, p
+   ```
+
+2. **Apache Jena (SPARQL)**
+   ```sparql
+   SELECT ?venture ?process
+   WHERE {
+     ?venture a :DigitalVenture ;
+              :implementsAI ?process .
+     ?process a :AIProcess .
+   }
+   ```
+
+3. **Stardog**
+   ```sparql
+   PREFIX onto: <http://wmo-digital-ai.org/ontology#>
+   SELECT ?venture
+   WHERE {
+     ?venture a onto:DigitalVenture ;
+              onto:usesAIModule true .
+   }
+   ```
 
 ## Best Practices
 1. Always specify node types explicitly
