@@ -31,10 +31,9 @@ class MarketIntelligenceAgent:
         )
 
         # Configure weights for hybrid predictions
-        # These weights determine the contribution of each component to the final risk assessment
         self.risk_weights = {
-            'lstm_trend': 0.6,      # LSTM predictions (60% weight)
-            'market_indicators': 0.4 # Traditional indicators (40% total, split equally)
+            'lstm_trend': 0.6,  # LSTM predictions weight
+            'market_indicators': 0.4  # Traditional indicators weight
         }
 
     def _build_lstm_model(self):
@@ -91,46 +90,39 @@ class MarketIntelligenceAgent:
         return 0.8  # Replace with actual confidence score calculation
 
     async def assess_risk(self, market_data):
-        # Get LSTM prediction (normalized or scaled)
+        # Get LSTM-based market trends
         trend_analysis = await self.analyze_market_trends(market_data)
 
         # Create weighted feature vector for Random Forest
         weighted_features = {
-            # LSTM component (60% weight)
-            'lstm_prediction': trend_analysis['predictions'][-1] * self.risk_weights['lstm_trend'],
-
-            # Traditional indicators (40% weight total, split equally)
+            'lstm_prediction': trend_analysis['predictions'][-1] * self.risk_weights['lstm_trend'],  # 60% weight
             'traditional_indicators': {
-                # Each traditional indicator gets 13.33% (40% / 3)
+                # Each traditional indicator gets an equal share of the 40% weight
                 'volatility': market_data.volatility * (self.risk_weights['market_indicators'] / 3),
                 'volume_change': market_data.volume_change * (self.risk_weights['market_indicators'] / 3),
                 'price_momentum': market_data.price_momentum * (self.risk_weights['market_indicators'] / 3)
             }
         }
 
-        # Build final feature vector for Random Forest
-        # The order of features must match the training data order
-        feature_vector = [
-            weighted_features['lstm_prediction'],  # 60% weight
-            weighted_features['traditional_indicators']['volatility'],     # ~13.33% weight
+        # Create final feature vector for Random Forest
+        combined_features = [
+            weighted_features['lstm_prediction'],  # LSTM prediction (60% weight)
+            weighted_features['traditional_indicators']['volatility'],  # ~13.33% weight
             weighted_features['traditional_indicators']['volume_change'],  # ~13.33% weight
             weighted_features['traditional_indicators']['price_momentum']  # ~13.33% weight
         ]
 
-        # Get risk classification with clear weight tracking
+        # Store weights in assessment for transparency
         risk_assessment = {
-            'risk_class': self.risk_classifier.predict([feature_vector])[0],
-            'risk_probabilities': self.risk_classifier.predict_proba([feature_vector])[0].tolist(),
+            'risk_class': self.risk_classifier.predict([combined_features])[0],
+            'risk_probabilities': self.risk_classifier.predict_proba([combined_features])[0].tolist(),
             'feature_weights': {
                 'lstm_contribution': self.risk_weights['lstm_trend'],
                 'market_indicators_contribution': self.risk_weights['market_indicators']
             },
-            'weighted_features': weighted_features,  # Store for transparency
+            'weighted_features': weighted_features,
             'timestamp': datetime.now()
         }
-
-        # Store in knowledge graph for versioning and tracking
-        await self.knowledge_graph.store_risk_assessment(risk_assessment)
 
         return risk_assessment
 
