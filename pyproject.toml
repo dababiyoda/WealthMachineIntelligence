@@ -2,16 +2,16 @@
 name = "ai_integration"
 version = "0.1.0"
 description = "Enterprise automation framework with multi-agent AI architecture"
-requires-python = "==3.10.*"
+requires-python = ">=3.10,<3.11"
 dependencies = [
-    "numpy==1.23.5",
-    "networkx==2.8.4",
-    "pandas==1.5.3",
-    "scikit-learn==1.0.2",
-    "tensorflow==2.9.3",
-    "transformers==4.26.1",
-    "pydantic==1.10.12",  # Using older version compatible with Python 3.10
-    "rdflib==6.3.2"  # Using older version compatible with Python 3.10
+    "numpy>=1.23.5,<1.24",
+    "networkx>=2.8.4,<2.9",
+    "pandas>=1.5.3,<1.6",
+    "scikit-learn>=1.0.2,<1.1",
+    "tensorflow>=2.9.3,<2.10",
+    "transformers>=4.26.1,<4.27",
+    "pydantic>=1.10.12,<1.11",
+    "rdflib>=6.3.2,<6.4"
 ]
 
 [tool.setuptools]
