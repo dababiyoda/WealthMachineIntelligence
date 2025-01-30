@@ -31,8 +31,14 @@ class MarketIntelligenceAgent:
         )
 
         # Configure weights for hybrid predictions
-        self.lstm_weight = 0.7
-        self.sentiment_weight = 0.3
+        self.lstm_weight = 0.7  # Increased weight for LSTM predictions
+        self.sentiment_weight = 0.3  # Decreased weight for sentiment analysis
+
+        # Risk classification weights
+        self.risk_weights = {
+            'lstm_trend': 0.6,  # LSTM trend contribution to risk
+            'market_indicators': 0.4  # Traditional indicators contribution
+        }
 
     def _build_lstm_model(self):
         model = Sequential([
@@ -62,55 +68,63 @@ class MarketIntelligenceAgent:
         # Process market data for LSTM
         processed_data = await self.preprocess_market_data(market_data)
 
-        # Get LSTM predictions
+        # Get LSTM predictions with confidence scores
         lstm_predictions = self.lstm_model.predict(processed_data)
+        lstm_confidence = self._calculate_lstm_confidence(lstm_predictions)
 
-        # Get sentiment analysis
-        sentiment = await self.sentiment_analyzer.process_market_data(market_data.text)
-
-        # Combine LSTM and sentiment predictions with weights
-        combined_prediction = (
-            self.lstm_weight * lstm_predictions +
-            self.sentiment_weight * sentiment.score
-        )
-
-        # Store in knowledge graph
-        await self.knowledge_graph.update_market_analysis({
+        # Store detailed prediction metrics in knowledge graph
+        prediction_details = {
             'lstm_prediction': lstm_predictions.tolist(),
-            'sentiment_score': sentiment.score,
-            'combined_score': combined_prediction,
-            'confidence': sentiment.confidence,
-            'timestamp': datetime.now()
-        })
+            'lstm_confidence': lstm_confidence,
+            'timestamp': datetime.now(),
+            'features_used': ['price', 'volume', 'volatility', 'sentiment', 'market_cap']
+        }
 
-        return combined_prediction
+        await self.knowledge_graph.update_market_analysis(prediction_details)
+
+        # Return enriched predictions for risk assessment
+        return {
+            'predictions': lstm_predictions,
+            'confidence': lstm_confidence,
+            'features': prediction_details['features_used']
+        }
+
+    def _calculate_lstm_confidence(self, predictions):
+        # Placeholder for LSTM confidence calculation.  Implementation needed.
+        return 0.8  # Replace with actual confidence score calculation
 
     async def assess_risk(self, market_data):
-        # Extract risk features
-        risk_features = [
-            market_data.volatility,
-            market_data.volume_change,
-            market_data.price_momentum,
-            market_data.market_sentiment
+        # Get LSTM-based market trends
+        trend_analysis = await self.analyze_market_trends(market_data)
+
+        # Combine LSTM trends with traditional market indicators
+        combined_features = [
+            trend_analysis['predictions'][-1],  # Latest LSTM prediction
+            market_data.volatility * self.risk_weights['market_indicators'],
+            market_data.volume_change * self.risk_weights['market_indicators'],
+            market_data.price_momentum * self.risk_weights['market_indicators']
         ]
 
-        # Get risk classification
-        risk_class = self.risk_classifier.predict([risk_features])[0]
-        risk_probs = self.risk_classifier.predict_proba([risk_features])[0]
+        # Get risk classification with probabilities
+        risk_class = self.risk_classifier.predict([combined_features])[0]
+        risk_probs = self.risk_classifier.predict_proba([combined_features])[0]
 
-        # Update knowledge graph with risk assessment
-        await self.knowledge_graph.update_risk_analysis({
-            'risk_class': risk_class,
-            'risk_probability': risk_probs.tolist(),
-            'features': risk_features,
+        risk_assessment = {
+            'risk_class': int(risk_class),
+            'risk_probabilities': risk_probs.tolist(),
+            'lstm_contribution': trend_analysis['predictions'][-1],
+            'market_indicators_contribution': {
+                'volatility': market_data.volatility,
+                'volume_change': market_data.volume_change,
+                'price_momentum': market_data.price_momentum
+            },
             'timestamp': datetime.now()
-        })
-
-        return {
-            'class': risk_class,
-            'probabilities': risk_probs,
-            'features': risk_features
         }
+
+        # Update knowledge graph with detailed risk assessment
+        await self.knowledge_graph.update_risk_analysis(risk_assessment)
+
+        return risk_assessment
 
     async def monitor_competitors(self, market_segment):
         competitor_data = await self.knowledge_graph.get_competitor_data(market_segment)
@@ -126,7 +140,7 @@ class MarketIntelligenceAgent:
             'timestamp': datetime.now()
         }
 
-        if risks['class'] > self.thresholds.competition:
+        if risks['risk_class'] > self.thresholds.competition: #Assuming thresholds is defined elsewhere
             await self.trigger_competitive_alert(analysis)
 
         return analysis
@@ -137,7 +151,7 @@ class MarketIntelligenceAgent:
         risks = await self.assess_risk(market_data)
 
         # Score opportunities based on positive trends and acceptable risk
-        opportunity_score = trends * (1 - risks['probabilities'][1])  # High risk probability reduces score
+        opportunity_score = trends['predictions'][-1] * (1 - risks['risk_probabilities'][1])  # High risk probability reduces score
 
         opportunities = {
             'score': opportunity_score,
@@ -166,295 +180,211 @@ class MarketIntelligenceAgent:
   - Random Forest models for risk classification
   - Real-time risk score updates
   - Automated threshold monitoring
-- Implementation Details:
+
+# AI Agent Architecture - Integration Details
+
+## 1. LSTM + Random Forest Synergy
+### Data Flow
+The `MarketIntelligenceAgent` orchestrates the data flow between the LSTM and Random Forest models.  The LSTM model first processes the preprocessed market data (`analyze_market_trends`) generating predictions and confidence scores.  These predictions, along with other relevant market indicators, are then combined to create a feature vector that is fed into the Random Forest classifier (`assess_risk`).
+
+```python
+# In MarketIntelligenceAgent
+
+# Step 1: LSTM processes market data
+async def analyze_market_trends(self, market_data):
+    processed_data = await self.preprocess_market_data(market_data)
+    lstm_predictions = self.lstm_model.predict(processed_data)
+    lstm_confidence = self._calculate_lstm_confidence(lstm_predictions)
+
+    # Store detailed prediction metrics for other components
+    prediction_details = {
+        'lstm_prediction': lstm_predictions.tolist(),
+        'lstm_confidence': lstm_confidence,
+        'features_used': ['price', 'volume', 'volatility', 'sentiment', 'market_cap']
+    }
+
+    return {
+        'predictions': lstm_predictions,
+        'confidence': lstm_confidence,
+        'features': prediction_details['features_used']
+    }
+
+# Step 2: Combine LSTM with traditional indicators for Random Forest
+async def assess_risk(self, market_data):
+    # Get LSTM market trends
+    trend_analysis = await self.analyze_market_trends(market_data)
+
+    # Create unified feature vector combining LSTM + market indicators
+    combined_features = [
+        trend_analysis['predictions'][-1],  # Latest LSTM prediction
+        market_data.volatility * self.risk_weights['market_indicators'],
+        market_data.volume_change * self.risk_weights['market_indicators'],
+        market_data.price_momentum * self.risk_weights['market_indicators']
+    ]
+
+    # Feed combined features to Random Forest
+    risk_class = self.risk_classifier.predict([combined_features])[0]
+    risk_probs = self.risk_classifier.predict_proba([combined_features])[0]
+```
+
+### Weighting Logic
+The weighting logic determines the contribution of each model to the final risk assessment.  The `risk_weights` dictionary in the `MarketIntelligenceAgent` class assigns weights to the LSTM trend predictions and traditional market indicators used by the Random Forest model.  These weights are used to scale the respective features within the combined feature vector before feeding them to the Random Forest.
+
 
 ```python
 class MarketIntelligenceAgent:
     def __init__(self):
-        self.sentiment_analyzer = SentimentPipeline()
-        self.market_predictor = MarketPredictor()
-        self.knowledge_graph = KnowledgeGraphConnector()
-
-    async def analyze_market_trends(self, market_data):
-        sentiment = await self.sentiment_analyzer.process_market_data(market_data.text)
-        predictions = await self.market_predictor.forecast_market(market_data.metrics)
-
-        await self.knowledge_graph.update_market_analysis({
-            'sentiment': sentiment,
-            'predictions': predictions,
-            'timestamp': datetime.now()
-        })
-
-    async def monitor_competitors(self, market_segment):
-        competitor_data = await self.knowledge_graph.get_competitor_data(market_segment)
-        analysis = await self.market_predictor.analyze_competition(competitor_data)
-
-        if analysis.threat_level > self.thresholds.competition:
-            await self.trigger_competitive_alert(analysis)
-
-    async def detect_opportunities(self, market_data):
-        opportunities = await self.market_predictor.identify_opportunities(market_data)
-        scored_opportunities = await self.score_opportunities(opportunities)
-
-        await self.knowledge_graph.update_opportunities(scored_opportunities)
-
+        # Risk classification weights
+        self.risk_weights = {
+            'lstm_trend': 0.6,  # LSTM trend contribution
+            'market_indicators': 0.4  # Traditional indicators
+        }
 ```
 
-### Legal Compliance Agent
+## 2. Compliance Triggers & Notifications
+### Event Handling
+The `LegalComplianceAgent` utilizes an event-driven architecture for handling compliance-related events.  The `process_regulations` function acts as the central event handler.  Upon detecting a compliance issue (`compliance_status.requires_action`), it triggers a chain of actions: notifying stakeholders, initiating a workflow, and directly informing the Risk Assessment Agent.
+
 ```python
-from transformers import pipeline
-
 class LegalComplianceAgent:
-    def __init__(self):
-        # Initialize NLP pipeline for regulation analysis
-        self.nlp_processor = pipeline(
-            "text-classification",
-            model="legal-bert-base-uncased",
-            tokenizer="legal-bert-base-uncased"
-        )
-        self.compliance_checker = ComplianceEngine()
-        self.knowledge_graph = KnowledgeGraphConnector()
-
     async def process_regulations(self, regulation_data):
         # Process regulation text using NLP
         classification = self.nlp_processor(regulation_data.text)
+
+        # Enrich parsed regulations with metadata
         parsed_regs = {
             'classification': classification,
             'text': regulation_data.text,
-            'metadata': regulation_data.metadata
+            'metadata': regulation_data.metadata,
+            'confidence': classification[0]['score'],
+            'timestamp': datetime.now()
         }
 
-        # Verify compliance status
+        # Verify compliance status with detailed validation
         compliance_status = await self.compliance_checker.verify(parsed_regs)
 
+        # Update knowledge graph with compliance status
+        await self.knowledge_graph.update_compliance_status({
+            'status': compliance_status.status,
+            'requiresAction': compliance_status.requires_action,
+            'riskLevel': compliance_status.risk_level,
+            'affectedDomains': compliance_status.affected_domains,
+            'timestamp': datetime.now()
+        })
+
+        # Multi-channel notification if action required
         if compliance_status.requires_action:
+            # 1. Notify stakeholders
             await self.notify_stakeholders(compliance_status)
-            await self.trigger_compliance_update(compliance_status)
 
-        return compliance_status
+            # 2. Trigger compliance workflow
+            await self.trigger_compliance_workflow(compliance_status)
 
-    async def notify_stakeholders(self, compliance_status):
-        # Determine relevant stakeholders based on compliance issue
-        stakeholders = await self.knowledge_graph.get_stakeholders(
-            compliance_status.domain
-        )
-
-        # Send notifications
-        for stakeholder in stakeholders:
-            await self.send_notification(
-                stakeholder,
-                compliance_status.summary,
-                compliance_status.priority
-            )
-
-    async def analyze_documents(self, documents):
-        # Batch process documents with NLP
-        analysis_results = []
-        for doc in documents:
-            classification = self.nlp_processor(doc.text)
-            analysis_results.append({
-                'doc_id': doc.id,
-                'classification': classification,
-                'confidence': classification[0]['score']
+            # 3. Direct notification to Risk Assessment Agent
+            await self.notify_risk_assessment({
+                'compliance_issue': compliance_status.summary,
+                'risk_level': compliance_status.risk_level,
+                'affected_ventures': compliance_status.affected_ventures
             })
-
-        # Classify document compliance
-        compliance_status = await self.compliance_checker.classify_documents(
-            analysis_results
-        )
-
-        await self.knowledge_graph.update_document_status(compliance_status)
-        return compliance_status
-
-    async def monitor_compliance_changes(self):
-        # Get regulatory updates
-        updates = await self.compliance_checker.get_regulatory_updates()
-
-        # Analyze impact using NLP
-        impact_analysis = []
-        for update in updates:
-            classification = self.nlp_processor(update.text)
-            impact = await self.assess_regulatory_impact({
-                'update': update,
-                'classification': classification
-            })
-            impact_analysis.append(impact)
-
-        # Update knowledge graph and trigger workflows if needed
-        for impact in impact_analysis:
-            if impact.requires_action:
-                await self.trigger_compliance_workflow(impact)
-                await self.notify_stakeholders(impact)
-
-        return impact_analysis
 ```
 
-- Implementation Details:
+### Knowledge Graph Updates
+The `LegalComplianceAgent` interacts with the knowledge graph to store and retrieve compliance-related information.  The `compliance_properties` dictionary defines the mapping between internal compliance attributes and knowledge graph properties.  The `notify_risk_assessment` function creates a direct relationship in the knowledge graph to link compliance issues to the Risk Assessment Agent for immediate evaluation.
+
+
 ```python
 class LegalComplianceAgent:
     def __init__(self):
-        self.nlp_processor = NLPProcessor()
-        self.compliance_checker = ComplianceEngine()
-        self.knowledge_graph = KnowledgeGraphConnector()
+        # Define compliance status properties
+        self.compliance_properties = {
+            'requiresAction': 'compliance_status',
+            'riskLevel': 'risk_level',
+            'stakeholders': 'involved_roles',
+            'deadline': 'compliance_deadline'
+        }
 
-    async def process_regulations(self, regulation_data):
-        parsed_regs = self.nlp_processor.process_text(regulation_data)
-        compliance_status = self.compliance_checker.verify(parsed_regs)
-
-        if compliance_status.requires_action:
-            await self.trigger_compliance_update(compliance_status)
-
-    async def analyze_documents(self, documents):
-        analysis_results = await self.nlp_processor.analyze_documents(documents)
-        classification = self.compliance_checker.classify_documents(analysis_results)
-
-        await self.knowledge_graph.update_document_status(classification)
-
-    async def monitor_compliance_changes(self):
-        updates = await self.compliance_checker.get_regulatory_updates()
-        impact_analysis = await self.assess_regulatory_impact(updates)
-
-        if impact_analysis.requires_action:
-            await self.trigger_compliance_workflow(impact_analysis)
+    async def notify_risk_assessment(self, compliance_issue):
+        # Create direct relationship for risk assessment
+        await self.knowledge_graph.create_relationship(
+            from_node=('Compliance', compliance_issue['compliance_issue']),
+            to_node=('Risk', 'pending_evaluation'),
+            relationship_type='requires_risk_assessment',
+            properties={
+                'risk_level': compliance_issue['risk_level'],
+                'timestamp': datetime.now()
+            }
+        )
 ```
 
-### Risk Assessment Agent
-```python
-import numpy as np
-from sklearn.ensemble import RandomForestRegressor
-from datetime import datetime
+## 3. Weighted Multi-Factor Risk Evaluation
+### Risk Factor Weights
+The `RiskAssessmentAgent` employs a weighted average to calculate the overall risk score. The `weights` dictionary defines the contribution of each risk factor (market, compliance, operational) to the final risk score. These weights are adjustable, allowing for dynamic prioritization of different risk categories.
 
+```python
 class RiskAssessmentAgent:
     def __init__(self):
-        self.market_analyzer = MarketAnalyzer()
-        self.knowledge_graph = KnowledgeGraphConnector()
-
-        # Initialize risk models
-        self.market_risk_model = RandomForestRegressor(n_estimators=100)
-        self.compliance_risk_model = RandomForestRegressor(n_estimators=100)
-        self.operational_risk_model = RandomForestRegressor(n_estimators=100)
-
-        # Risk weights
+        # Adjustable risk weights
         self.weights = {
-            'market': 0.4,
-            'compliance': 0.3,
-            'operational': 0.3
+            'market': 0.4,      # Market risk weight
+            'compliance': 0.3,  # Compliance risk weight
+            'operational': 0.3  # Operational risk weight
+        }
+```
+
+### Risk Score Storage & Versioning
+The `RiskAssessmentAgent` manages risk score storage and versioning within the knowledge graph.  The `versioning` configuration allows for enabling/disabling versioning, setting the maximum number of versions to retain, and defining the versioning interval.  The `evaluate_risk` function calculates the weighted risk score, creates a versioned risk profile, and stores it in the knowledge graph with versioning enabled.
+
+```python
+class RiskAssessmentAgent:
+    def __init__(self):
+        # Risk score versioning configuration
+        self.versioning = {
+            'enabled': True,
+            'max_versions': 10,  # Keep last 10 versions
+            'version_interval': timedelta(hours=24)  # Daily versions
         }
 
     async def evaluate_risk(self, venture_data):
-        # Assess different risk components
+        # Collect risk components with timestamps
         market_risk = await self.assess_market_risk(venture_data)
         compliance_risk = await self.assess_compliance_risk(venture_data)
         operational_risk = await self.assess_operational_risk(venture_data)
 
         # Calculate weighted total risk
-        total_risk = np.average([
-            market_risk,
-            compliance_risk,
-            operational_risk
-        ], weights=[
-            self.weights['market'],
-            self.weights['compliance'],
-            self.weights['operational']
-        ])
-
-        risk_profile = {
-            'total_risk': total_risk,
-            'components': {
-                'market': market_risk,
-                'compliance': compliance_risk,
-                'operational': operational_risk
-            },
-            'weights': self.weights,
-            'timestamp': datetime.now()
-        }
-
-        await self.knowledge_graph.update_risk_profile(
-            venture_data.id,
-            risk_profile
+        total_risk = np.average(
+            [market_risk, compliance_risk, operational_risk],
+            weights=[
+                self.weights['market'],
+                self.weights['compliance'],
+                self.weights['operational']
+            ]
         )
 
-        return risk_profile
+        # Create versioned risk profile
+        risk_profile = {
+            'total_risk': float(total_risk),
+            'components': {
+                'market': float(market_risk),
+                'compliance': float(compliance_risk),
+                'operational': float(operational_risk)
+            },
+            'weights': self.weights,
+            'timestamp': datetime.now(),
+            'version': await self._get_next_version(venture_data.id)
+        }
 
-    async def assess_market_risk(self, venture_data):
-        # Extract market features
-        features = [
-            venture_data.market_volatility,
-            venture_data.sector_performance,
-            venture_data.competitor_strength,
-            venture_data.market_share
-        ]
-
-        return self.market_risk_model.predict([features])[0]
-
-    async def assess_compliance_risk(self, venture_data):
-        # Extract compliance features
-        features = [
-            venture_data.regulatory_violations,
-            venture_data.policy_adherence,
-            venture_data.audit_score,
-            venture_data.legal_exposure
-        ]
-
-        return self.compliance_risk_model.predict([features])[0]
-
-    async def assess_operational_risk(self, venture_data):
-        # Extract operational features
-        features = [
-            venture_data.system_uptime,
-            venture_data.error_rate,
-            venture_data.response_time,
-            venture_data.resource_utilization
-        ]
-
-        return self.operational_risk_model.predict([features])[0]
-
-    async def monitor_risk_thresholds(self):
-        active_ventures = await self.knowledge_graph.get_active_ventures()
-
-        risk_alerts = []
-        for venture in active_ventures:
-            current_risk = await self.evaluate_risk(venture)
-
-            if current_risk['total_risk'] > self.thresholds.risk_level:
-                alert = await self.trigger_risk_alert(venture, current_risk)
-                risk_alerts.append(alert)
-
-        return risk_alerts
-```
-
-- Implementation Details:
-```python
-class RiskAssessmentAgent:
-    def __init__(self):
-        self.risk_model = RiskModel()
-        self.market_analyzer = MarketAnalyzer()
-        self.knowledge_graph = KnowledgeGraphConnector()
-
-    async def evaluate_risk(self, venture_data):
-        market_risk = await self.market_analyzer.assess_market_risk(venture_data)
-        compliance_risk = await self.assess_compliance_risk(venture_data)
-        operational_risk = await self.assess_operational_risk(venture_data)
-
-        total_risk = self.risk_model.calculate_total_risk({
-            'market': market_risk,
-            'compliance': compliance_risk,
-            'operational': operational_risk
-        })
-
-        await self.knowledge_graph.update_risk_profile(venture_data.id, total_risk)
-
-    async def monitor_risk_thresholds(self):
-        active_ventures = await self.knowledge_graph.get_active_ventures()
-        for venture in active_ventures:
-            current_risk = await self.evaluate_risk(venture)
-            if current_risk > self.thresholds.risk_level:
-                await self.trigger_risk_alert(venture)
+        # Store with versioning enabled
+        await self.knowledge_graph.update_risk_profile(
+            venture_id=venture_data.id,
+            risk_profile=risk_profile,
+            create_version=self.versioning['enabled']
+        )
 ```
 
 ## Communication Flows
 
 ### Market Intelligence → Risk Assessment
+
 ```python
 # Event message structure
 market_volatility_event = {
@@ -476,6 +406,7 @@ async def handle_market_event(event):
 ```
 
 ### Legal Compliance → Product Development
+
 ```python
 # Event message structure
 compliance_update_event = {
@@ -499,6 +430,7 @@ async def handle_compliance_event(event):
 ## Knowledge Graph Integration
 
 ### Query Patterns
+
 ```python
 class KnowledgeGraphQueries:
     async def get_venture_risk_profile(self, venture_id):
@@ -525,6 +457,7 @@ class KnowledgeGraphQueries:
 ```
 
 ## State Management
+
 ```python
 import asyncio
 

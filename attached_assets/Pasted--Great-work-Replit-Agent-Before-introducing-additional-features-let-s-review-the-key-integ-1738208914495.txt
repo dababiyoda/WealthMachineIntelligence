@@ -1,0 +1,19 @@
+```
+Great work, Replit Agent. Before introducing additional features, let’s **review** the key integration points to ensure everything aligns with our design and ontology references. I’m particularly interested in the following:
+
+1. **LSTM + Random Forest Synergy**  
+   - **Data Flow**: How are the outputs of the LSTM model being passed to the Random Forest classifier? Is there a unifying feature vector combining the LSTM’s predictions with other market indicators before classification?  
+   - **Weighting Logic**: If there’s a hybrid or ensemble approach (where LSTM and Random Forest results are combined), I’d like to see how you’re weighting or aggregating these results for final risk or opportunity scores.
+
+2. **Compliance Triggers & Notifications**  
+   - **Event Handling**: How exactly does the Legal Compliance Agent escalate potential regulatory issues to the relevant roles or other agents (e.g., Risk Assessment Agent)?  
+   - **Knowledge Graph Updates**: Which properties or relationships get updated when a compliance issue arises (e.g., `requiresAction`, `complianceStatus`)? Are these updates systematically consumed by the event orchestration (if present) or other agents?
+
+3. **Weighted Multi-Factor Evaluation in Risk Assessment**  
+   - **Combination of Factors**: You mentioned Market, Compliance, and Operational risk. Do they each have an adjustable weight in the final calculation (e.g., 0.4 Market, 0.3 Compliance, 0.3 Operational)? Or is it a purely algorithmic approach that infers weights from historical data?  
+   - **Risk Score Storage**: How is the final risk score represented in the knowledge graph (e.g., a `riskScore` property, a specialized node type)? Is it versioned over time to track risk evolution?
+
+A short code excerpt or high-level overview for each point would be ideal. Once we confirm that the logic is solid, we can decide on the next set of enhancements—be it an event orchestration system, real-time dashboards, or more advanced analytics.
+
+Thanks again for the quick turnaround. Let’s finalize these review items, then proceed to the next steps once everything checks out.
+```
