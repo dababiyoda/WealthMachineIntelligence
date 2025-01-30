@@ -2,57 +2,110 @@
   "version": "1.0",
   "rules": [
     {
-      "id": "marketing_budget_control",
-      "name": "Marketing Budget Control",
+      "id": "market_volatility_control",
+      "name": "Market Volatility Control",
+      "venture_type": "SaaSVenture",
       "condition": {
-        "metric": "CPC",
-        "operator": "greater_than",
-        "value": 2.5,
-        "AND": {
-          "metric": "conversion_rate",
-          "operator": "less_than",
-          "value": 0.02
-        }
+        "AND": [
+          {
+            "metric": "market_volatility",
+            "operator": "greater_than",
+            "value": 0.8
+          },
+          {
+            "metric": "risk_profile",
+            "operator": "equals",
+            "value": "High"
+          }
+        ]
       },
       "action": {
-        "type": "pause_campaign",
+        "type": "update_venture_status",
         "parameters": {
-          "notification": true,
-          "grace_period_hours": 24
+          "new_status": "On Hold",
+          "notify_roles": ["FinancialStrategist"],
+          "priority": "high"
         }
       }
     },
     {
-      "id": "customer_satisfaction_alert",
-      "name": "Customer Satisfaction Monitor",
+      "id": "saas_performance_monitor",
+      "name": "SaaS Performance Monitor",
+      "venture_type": "SaaSVenture",
       "condition": {
-        "metric": "satisfaction_score",
-        "operator": "less_than",
-        "value": 4.0,
-        "timeframe": "7d"
+        "OR": [
+          {
+            "metric": "monthly_churn_rate",
+            "operator": "greater_than",
+            "value": 0.05
+          },
+          {
+            "metric": "mrr_growth_rate",
+            "operator": "less_than",
+            "value": 0.10
+          }
+        ]
       },
       "action": {
         "type": "trigger_review",
         "parameters": {
+          "assign_to": "ProductDevSpecialist",
           "priority": "high",
-          "assign_to": "customer_success_team"
+          "required_actions": ["optimize_retention", "review_pricing"]
         }
       }
     },
     {
-      "id": "resource_scaling",
-      "name": "Automatic Resource Scaling",
+      "id": "ecommerce_performance_alert",
+      "name": "E-commerce Performance Alert",
+      "venture_type": "EcommerceVenture",
       "condition": {
-        "metric": "system_load",
-        "operator": "greater_than",
-        "value": 80,
-        "duration": "5m"
+        "AND": [
+          {
+            "metric": "cart_abandonment_rate",
+            "operator": "greater_than",
+            "value": 0.7
+          },
+          {
+            "metric": "customer_acquisition_cost",
+            "operator": "greater_than",
+            "value": 50.0
+          }
+        ]
       },
       "action": {
-        "type": "scale_resources",
+        "type": "optimize_funnel",
         "parameters": {
-          "increment": 20,
-          "max_limit": 200
+          "notify_roles": ["MarketingStrategist"],
+          "priority": "high",
+          "optimization_areas": ["checkout_process", "marketing_spend"]
+        }
+      }
+    },
+    {
+      "id": "compliance_risk_assessment",
+      "name": "Compliance Risk Monitor",
+      "venture_type": "DigitalVenture",
+      "condition": {
+        "OR": [
+          {
+            "metric": "regulatory_compliance_score",
+            "operator": "less_than",
+            "value": 0.95
+          },
+          {
+            "metric": "data_protection_score",
+            "operator": "less_than",
+            "value": 0.98
+          }
+        ]
+      },
+      "action": {
+        "type": "compliance_review",
+        "parameters": {
+          "notify_roles": ["RegulatoryExpert", "LegalCounsel"],
+          "priority": "critical",
+          "required_actions": ["audit_compliance", "update_policies"]
         }
       }
     }

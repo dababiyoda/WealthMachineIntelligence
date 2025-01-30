@@ -8,21 +8,45 @@ For detailed lifecycle and interaction specifications, see `/ai-integration/agen
 
 ### Market Intelligence Agent
 - Market trend analysis
+  - Uses LSTM networks for time series prediction
+  - Integrates with sentiment analysis pipeline
+  - Real-time market data processing
 - Competitor monitoring
+  - NLP-based competitor analysis
+  - Automated alert generation
+  - Strategic insight extraction
 - Opportunity detection
+  - ML-powered opportunity scoring
+  - Market segment analysis
+  - Growth potential assessment
 - Risk assessment
+  - Random Forest models for risk classification
+  - Real-time risk score updates
+  - Automated threshold monitoring
 - Communication Protocol: JSON events
 - Trigger Conditions: market_volatility, competitor_action
 - Ontology References:
   - Queries SaaSVenture, EcommerceVenture for market context
-  - Updates RiskProfile based on findings
-  - Interacts with MarketSegment data
+  - Updates RiskProfile based on ML predictions
+  - Interacts with MarketSegment data through knowledge graph
 
 ### Legal Compliance Agent
 - Regulatory monitoring
+  - NLP-based regulation parsing
+  - Automated compliance checking
+  - Real-time alert system
 - Compliance verification
+  - Rule-based compliance engine
+  - ML-powered risk assessment
+  - Automated documentation review
 - Document analysis
+  - BERT/GPT for document understanding
+  - Automated classification
+  - Key information extraction
 - Risk flagging
+  - Predictive risk modeling
+  - Compliance score calculation
+  - Automated escalation
 - Communication Protocol: JSON events
 - Trigger Conditions: compliance_breach, regulatory_update
 - Ontology References:
@@ -32,9 +56,21 @@ For detailed lifecycle and interaction specifications, see `/ai-integration/agen
 
 ### Customer Experience Agent
 - Behavior analysis
+  - ML-powered user behavior modeling
+  - Pattern recognition algorithms
+  - Predictive user journey mapping
 - Satisfaction monitoring
+  - NLP-based sentiment analysis
+  - Real-time satisfaction scoring
+  - Automated response triggers
 - Service optimization
+  - AI-driven service recommendations
+  - Automated workflow adjustments
+  - Performance optimization models
 - Feedback processing
+  - NLP sentiment analysis
+  - Automated categorization
+  - Priority routing systems
 - Communication Protocol: JSON events
 - Trigger Conditions: satisfaction_threshold, service_degradation
 - Ontology References:
@@ -44,9 +80,21 @@ For detailed lifecycle and interaction specifications, see `/ai-integration/agen
 
 ### Operations Agent
 - Process optimization
+  - ML workflow optimization
+  - Resource utilization prediction
+  - Automated bottleneck detection
 - Resource allocation
+  - AI-powered resource scheduling
+  - Predictive scaling models
+  - Dynamic load balancing
 - Performance monitoring
+  - Anomaly detection models
+  - Predictive maintenance
+  - Real-time metrics analysis
 - Quality assurance
+  - ML-based quality prediction
+  - Automated testing systems
+  - Performance validation models
 - Communication Protocol: JSON events
 - Trigger Conditions: resource_constraint, quality_threshold
 - Ontology References:

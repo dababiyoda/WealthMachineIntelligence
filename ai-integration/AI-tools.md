@@ -7,6 +7,12 @@
 - Purpose: Market sentiment tracking
 - Integration: REST API
 - Data Schema: JSON
+- Knowledge Graph Connection:
+  ```cypher
+  MATCH (tool:AITool)-[:PROCESSES]->(data:MarketData)
+  WHERE tool.name = 'SentimentAI'
+  RETURN data.sentiment_score, data.confidence
+  ```
 - Use Cases:
   - Brand monitoring
   - Customer feedback
@@ -18,9 +24,17 @@
 
 ### Predictive Analytics
 - Tool: PredictiveEngine
+- Framework: TensorFlow/PyTorch
+- Models: LSTM, ARIMA for time series
 - Purpose: Market forecasting
 - Integration: Python SDK
 - Data Schema: DataFrame
+- Knowledge Graph Connection:
+  ```cypher
+  MATCH (model:PredictiveModel)-[:FORECASTS]->(venture:DigitalVenture)
+  WHERE model.type IN ['LSTM', 'ARIMA']
+  RETURN venture.metrics, model.predictions
+  ```
 - Use Cases:
   - Demand prediction
   - Trend forecasting
@@ -37,6 +51,11 @@
 - Purpose: Feature validation
 - Integration: JavaScript API
 - Data Schema: JSON
+- Knowledge Graph Connection:
+  ```cypher
+  MATCH (test:ABTest)-[:AFFECTS]->(feature:ProductFeature)
+  RETURN test.results, feature.metrics
+  ```
 - Use Cases:
   - UI optimization
   - Feature testing
@@ -51,6 +70,11 @@
 - Purpose: System optimization
 - Integration: REST API
 - Data Schema: Metrics
+- Knowledge Graph Connection:
+  ```cypher
+  MATCH (metric:SystemMetric)-[:MONITORS]->(service:DigitalService)
+  RETURN metric.performance_data, service.status
+  ```
 - Use Cases:
   - Resource monitoring
   - Performance tracking
@@ -76,31 +100,32 @@
 - Backup: Automated daily
 - Security: See `/ai-integration/agent-architecture.md` for access control details
 
-## Multi-Agent Integration
-For detailed understanding of how these tools integrate with the agent system:
+## Machine Learning Models
 
-1. **Tool Selection**
-   - Review agent requirements in `/ai-integration/agent-architecture.md`
-   - Match tools to agent capabilities
-   - Configure according to security protocols
+### Market Intelligence Models
+- LSTM Networks:
+  - Purpose: Time series prediction
+  - Input: Historical market data
+  - Output: Trend forecasts
+  - Training: Continuous with daily updates
 
-2. **Implementation**
-   - Follow workflow patterns in `/ai-integration/agent-flow.md`
-   - Implement error handling as per architecture
-   - Set up monitoring and logging
+### Risk Assessment Models
+- Random Forests:
+  - Purpose: Risk classification
+  - Input: Venture metrics
+  - Output: Risk scores
+  - Training: Weekly updates
 
-3. **Deployment**
-   - Use scalability guidelines in agent architecture
-   - Follow security protocols for tool access
-   - Monitor performance metrics
+### Natural Language Processing
+- BERT/GPT Models:
+  - Purpose: Market sentiment analysis
+  - Input: Social media, news data
+  - Output: Sentiment scores
+  - Training: Monthly updates
 
-4. **Maintenance**
-   - Regular updates per `/ai-integration/agent-lifecycle.md`
-   - Performance optimization
-   - Security audits
-
-## Ontology Integration
+## Knowledge Graph Integration
 - Tool → implements → AICapability
 - Tool → processesData → DataType
 - Tool → supportsProcess → BusinessProcess
 - Tool → enablesAgent → AgentType
+- Tool → updatesMetric → PerformanceIndicator
