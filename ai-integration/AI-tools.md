@@ -1,24 +1,5 @@
 # AI Tools Catalog
 
-## Performance Monitoring Tools
-
-### Agent Performance Heatmap
-- Tool: AgentPerformanceHeatmap
-- Purpose: Visualize agent efficiency metrics
-- Integration: Python Module
-- Data Schema: Pandas DataFrame
-- Metrics Tracked:
-  - Response time
-  - Success rate
-  - Resource usage
-  - Task completion
-  - Accuracy
-- Features:
-  - 24-hour performance visualization
-  - Color-coded efficiency scores
-  - Real-time metric updates
-  - Cross-agent comparisons
-
 ## Market Analysis Tools
 
 ### Sentiment Analysis
@@ -52,6 +33,16 @@
   - UI optimization
   - Feature testing
   - Conversion optimization
+
+### Performance Monitoring
+- Tool: PerformanceAI
+- Purpose: System optimization
+- Integration: REST API
+- Data Schema: Metrics
+- Use Cases:
+  - Resource monitoring
+  - Performance tracking
+  - Optimization
 
 ## Integration Guidelines
 
