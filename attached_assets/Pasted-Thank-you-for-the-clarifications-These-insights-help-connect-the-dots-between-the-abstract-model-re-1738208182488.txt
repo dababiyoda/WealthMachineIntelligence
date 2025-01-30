@@ -1,0 +1,18 @@
+Thank you for the clarifications. These insights help connect the dots between the abstract model references and the actual operational details. I have a few follow-up questions to deepen understanding:
+
+1. **Market Intelligence Agent**  
+   - **LSTM + Sentiment Pipeline**: You mentioned that the LSTM output is combined with sentiment analysis and then stored in the knowledge graph (lines 38–42). Does this combination happen in a simple additive or weighted manner (e.g., LSTM output gets 70% weight, sentiment 30%), or is it more of a post-processing rule that interprets both signals?
+
+2. **Random Forest “Risk Classification” vs. Risk Assessment Agent**  
+   - If the Random Forest is currently part of a “separate workflow,” do you envision it eventually feeding into the **Risk Assessment Agent** directly, or would it remain under the Market Intelligence umbrella, only providing partial risk data? I’m trying to see if there’s an intended pipeline synergy (e.g., Market Intelligence passes risk flags to the Risk Assessment Agent).
+
+3. **Legal Compliance Agent**  
+   - **Compliance Workflow Trigger**: When the system flags a regulatory risk, you mentioned that it updates the knowledge graph and triggers a compliance workflow (line 85). Is there a parallel notification to the roles involved (e.g., *Regulatory Expert, Legal Counsel*) or is that delegated to a separate process (perhaps the multi-agent collaboration framework) that monitors changes in the knowledge graph?
+
+4. **Risk Assessment Agent**  
+   - **Operational Risk Handling**: For operational risk (line 100), do you have any high-level examples of the data it evaluates (e.g., server uptime metrics, transaction success rates, user complaint rates)? And is this data likewise fed from external monitors into the agent, then aggregated before final scoring?
+
+5. **Overall Integration**  
+   - **Monitoring & Updates**: Since each agent updates the knowledge graph with new information (LSTM predictions, compliance statuses, risk scores), is there a unifying “Event Orchestrator” or do the agents simply listen for relevant graph updates and act independently?
+
+These clarifications will help pinpoint where the most value might be gained from further development or deeper integration among the agents. Thank you again for sharing the detailed breakdown!

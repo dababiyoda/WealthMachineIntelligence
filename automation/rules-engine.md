@@ -3,124 +3,6 @@
 ## Overview
 Framework for automated decision-making in digital business operations with real-time event handling capabilities.
 
-## Components
-
-### Decision Rules
-- Conditional logic structures
-- Action triggers
-- Validation rules
-- Exception handling
-
-### Integration Points
-- API connections
-- Data pipelines
-- Event handlers
-- Monitoring systems
-
-### Rule Categories
-
-#### Marketing Rules
-- Campaign optimization
-- Budget allocation
-- Performance thresholds
-- Audience targeting
-
-#### Operations Rules
-- Resource management
-- Quality control
-- Process automation
-- Risk mitigation
-
-#### Financial Rules
-- Budget controls
-- Investment triggers
-- Risk thresholds
-- Performance metrics
-
-## Implementation Guidelines
-
-### Rule Structure
-```python
-class Rule:
-    def __init__(self, condition, action, priority="normal"):
-        self.condition = condition
-        self.action = action
-        self.priority = priority
-
-    def evaluate(self, context):
-        if self.condition.evaluate(context):
-            return self.action.execute(context)
-        return None
-```
-
-### Real-Time Event Handling
-```python
-class EventHandler:
-    def __init__(self):
-        self.rules = []
-        self.event_queue = Queue()
-
-    def register_rule(self, rule):
-        self.rules.append(rule)
-
-    async def process_events(self):
-        while True:
-            event = await self.event_queue.get()
-            context = self.build_context(event)
-
-            for rule in self.rules:
-                if rule.matches_event(event):
-                    await rule.evaluate(context)
-
-    def build_context(self, event):
-        return {
-            'event_type': event.type,
-            'timestamp': event.timestamp,
-            'data': event.data,
-            'source': event.source
-        }
-```
-
-### Process Mapping Example
-```python
-# Market Volatility Rule
-market_volatility_rule = Rule(
-    condition=Condition(
-        lambda ctx: ctx['market_volatility'] > 0.8 and 
-                   ctx['risk_profile'] == 'High'
-    ),
-    action=Action(
-        lambda ctx: [
-            update_venture_status(ctx['venture_id'], 'On Hold'),
-            notify_role('FinancialStrategist', {
-                'message': 'High market volatility detected',
-                'venture_id': ctx['venture_id'],
-                'volatility': ctx['market_volatility']
-            })
-        ]
-    ),
-    priority='high'
-)
-```
-
-### Knowledge Graph Integration
-```python
-class KnowledgeGraphConnector:
-    def query_venture_status(self, venture_id):
-        return graph.query("""
-            MATCH (v:DigitalVenture {id: $venture_id})
-            OPTIONAL MATCH (v)-[:hasRiskProfile]->(r:RiskProfile)
-            RETURN v.status, r.level
-        """, venture_id=venture_id)
-
-    def update_venture_status(self, venture_id, new_status):
-        graph.execute("""
-            MATCH (v:DigitalVenture {id: $venture_id})
-            SET v.status = $status
-            SET v.last_updated = datetime()
-        """, venture_id=venture_id, status=new_status)
-```
-
 ## Real-Time Rule Evaluation Examples
 
 ### Market Intelligence Rules
@@ -229,3 +111,122 @@ def monitor_saas_metrics():
         }
     ]
 }
+```
+
+## Implementation Guidelines
+
+### Rule Structure
+```python
+class Rule:
+    def __init__(self, condition, action, priority="normal"):
+        self.condition = condition
+        self.action = action
+        self.priority = priority
+
+    def evaluate(self, context):
+        if self.condition.evaluate(context):
+            return self.action.execute(context)
+        return None
+```
+
+### Real-Time Event Handling
+```python
+class EventHandler:
+    def __init__(self):
+        self.rules = []
+        self.event_queue = Queue()
+
+    def register_rule(self, rule):
+        self.rules.append(rule)
+
+    async def process_events(self):
+        while True:
+            event = await self.event_queue.get()
+            context = self.build_context(event)
+
+            for rule in self.rules:
+                if rule.matches_event(event):
+                    await rule.evaluate(context)
+
+    def build_context(self, event):
+        return {
+            'event_type': event.type,
+            'timestamp': event.timestamp,
+            'data': event.data,
+            'source': event.source
+        }
+```
+
+### Process Mapping Example
+```python
+# Market Volatility Rule
+market_volatility_rule = Rule(
+    condition=Condition(
+        lambda ctx: ctx['market_volatility'] > 0.8 and 
+                   ctx['risk_profile'] == 'High'
+    ),
+    action=Action(
+        lambda ctx: [
+            update_venture_status(ctx['venture_id'], 'On Hold'),
+            notify_role('FinancialStrategist', {
+                'message': 'High market volatility detected',
+                'venture_id': ctx['venture_id'],
+                'volatility': ctx['market_volatility']
+            })
+        ]
+    ),
+    priority='high'
+)
+```
+
+### Knowledge Graph Integration
+```python
+class KnowledgeGraphConnector:
+    def query_venture_status(self, venture_id):
+        return graph.query("""
+            MATCH (v:DigitalVenture {id: $venture_id})
+            OPTIONAL MATCH (v)-[:hasRiskProfile]->(r:RiskProfile)
+            RETURN v.status, r.level
+        """, venture_id=venture_id)
+
+    def update_venture_status(self, venture_id, new_status):
+        graph.execute("""
+            MATCH (v:DigitalVenture {id: $venture_id})
+            SET v.status = $status
+            SET v.last_updated = datetime()
+        """, venture_id=venture_id, status=new_status)
+```
+
+## Components
+
+### Decision Rules
+- Conditional logic structures
+- Action triggers
+- Validation rules
+- Exception handling
+
+### Integration Points
+- API connections
+- Data pipelines
+- Event handlers
+- Monitoring systems
+
+## Rule Categories
+
+#### Marketing Rules
+- Campaign optimization
+- Budget allocation
+- Performance thresholds
+- Audience targeting
+
+#### Operations Rules
+- Resource management
+- Quality control
+- Process automation
+- Risk mitigation
+
+#### Financial Rules
+- Budget controls
+- Investment triggers
+- Risk thresholds
+- Performance metrics

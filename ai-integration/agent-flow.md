@@ -271,3 +271,162 @@ def process_market_data(agent: Agent, venture_id: str):
         payload=analysis_result
     )
 ```
+
+## Example Workflow: New Digital Venture Assessment
+
+### 1. Market Intelligence Phase
+```python
+async def market_intelligence_workflow(venture_id: str):
+    market_agent = MarketIntelligenceAgent()
+
+    # Fetch historical market data
+    market_data = await market_agent.knowledge_graph.get_market_data(venture_id)
+
+    # Run market trend analysis using LSTM
+    market_trends = await market_agent.market_predictor.predict_trends(market_data)
+
+    # Run ARIMA analysis for additional validation
+    arima_analyzer = ARIMAAnalyzer()
+    arima_forecast = await arima_analyzer.forecast_market(
+        market_data['historical_prices'],
+        steps=30  # 30-day forecast
+    )
+
+    # Combine insights and update knowledge graph
+    analysis = {
+        'venture_id': venture_id,
+        'lstm_predictions': market_trends,
+        'arima_forecast': arima_forecast,
+        'timestamp': datetime.now()
+    }
+    await market_agent.knowledge_graph.update_market_analysis(analysis)
+
+    # Trigger risk assessment if volatility is high
+    combined_volatility = calculate_combined_volatility(market_trends, arima_forecast)
+    if combined_volatility > VOLATILITY_THRESHOLD:
+        await trigger_risk_assessment(venture_id, analysis)
+```
+
+### 2. Risk Assessment Phase
+```python
+async def risk_assessment_workflow(venture_id: str, market_analysis: Dict):
+    risk_agent = RiskAssessmentAgent()
+    risk_model = RiskAssessmentModel(n_simulations=1000)
+
+    # Gather venture data
+    venture_data = await risk_agent.knowledge_graph.get_venture_data(venture_id)
+
+    # Run Monte Carlo simulation for risk assessment
+    risk_assessment = await risk_model.monte_carlo_simulation({
+        'id': venture_id,
+        'risk_factors': [
+            {
+                'value': market_analysis['lstm_predictions']['latest'],
+                'volatility': calculate_volatility(market_analysis['historical_data'])
+            },
+            # Add other risk factors
+            {
+                'value': venture_data['current_capital'],
+                'volatility': CAPITAL_VOLATILITY
+            }
+        ]
+    })
+
+    # Update venture risk profile
+    await risk_agent.knowledge_graph.update_risk_profile(
+        venture_id=venture_id,
+        risk_data=risk_assessment
+    )
+
+    # Notify Legal Compliance if risk is high
+    if risk_assessment['var_95'] > HIGH_RISK_THRESHOLD:
+        await trigger_compliance_check(venture_id, risk_assessment)
+```
+
+### 3. Legal Compliance Phase
+```python
+async def legal_compliance_workflow(venture_id: str):
+    legal_agent = LegalComplianceAgent()
+    compliance_analyzer = LegalComplianceAnalyzer()
+
+    # Fetch venture and regulatory documents
+    venture_data = await legal_agent.knowledge_graph.get_venture_data(venture_id)
+    regulatory_docs = await legal_agent.get_relevant_regulations(venture_data['type'])
+
+    # Analyze regulatory compliance using BERT
+    compliance_analysis = await compliance_analyzer.analyze_regulations(regulatory_docs)
+
+    # Update compliance status
+    await legal_agent.knowledge_graph.update_compliance_status({
+        'venture_id': venture_id,
+        'compliance_status': compliance_analysis['overall_status'],
+        'timestamp': datetime.now(),
+        'required_actions': extract_required_actions(compliance_analysis)
+    })
+
+    # If critical compliance issues found, notify team immediately
+    if compliance_analysis['overall_status'] == 'non_compliant':
+        await notify_team(venture_id, {
+            'status': 'CRITICAL',
+            'message': 'Compliance violation detected',
+            'details': compliance_analysis['results']
+        })
+```
+
+### Complete Assessment Flow
+```python
+async def assess_new_venture(venture_id: str):
+    try:
+        # 1. Market Intelligence Analysis using LSTM and ARIMA
+        await market_intelligence_workflow(venture_id)
+
+        # 2. Risk Assessment with Monte Carlo simulation
+        await risk_assessment_workflow(venture_id)
+
+        # 3. Legal Compliance Check using BERT
+        await legal_compliance_workflow(venture_id)
+
+        # 4. Final Status Update
+        await update_venture_status(venture_id, 'ASSESSMENT_COMPLETE')
+
+    except Exception as e:
+        await handle_assessment_error(venture_id, e)
+        raise
+```
+
+## Implementation Guidelines
+
+### 1. Agent Initialization
+- Load role definitions from ontology
+- Verify AI module requirements
+- Configure communication channels
+- Initialize state management
+- Register event handlers
+
+### 2. Data Gathering Process
+- Identify required data points from ontology
+- Execute knowledge graph queries
+- Validate data completeness
+- Transform to agent-specific format
+- Cache relevant information
+
+### 3. Processing & Decision Logic
+- Apply domain-specific algorithms
+- Consider ontology constraints
+- Validate against business rules
+- Generate recommendations
+- Prepare action items
+
+### 4. Output & Logging
+- Format results according to ontology
+- Update knowledge graph
+- Generate event notifications
+- Archive detailed logs
+- Trigger next steps in workflow
+
+## Error Handling
+- Implement retry mechanisms for transient failures
+- Log detailed error information
+- Maintain assessment state for recovery
+- Notify relevant stakeholders
+- Roll back partial updates if needed
