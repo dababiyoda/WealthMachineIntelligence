@@ -230,7 +230,6 @@ async def assess_risk(self, market_data):
 ### Weighting Logic
 The weighting logic determines the contribution of each model to the final risk assessment.  The `risk_weights` dictionary in the `MarketIntelligenceAgent` class assigns weights to the LSTM trend predictions and traditional market indicators used by the Random Forest model.  These weights are used to scale the respective features within the combined feature vector before feeding them to the Random Forest.
 
-
 ```python
 class MarketIntelligenceAgent:
     def __init__(self):
@@ -246,7 +245,24 @@ class MarketIntelligenceAgent:
 The `LegalComplianceAgent` utilizes an event-driven architecture for handling compliance-related events.  The `process_regulations` function acts as the central event handler.  Upon detecting a compliance issue (`compliance_status.requires_action`), it triggers a chain of actions: notifying stakeholders, initiating a workflow, and directly informing the Risk Assessment Agent.
 
 ```python
+import asyncio
+from typing import List, Dict
+from datetime import datetime, timedelta
+
 class LegalComplianceAgent:
+    def __init__(self):
+        self.knowledge_graph = KnowledgeGraphConnector()
+        self.nlp_processor = NLPProcessor()
+        self.compliance_analyzer = LegalComplianceAnalyzer()
+
+        # Define compliance status mappings
+        self.compliance_properties = {
+            'requiresAction': 'compliance_status',
+            'riskLevel': 'risk_level',
+            'stakeholders': 'involved_roles',
+            'deadline': 'compliance_deadline'
+        }
+
     async def process_regulations(self, regulation_data):
         # Process regulation text using NLP
         classification = self.nlp_processor(regulation_data.text)
@@ -274,7 +290,7 @@ class LegalComplianceAgent:
 
         # Multi-channel notification if action required
         if compliance_status.requires_action:
-            # 1. Notify stakeholders
+            # 1. Notify stakeholders through multiple channels
             await self.notify_stakeholders(compliance_status)
 
             # 2. Trigger compliance workflow
@@ -286,11 +302,100 @@ class LegalComplianceAgent:
                 'risk_level': compliance_status.risk_level,
                 'affected_ventures': compliance_status.affected_ventures
             })
+
+    async def notify_stakeholders(self, notification_data: Dict):
+        """Multi-channel stakeholder notification based on ontology roles"""
+        # Get stakeholder contacts from ontology roles
+        stakeholders = await self.knowledge_graph.get_role_contacts(
+            notification_data['roles']
+        )
+
+        # Send notifications through configured channels
+        notification_tasks = []
+        for stakeholder in stakeholders:
+            for channel in stakeholder['notification_channels']:
+                if channel == 'email':
+                    notification_tasks.append(
+                        self.send_email_notification(
+                            stakeholder['email'],
+                            notification_data
+                        )
+                    )
+                elif channel == 'slack':
+                    notification_tasks.append(
+                        self.send_slack_notification(
+                            stakeholder['slack_id'],
+                            notification_data
+                        )
+                    )
+
+        # Execute all notifications in parallel
+        await asyncio.gather(*notification_tasks)
+
+    async def trigger_compliance_workflow(self, compliance_status: Dict):
+        """Initiate compliance mitigation workflow"""
+        workflow_data = {
+            'name': 'ComplianceMitigation',
+            'data': {
+                'issues': compliance_status.summary,
+                'risk_level': compliance_status.risk_level,
+                'required_actions': compliance_status.required_actions,
+                'deadline': datetime.now() + timedelta(days=30)
+            }
+        }
+        await workflow_api.start_workflow(**workflow_data)
+
+    async def notify_risk_assessment(self, notification_data: Dict):
+        """Send direct notification to Risk Assessment Agent"""
+        risk_assessment_event = {
+            'type': 'compliance_update',
+            'source': 'legal_compliance_001',
+            'target': 'risk_assessment_001',
+            'payload': notification_data
+        }
+        await self.knowledge_graph.publish_event(risk_assessment_event)
+
+    async def get_relevant_regulations(self, venture_id: str) -> List[str]:
+        """Fetch relevant regulations based on venture type and jurisdiction"""
+        venture_data = await self.knowledge_graph.get_venture_data(venture_id)
+        return await self.knowledge_graph.query_regulations(
+            venture_type=venture_data.type,
+            jurisdiction=venture_data.jurisdiction
+        )
+
+    def determine_risk_level(self, compliance_analysis: Dict) -> str:
+        """Calculate risk level based on compliance analysis"""
+        if compliance_analysis['overall_status'] == 'non_compliant':
+            return 'high'
+        elif compliance_analysis['overall_status'] == 'compliance_required':
+            return 'medium'
+        return 'low'
+
+    def format_compliance_summary(self, compliance_analysis: Dict) -> str:
+        """Format compliance analysis results for notifications"""
+        return f"Compliance Status: {compliance_analysis['overall_status'].upper()}\n" + \
+               f"Issues Found: {len(compliance_analysis['results'])}\n" + \
+               "Details: " + "\n".join(
+                   f"- {result['document']}: {result['status']}"
+                   for result in compliance_analysis['results']
+               )
+
+    def extract_required_actions(self, compliance_analysis: Dict) -> List[Dict]:
+        """Extract required actions from compliance analysis"""
+        actions = []
+        for result in compliance_analysis['results']:
+            if result['status'] in ['non_compliant', 'compliance_required']:
+                actions.append({
+                    'type': 'compliance_action',
+                    'description': f"Address compliance issue in {result['document']}",
+                    'priority': 'high' if result['status'] == 'non_compliant' else 'medium',
+                    'deadline': datetime.now() + timedelta(days=30)
+                })
+        return actions
 ```
 
 ### Knowledge Graph Updates
 The `LegalComplianceAgent` interacts with the knowledge graph to store and retrieve compliance-related information.  The `compliance_properties` dictionary defines the mapping between internal compliance attributes and knowledge graph properties.  The `notify_risk_assessment` function creates a direct relationship in the knowledge graph to link compliance issues to the Risk Assessment Agent for immediate evaluation.
-
 
 ```python
 class LegalComplianceAgent:

@@ -346,7 +346,7 @@ async def risk_assessment_workflow(venture_id: str, market_analysis: Dict):
 ### 3. Legal Compliance Phase
 ```python
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict
 
 async def legal_compliance_workflow(venture_id: str):
@@ -356,7 +356,7 @@ async def legal_compliance_workflow(venture_id: str):
     # Multi-channel notification system setup
     notification_channels = {
         'knowledge_graph': async (data) => {
-            # Update compliance status in knowledge graph
+            # Update compliance status and properties in knowledge graph
             await legal_agent.knowledge_graph.update_compliance_status({
                 'venture_id': venture_id,
                 'compliance_status': data.status,
@@ -375,13 +375,28 @@ async def legal_compliance_workflow(venture_id: str):
                 'venture_id': venture_id
             })
         },
+        'workflow': async (data) => {
+            # Trigger compliance workflow if action required
+            if data.requires_action:
+                await workflow_api.start_workflow(
+                    name="ComplianceMitigation",
+                    data={
+                        'venture_id': venture_id,
+                        'issues': data.description,
+                        'required_actions': data.required_actions,
+                        'priority': data.risk_level,
+                        'deadline': datetime.now() + timedelta(days=30)
+                    }
+                )
+        },
         'stakeholder_notification': async (data) => {
-            # Notify relevant stakeholders
+            # Notify relevant stakeholders based on ontology roles
             await legal_agent.notify_stakeholders({
                 'roles': ['LegalCounsel', 'RegulatoryExpert'],
                 'priority': data.risk_level,
                 'message': data.description,
-                'action_items': data.required_actions
+                'action_items': data.required_actions,
+                'venture_id': venture_id
             })
         }
     }
