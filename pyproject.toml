@@ -1,7 +1,7 @@
 [project]
-name = "repl-nix-workspace"
+name = "ai_integration"
 version = "0.1.0"
-description = "Add your description here"
+description = "Enterprise automation framework with multi-agent AI architecture"
 requires-python = ">=3.11"
 dependencies = [
     "numpy>=2.2.2",
@@ -9,4 +9,10 @@ dependencies = [
     "scikit-learn>=1.6.1",
     "tensorflow>=2.14.0",
     "transformers>=4.48.1",
+    "networkx>=3.2.1", # For knowledge graph implementation
+    "pydantic>=2.6.1", # For data validation
+    "rdflib>=7.0.0", # For ontology management
 ]
+
+[tool.setuptools]
+packages = ["ai_integration", "ai_integration.agents"]
