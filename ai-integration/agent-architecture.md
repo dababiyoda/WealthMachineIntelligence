@@ -183,6 +183,30 @@ For detailed lifecycle and interaction specifications, see `/ai-integration/agen
 - Agent → communicatesVia → Protocol
 - Agent → maintainsState → AgentLifecycle
 
+## Knowledge Graph Integration
+
+### Query Patterns
+```yaml
+# Agent State Query
+match:
+  agent:
+    type: "AIAgent"
+    status: "active"
+  process:
+    relationship: "performsRole"
+    target: "agent"
+return:
+  - agent.current_state
+  - agent.active_processes
+  - process.metrics
+```
+
+### State Tracking
+- Agent states mapped to ontology
+- Relationship tracking
+- Performance metrics
+- Audit trail
+
 ## Ontology-Driven Operations
 
 ### SaaSVenture Integration
