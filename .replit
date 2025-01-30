@@ -15,6 +15,10 @@ author = "agent"
 task = "workflow.run"
 args = "Documentation Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Test Workflow"
+
 [[workflows.workflow]]
 name = "Documentation Server"
 author = "agent"
@@ -29,6 +33,20 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "python -m http.server 8000"
 waitForPort = 8000
+
+[[workflows.workflow]]
+name = "Test Workflow"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "/nix/store/python3/bin/python3 src/test_workflow.py"
 
 [deployment]
 run = ["sh", "-c", "python -m http.server 8000"]
