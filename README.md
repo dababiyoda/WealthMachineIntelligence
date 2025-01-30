@@ -14,6 +14,8 @@ A unified ontological backbone for digital business ventures that emphasizes AI 
 - Multi-agent architecture for automated decision-making
 - Data-driven validation of business opportunities
 - Continuous learning and optimization through AI feedback loops
+- Real-time agent performance monitoring and visualization
+- Intelligent efficiency metrics tracking across agent ecosystem
 
 ### Iterative Growth Strategy
 - Phased approach to business development
@@ -38,7 +40,12 @@ Strategic roadmap divided into three progressive phases of business development.
 Rules and logic for automated decision-making processes.
 
 ### /ai-integration
-Architecture and workflows for AI agent implementation.
+Architecture and workflows for AI agent implementation. Key components:
+- Agent lifecycle management and communication protocols
+- Performance monitoring and visualization tools
+- Real-time efficiency metrics and heatmaps
+- Multi-agent coordination frameworks
+See `/ai-integration/performance_metrics.py` for agent performance tracking implementation.
 
 ### /knowledge-graph
 Query patterns and examples for exploring relationships between ventures, roles, and processes. See:
@@ -53,7 +60,8 @@ Query patterns and examples for exploring relationships between ventures, roles,
 4. Follow the phase progression in `/phases`
 5. Implement automation rules from `/automation`
 6. Deploy AI agents according to `/ai-integration` guidelines
-7. Explore knowledge graph capabilities in `/knowledge-graph`
+7. Monitor agent performance using the heatmap visualization system
+8. Explore knowledge graph capabilities in `/knowledge-graph`
 
 ## Future Development
 - Expansion of ontology with domain-specific extensions
@@ -61,3 +69,4 @@ Query patterns and examples for exploring relationships between ventures, roles,
 - Development of automated validation systems
 - Enhancement of multi-agent coordination
 - Implementation of live knowledge graph queries
+- Advanced performance analytics and optimization tools
