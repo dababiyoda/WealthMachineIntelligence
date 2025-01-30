@@ -38,7 +38,18 @@ Strategic roadmap divided into three progressive phases of business development.
 Rules and logic for automated decision-making processes.
 
 ### /ai-integration
-Architecture and workflows for AI agent implementation.
+Architecture and workflows for AI agent implementation. Key documentation includes:
+- `agent-architecture.md`: Comprehensive agent system design, communication flows, and scalability
+- `agent-flow.md`: Detailed step-by-step workflow for agent operations
+- `agent-lifecycle.md`: Agent initialization, state management, and maintenance
+- `multi-agent-workflow.md`: Inter-agent coordination and business process automation
+- `AI-tools.md`: Integration guidelines for AI capabilities
+
+For detailed understanding of the multi-agent system:
+1. Start with `agent-architecture.md` for system overview
+2. Review `agent-flow.md` for operational details
+3. Study `agent-lifecycle.md` for implementation specifics
+4. See `multi-agent-workflow.md` for orchestration patterns
 
 ### /knowledge-graph
 Query patterns and examples for exploring relationships between ventures, roles, and processes. See:
