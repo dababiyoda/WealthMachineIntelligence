@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
-    pkgs.glibcLocales
+    pkgs.glibcLocal
+    pkgs.python310es
   ];
 }

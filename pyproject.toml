@@ -2,7 +2,7 @@
 name = "repl-nix-workspace"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.11"
+requires-python = ">=3.8
 dependencies = [
     "numpy>=2.2.2",
     "pandas>=2.2.3",
