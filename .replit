@@ -46,7 +46,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "/nix/store/python3/bin/python3 src/test_workflow.py"
+args = "python3 src/test_workflow.py"
 
 [deployment]
 run = ["sh", "-c", "python -m http.server 8000"]
