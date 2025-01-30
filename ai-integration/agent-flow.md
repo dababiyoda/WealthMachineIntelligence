@@ -1,5 +1,5 @@
 # Agent Flow Documentation
-
+#
 ## Overview
 This document details the operational flow of AI agents within the WealthMachineOntology_DigitalAI framework, covering initialization through output logging.
 
@@ -345,32 +345,68 @@ async def risk_assessment_workflow(venture_id: str, market_analysis: Dict):
 
 ### 3. Legal Compliance Phase
 ```python
+import asyncio
+from datetime import datetime
+from typing import Dict
+
 async def legal_compliance_workflow(venture_id: str):
     legal_agent = LegalComplianceAgent()
     compliance_analyzer = LegalComplianceAnalyzer()
 
-    # Fetch venture and regulatory documents
-    venture_data = await legal_agent.knowledge_graph.get_venture_data(venture_id)
-    regulatory_docs = await legal_agent.get_relevant_regulations(venture_data['type'])
+    # Multi-channel notification system setup
+    notification_channels = {
+        'knowledge_graph': async (data) => {
+            # Update compliance status in knowledge graph
+            await legal_agent.knowledge_graph.update_compliance_status({
+                'venture_id': venture_id,
+                'compliance_status': data.status,
+                'requires_action': data.requires_action,
+                'risk_level': data.risk_level,
+                'timestamp': datetime.now(),
+                'action_items': data.required_actions
+            })
+        },
+        'risk_assessment': async (data) => {
+            # Direct notification to Risk Assessment Agent
+            await legal_agent.notify_risk_assessment({
+                'compliance_issue': data.description,
+                'risk_level': data.risk_level,
+                'required_actions': data.required_actions,
+                'venture_id': venture_id
+            })
+        },
+        'stakeholder_notification': async (data) => {
+            # Notify relevant stakeholders
+            await legal_agent.notify_stakeholders({
+                'roles': ['LegalCounsel', 'RegulatoryExpert'],
+                'priority': data.risk_level,
+                'message': data.description,
+                'action_items': data.required_actions
+            })
+        }
+    }
 
-    # Analyze regulatory compliance using BERT
-    compliance_analysis = await compliance_analyzer.analyze_regulations(regulatory_docs)
+    # Process compliance analysis
+    compliance_analysis = await compliance_analyzer.analyze_regulations(
+        await legal_agent.get_relevant_regulations(venture_id)
+    )
 
-    # Update compliance status
-    await legal_agent.knowledge_graph.update_compliance_status({
-        'venture_id': venture_id,
-        'compliance_status': compliance_analysis['overall_status'],
-        'timestamp': datetime.now(),
+    # Prepare notification data
+    notification_data = {
+        'status': compliance_analysis['overall_status'],
+        'requires_action': compliance_analysis['overall_status'] != 'compliant',
+        'risk_level': determine_risk_level(compliance_analysis),
+        'description': format_compliance_summary(compliance_analysis),
         'required_actions': extract_required_actions(compliance_analysis)
-    })
+    }
 
-    # If critical compliance issues found, notify team immediately
-    if compliance_analysis['overall_status'] == 'non_compliant':
-        await notify_team(venture_id, {
-            'status': 'CRITICAL',
-            'message': 'Compliance violation detected',
-            'details': compliance_analysis['results']
-        })
+    # Execute all notifications in parallel
+    await asyncio.gather(*[
+        channel(notification_data)
+        for channel in notification_channels.values()
+    ])
+
+    return compliance_analysis
 ```
 
 ### Complete Assessment Flow

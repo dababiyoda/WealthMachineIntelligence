@@ -1,7 +1,7 @@
 # AI Tools Catalog
-
+#
 ## Market Analysis Tools
-
+#
 ### Sentiment Analysis
 - Tool: SentimentAI
 - Framework: spaCy + Hugging Face Transformers
@@ -30,6 +30,8 @@ class SentimentAnalyzer:
         return sentiments
 ```
 
+```python
+#
 ### Market Predictor
 - Framework: PyTorch
 - Models: LSTM for time series
@@ -67,6 +69,8 @@ class MarketPredictor(nn.Module):
         }
 ```
 
+```python
+#
 ### ARIMA Market Analyzer
 - Framework: statsmodels
 - Purpose: Time series forecasting
@@ -75,6 +79,7 @@ class MarketPredictor(nn.Module):
 from statsmodels.tsa.arima.model import ARIMA
 import numpy as np
 from typing import Dict, List
+from datetime import datetime
 
 class ARIMAAnalyzer:
     def __init__(self, order=(1, 1, 1)):
@@ -107,6 +112,8 @@ class ARIMAAnalyzer:
         }
 ```
 
+```python
+#
 ### Risk Assessment Model
 - Framework: Scikit-learn with Monte Carlo
 - Purpose: Risk simulation and classification
@@ -115,6 +122,8 @@ class ARIMAAnalyzer:
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 from typing import Dict, List
+import json
+from datetime import datetime
 
 class RiskAssessmentModel:
     def __init__(self, n_simulations: int = 1000):
@@ -168,6 +177,8 @@ class RiskAssessmentModel:
         return perturbed
 ```
 
+```python
+#
 ### Legal Compliance Analyzer
 - Framework: Transformers (BERT)
 - Purpose: Regulatory document analysis
@@ -176,6 +187,7 @@ class RiskAssessmentModel:
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from typing import Dict, List
+from datetime import datetime
 
 class LegalComplianceAnalyzer:
     def __init__(self):
@@ -227,8 +239,116 @@ class LegalComplianceAnalyzer:
         return 'compliant'
 ```
 
-## Data Processing Pipeline
+```python
+#
+### Knowledge Graph Integration
+- Integration Interface:
+```python
+from typing import Dict, List
+from datetime import datetime
+import json
 
+class KnowledgeGraphConnector:
+    def __init__(self):
+        self.client = GraphDBClient()
+
+    async def store_sentiment(self, sentiment_data: Dict) -> None:
+        query = """
+        MATCH (t:AITool {name: 'SentimentAI'})
+        MERGE (t)-[:PROCESSES]->(d:MarketData)
+        SET d.sentiment_score = $score,
+            d.confidence = $confidence,
+            d.timestamp = datetime()
+        """
+        await self.client.execute(query, sentiment_data)
+
+    async def store_predictions(self, prediction_data: Dict) -> None:
+        query = """
+        MATCH (m:PredictiveModel)-[:FORECASTS]->(v:DigitalVenture)
+        WHERE m.type IN ['LSTM', 'ARIMA']
+        SET v.forecast = $forecast,
+            v.confidence = $confidence,
+            v.last_updated = datetime()
+        """
+        await self.client.execute(query, prediction_data)
+
+    async def store_risk_assessment(self, risk_data: Dict) -> None:
+        # First, get current version count
+        version_count_query = """
+        MATCH (v:DigitalVenture {id: $venture_id})
+        OPTIONAL MATCH (v)-[:hasRiskHistory]->(h:RiskHistory)
+        RETURN count(h) as version_count
+        """
+        version_count = await self.client.execute(version_count_query, 
+            {'venture_id': risk_data['venture_id']})
+
+        # If we have 10 versions, remove the oldest one
+        if version_count >= 10:
+            cleanup_query = """
+            MATCH (v:DigitalVenture {id: $venture_id})-[:hasRiskHistory]->(h:RiskHistory)
+            WITH h ORDER BY h.timestamp ASC LIMIT 1
+            DETACH DELETE h
+            """
+            await self.client.execute(cleanup_query, 
+                {'venture_id': risk_data['venture_id']})
+
+        # Create new risk history node
+        store_query = """
+        MATCH (v:DigitalVenture {id: $venture_id})
+        CREATE (v)-[:hasRiskHistory]->(h:RiskHistory {
+            timestamp: datetime(),
+            risk_score: $risk_score,
+            risk_factors: $risk_factors,
+            confidence: $confidence,
+            version_number: $version_number
+        })
+
+        // Also update current risk profile
+        MERGE (v)-[:hasCurrentRisk]->(r:RiskProfile)
+        SET r.risk_score = $risk_score,
+            r.last_updated = datetime(),
+            r.confidence = $confidence
+        """
+
+        await self.client.execute(store_query, {
+            'venture_id': risk_data['venture_id'],
+            'risk_score': risk_data['risk_class'],
+            'risk_factors': json.dumps(risk_data['weighted_features']),
+            'confidence': float(risk_data['risk_probabilities'].max()),
+            'version_number': version_count + 1
+        })
+
+    async def get_risk_history(self, venture_id: str) -> List[Dict]:
+        """Retrieve the risk history for trend analysis"""
+        query = """
+        MATCH (v:DigitalVenture {id: $venture_id})-[:hasRiskHistory]->(h:RiskHistory)
+        RETURN h
+        ORDER BY h.timestamp DESC
+        LIMIT 10
+        """
+        return await self.client.execute(query, {'venture_id': venture_id})
+
+    async def store_compliance_analysis(self, analysis_data: Dict) -> None:
+        query = """
+        MATCH (d:DigitalVenture {id: $venture_id})
+        MERGE (d)-[:COMPLIES_WITH]->(r:RegulatoryCompliance)
+        SET r.status = $overall_status,
+            r.analysis_timestamp = datetime()
+        """
+        await self.client.execute(query, analysis_data)
+    async def store_forecast(self, forecast_data: Dict) -> None:
+        query = """
+        MATCH (m:PredictiveModel)-[:FORECASTS]->(v:DigitalVenture)
+        WHERE m.type = 'ARIMA'
+        SET v.forecast = $forecast,
+            v.confidence_intervals = $confidence_intervals,
+            v.last_updated = datetime()
+        """
+        await self.client.execute(query, forecast_data)
+```
+
+```python
+#
 ### Market Data Pipeline
 - Framework: Apache Spark
 - Purpose: Large-scale market data processing
@@ -264,66 +384,8 @@ class MarketDataPipeline:
         return results
 ```
 
-### Knowledge Graph Integration
-- Integration Interface:
 ```python
-from typing import Dict, List
-from datetime import datetime
-
-class KnowledgeGraphConnector:
-    def __init__(self):
-        self.client = GraphDBClient()
-
-    async def store_sentiment(self, sentiment_data: Dict) -> None:
-        query = """
-        MATCH (t:AITool {name: 'SentimentAI'})
-        MERGE (t)-[:PROCESSES]->(d:MarketData)
-        SET d.sentiment_score = $score,
-            d.confidence = $confidence,
-            d.timestamp = datetime()
-        """
-        await self.client.execute(query, sentiment_data)
-
-    async def store_predictions(self, prediction_data: Dict) -> None:
-        query = """
-        MATCH (m:PredictiveModel)-[:FORECASTS]->(v:DigitalVenture)
-        WHERE m.type IN ['LSTM', 'ARIMA']
-        SET v.forecast = $forecast,
-            v.confidence = $confidence,
-            v.last_updated = datetime()
-        """
-        await self.client.execute(query, prediction_data)
-
-    async def store_risk_assessment(self, risk_data: Dict) -> None:
-        query = """
-        MATCH (v:DigitalVenture {id: $venture_id})
-        MERGE (v)-[:hasRiskProfile]->(r:RiskProfile)
-        SET r.risk_score = $risk_score,
-            r.last_updated = datetime()
-        """
-        await self.client.execute(query, risk_data)
-    async def store_compliance_analysis(self, analysis_data: Dict) -> None:
-        query = """
-        MATCH (d:DigitalVenture {id: $venture_id})
-        MERGE (d)-[:COMPLIES_WITH]->(r:RegulatoryCompliance)
-        SET r.status = $overall_status,
-            r.analysis_timestamp = datetime()
-        """
-        await self.client.execute(query, analysis_data)
-    async def store_forecast(self, forecast_data: Dict) -> None:
-        query = """
-        MATCH (m:PredictiveModel)-[:FORECASTS]->(v:DigitalVenture)
-        WHERE m.type = 'ARIMA'
-        SET v.forecast = $forecast,
-            v.confidence_intervals = $confidence_intervals,
-            v.last_updated = datetime()
-        """
-        await self.client.execute(query, forecast_data)
-
-```
-
-## Big Data Processing
-
+#
 ### Data Pipeline Tools
 - Framework: Apache Spark
 - Purpose: Large-scale data processing
@@ -349,6 +411,8 @@ class DataPipeline:
         return processed
 ```
 
+```python
+#
 ### NLP Processing
 - Framework: Hugging Face Transformers
 - Models: BERT, RoBERTa, GPT
@@ -366,15 +430,17 @@ class NLPProcessor:
         return self.model(**tokens)
 ```
 
+```python
+#
 ## Knowledge Graph Integration
 - Tool → implements → AICapability
 - Tool → processesData → DataType
 - Tool → supportsProcess → BusinessProcess
 - Tool → enablesAgent → AgentType
 - Tool → updatesMetric → PerformanceIndicator
-
+#
 ## Machine Learning Models
-
+#
 ### Market Intelligence Models
 - LSTM Networks:
   - Purpose: Time series prediction
@@ -386,14 +452,14 @@ class NLPProcessor:
   - Input: Historical market data
   - Output: Forecasts and confidence intervals
   - Training: Regular updates as new data becomes available
-
+#
 ### Risk Assessment Models
 - Monte Carlo Simulation:
   - Purpose: Risk scenario analysis
   - Input: Venture metrics and historical volatility
   - Output: Risk distribution and VaR metrics
   - Updates: Daily risk reassessment
-
+#
 ### Natural Language Processing
 - BERT Models:
   - Purpose: Regulatory compliance analysis

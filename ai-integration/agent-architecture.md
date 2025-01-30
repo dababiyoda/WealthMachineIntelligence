@@ -1,5 +1,5 @@
 # AI Agent Architecture
-
+#
 ## Overview
 Comprehensive framework for AI agent deployment and orchestration in digital business operations.
 For detailed lifecycle and interaction specifications, see `/ai-integration/agent-lifecycle.md`.
@@ -31,13 +31,9 @@ class MarketIntelligenceAgent:
         )
 
         # Configure weights for hybrid predictions
-        self.lstm_weight = 0.7  # Increased weight for LSTM predictions
-        self.sentiment_weight = 0.3  # Decreased weight for sentiment analysis
-
-        # Risk classification weights
         self.risk_weights = {
-            'lstm_trend': 0.6,  # LSTM trend contribution to risk
-            'market_indicators': 0.4  # Traditional indicators contribution
+            'lstm_trend': 0.6,  # LSTM predictions weight
+            'market_indicators': 0.4  # Traditional indicators weight
         }
 
     def _build_lstm_model(self):
@@ -97,32 +93,36 @@ class MarketIntelligenceAgent:
         # Get LSTM-based market trends
         trend_analysis = await self.analyze_market_trends(market_data)
 
-        # Combine LSTM trends with traditional market indicators
-        combined_features = [
-            trend_analysis['predictions'][-1],  # Latest LSTM prediction
-            market_data.volatility * self.risk_weights['market_indicators'],
-            market_data.volume_change * self.risk_weights['market_indicators'],
-            market_data.price_momentum * self.risk_weights['market_indicators']
-        ]
-
-        # Get risk classification with probabilities
-        risk_class = self.risk_classifier.predict([combined_features])[0]
-        risk_probs = self.risk_classifier.predict_proba([combined_features])[0]
-
-        risk_assessment = {
-            'risk_class': int(risk_class),
-            'risk_probabilities': risk_probs.tolist(),
-            'lstm_contribution': trend_analysis['predictions'][-1],
-            'market_indicators_contribution': {
-                'volatility': market_data.volatility,
-                'volume_change': market_data.volume_change,
-                'price_momentum': market_data.price_momentum
-            },
-            'timestamp': datetime.now()
+        # Create weighted feature vector for Random Forest
+        weighted_features = {
+            'lstm_prediction': trend_analysis['predictions'][-1] * self.risk_weights['lstm_trend'],  # 60% weight
+            'traditional_indicators': {
+                # Each traditional indicator gets an equal share of the 40% weight
+                'volatility': market_data.volatility * (self.risk_weights['market_indicators'] / 3),
+                'volume_change': market_data.volume_change * (self.risk_weights['market_indicators'] / 3),
+                'price_momentum': market_data.price_momentum * (self.risk_weights['market_indicators'] / 3)
+            }
         }
 
-        # Update knowledge graph with detailed risk assessment
-        await self.knowledge_graph.update_risk_analysis(risk_assessment)
+        # Create final feature vector for Random Forest
+        combined_features = [
+            weighted_features['lstm_prediction'],  # LSTM prediction (60% weight)
+            weighted_features['traditional_indicators']['volatility'],  # ~13.33% weight
+            weighted_features['traditional_indicators']['volume_change'],  # ~13.33% weight
+            weighted_features['traditional_indicators']['price_momentum']  # ~13.33% weight
+        ]
+
+        # Store weights in assessment for transparency
+        risk_assessment = {
+            'risk_class': self.risk_classifier.predict([combined_features])[0],
+            'risk_probabilities': self.risk_classifier.predict_proba([combined_features])[0].tolist(),
+            'feature_weights': {
+                'lstm_contribution': self.risk_weights['lstm_trend'],
+                'market_indicators_contribution': self.risk_weights['market_indicators']
+            },
+            'weighted_features': weighted_features,
+            'timestamp': datetime.now()
+        }
 
         return risk_assessment
 
