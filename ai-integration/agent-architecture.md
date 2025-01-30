@@ -13,7 +13,7 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class MarketIntelligenceAgent:
     def __init__(self):
@@ -426,6 +426,7 @@ class LegalComplianceAgent:
 The `RiskAssessmentAgent` employs a weighted average to calculate the overall risk score. The `weights` dictionary defines the contribution of each risk factor (market, compliance, operational) to the final risk score. These weights are adjustable, allowing for dynamic prioritization of different risk categories.
 
 ```python
+import numpy as np
 class RiskAssessmentAgent:
     def __init__(self):
         # Adjustable risk weights
@@ -434,14 +435,7 @@ class RiskAssessmentAgent:
             'compliance': 0.3,  # Compliance risk weight
             'operational': 0.3  # Operational risk weight
         }
-```
 
-### Risk Score Storage & Versioning
-The `RiskAssessmentAgent` manages risk score storage and versioning within the knowledge graph.  The `versioning` configuration allows for enabling/disabling versioning, setting the maximum number of versions to retain, and defining the versioning interval.  The `evaluate_risk` function calculates the weighted risk score, creates a versioned risk profile, and stores it in the knowledge graph with versioning enabled.
-
-```python
-class RiskAssessmentAgent:
-    def __init__(self):
         # Risk score versioning configuration
         self.versioning = {
             'enabled': True,
@@ -485,6 +479,10 @@ class RiskAssessmentAgent:
             create_version=self.versioning['enabled']
         )
 ```
+
+### Risk Score Storage & Versioning
+The `RiskAssessmentAgent` manages risk score storage and versioning within the knowledge graph.  The `versioning` configuration allows for enabling/disabling versioning, setting the maximum number of versions to retain, and defining the versioning interval.  The `evaluate_risk` function calculates the weighted risk score, creates a versioned risk profile, and stores it in the knowledge graph with versioning enabled.
+
 
 ## Communication Flows
 

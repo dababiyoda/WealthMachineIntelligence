@@ -430,9 +430,7 @@ class NLPProcessor:
         return self.model(**tokens)
 ```
 
-```python
-#
-## Knowledge Graph Integration
+# Knowledge Graph Integration
 - Tool → implements → AICapability
 - Tool → processesData → DataType
 - Tool → supportsProcess → BusinessProcess
