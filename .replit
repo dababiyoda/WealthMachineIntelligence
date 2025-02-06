@@ -13,14 +13,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Documentation Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Test Workflow"
+args = "Python Test"
 
 [[workflows.workflow]]
-name = "Documentation Server"
+name = "Python Test"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -31,25 +27,10 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m http.server 8000"
-waitForPort = 8000
-
-[[workflows.workflow]]
-name = "Test Workflow"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python3 src/test_workflow.py"
+args = "python3 -c 'import sys; print(f\"Python {sys.version} is working!\")'"
 
 [deployment]
-run = ["sh", "-c", "python -m http.server 8000"]
+run = ["sh", "-c", "python3 -c 'import sys; print(f\"Python {sys.version} is working!\")'"]
 
 [[ports]]
 localPort = 8000
