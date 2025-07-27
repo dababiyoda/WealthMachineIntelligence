@@ -2,145 +2,234 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WealthMachine</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#FFFFFF">
+    <title>WealthMachine - Smart Digital Ventures</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    
+    <!-- Google Fonts - SF Pro Display alternative -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
-<body class="dark-mode">
+<body>
     <div class="app">
-        <!-- Navigation -->
-        <nav class="nav">
-            <div class="nav-content">
-                <div class="nav-brand">
-                    <span class="brand-symbol">◎</span>
-                    <span class="brand-text">WealthMachine</span>
+        <!-- iOS-style Navigation Bar -->
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">
+                    <div class="brand-icon">
+                        <span class="material-icons-round">trending_up</span>
+                    </div>
+                    <h1 class="brand-name">WealthMachine</h1>
                 </div>
                 
-                <div class="nav-actions">
-                    <button class="theme-toggle" id="themeToggle">
-                        <span class="theme-icon">◐</span>
+                <div class="navbar-actions">
+                    <button class="icon-button" id="themeToggle" aria-label="Toggle theme">
+                        <span class="material-icons-round">dark_mode</span>
                     </button>
-                    <div class="user-avatar">DY</div>
+                    <button class="icon-button" id="notificationBtn" aria-label="Notifications">
+                        <span class="material-icons-round">notifications</span>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <button class="avatar-button">
+                        <img src="https://ui-avatars.com/api/?name=User&background=6366F1&color=fff&bold=true" alt="User avatar">
+                    </button>
                 </div>
             </div>
         </nav>
 
         <!-- Main Content -->
-        <main class="main">
-            <div class="container">
-                <!-- Header Section -->
-                <section class="header-section">
-                    <div class="status-badge">
-                        <span class="status-dot"></span>
-                        <span>P(failure) ≤ 0.01%</span>
+        <main class="main-content">
+            <!-- Hero Section with Stats -->
+            <section class="hero-section">
+                <div class="container">
+                    <div class="hero-content">
+                        <div class="success-indicator">
+                            <span class="pulse-dot"></span>
+                            <span class="indicator-text">Ultra-Low Risk Mode Active</span>
+                        </div>
+                        
+                        <h2 class="hero-title">Your Digital Ventures</h2>
+                        <p class="hero-subtitle">AI-powered business opportunities with 99.99% success rate</p>
                     </div>
                     
-                    <h1 class="main-title">Ultra-Reliable Digital Opportunities</h1>
-                    <p class="main-subtitle">AI-driven identification, validation, and scaling with enterprise precision</p>
-                    
-                    <div class="quick-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="totalVentures">—</div>
-                            <div class="stat-label">Active Ventures</div>
+                    <!-- Material Design Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <span class="material-icons-round">rocket_launch</span>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalVentures">0</h3>
+                                <p class="stat-label">Active Ventures</p>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="monthlyRevenue">—</div>
-                            <div class="stat-label">Monthly Revenue</div>
+                        
+                        <div class="stat-card primary">
+                            <div class="stat-icon">
+                                <span class="material-icons-round">attach_money</span>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="monthlyRevenue">$0</h3>
+                                <p class="stat-label">Monthly Revenue</p>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="successRate">—</div>
-                            <div class="stat-label">Target Achievement</div>
+                        
+                        <div class="stat-card success">
+                            <div class="stat-icon">
+                                <span class="material-icons-round">verified</span>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="successRate">0%</h3>
+                                <p class="stat-label">Success Rate</p>
+                            </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- Ventures Grid -->
-                <section class="ventures-section">
+            <!-- Ventures Section -->
+            <section class="ventures-section">
+                <div class="container">
                     <div class="section-header">
-                        <h2>Portfolio Overview</h2>
-                        <button class="btn-primary" id="evaluateBtn">Evaluate New Opportunity</button>
+                        <div>
+                            <h2 class="section-title">Active Ventures</h2>
+                            <p class="section-subtitle">Your portfolio of AI-validated opportunities</p>
+                        </div>
+                        <button class="fab" id="evaluateBtn" aria-label="Add new venture">
+                            <span class="material-icons-round">add</span>
+                        </button>
                     </div>
                     
                     <div class="ventures-grid" id="venturesGrid">
-                        <!-- Dynamic content will be loaded here -->
+                        <!-- Ventures will be loaded here -->
+                        <div class="empty-state">
+                            <span class="material-icons-round empty-icon">inventory_2</span>
+                            <h3>No ventures yet</h3>
+                            <p>Start by evaluating a new opportunity</p>
+                        </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- AI Agents Status -->
-                <section class="agents-section">
+            <!-- AI Agents Section -->
+            <section class="agents-section">
+                <div class="container">
                     <div class="section-header">
-                        <h2>AI System Status</h2>
-                        <div class="agents-health">
-                            <span class="health-dot"></span>
-                            <span>All Systems Operational</span>
+                        <div>
+                            <h2 class="section-title">AI Agents</h2>
+                            <p class="section-subtitle">Intelligent systems powering your success</p>
+                        </div>
+                        <div class="system-status">
+                            <span class="status-icon success"></span>
+                            <span>All Systems Active</span>
                         </div>
                     </div>
                     
                     <div class="agents-grid" id="agentsGrid">
-                        <!-- Dynamic content will be loaded here -->
+                        <!-- AI Agents will be loaded here -->
                     </div>
-                </section>
-            </div>
+                </div>
+            </section>
         </main>
 
-        <!-- Evaluation Modal -->
-        <div class="modal" id="evaluationModal">
+        <!-- Material Design Modal -->
+        <div class="modal-overlay" id="evaluationModal" aria-hidden="true">
             <div class="modal-backdrop"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Venture Evaluation</h3>
-                    <button class="modal-close" id="modalClose">×</button>
-                </div>
-                <div class="modal-body">
-                    <div class="evaluation-form">
-                        <div class="form-group">
-                            <label>Venture Name</label>
-                            <input type="text" id="ventureName" placeholder="Enter venture name">
-                        </div>
-                        <div class="form-group">
-                            <label>Market Size</label>
-                            <input type="number" id="marketSize" placeholder="5000000">
-                        </div>
-                        <div class="form-group">
-                            <label>Competition Level</label>
-                            <select id="competitionLevel">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-                        <button class="btn-primary btn-full" id="runEvaluation">Run AI Evaluation</button>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">New Venture Evaluation</h3>
+                        <button class="icon-button" id="modalClose" aria-label="Close modal">
+                            <span class="material-icons-round">close</span>
+                        </button>
                     </div>
                     
-                    <div class="evaluation-results" id="evaluationResults" style="display: none;">
-                        <div class="result-header">
-                            <div class="result-status"></div>
-                            <div class="result-confidence"></div>
+                    <div class="modal-body">
+                        <!-- Evaluation Form -->
+                        <form class="evaluation-form" id="evaluationForm">
+                            <div class="form-field">
+                                <input type="text" id="ventureName" class="text-input" placeholder=" " required>
+                                <label for="ventureName" class="floating-label">Venture Name</label>
+                            </div>
+                            
+                            <div class="form-field">
+                                <input type="number" id="marketSize" class="text-input" placeholder=" " value="5000000" required>
+                                <label for="marketSize" class="floating-label">Market Size ($)</label>
+                            </div>
+                            
+                            <div class="form-field">
+                                <select id="competitionLevel" class="select-input">
+                                    <option value="low">Low Competition</option>
+                                    <option value="medium" selected>Medium Competition</option>
+                                    <option value="high">High Competition</option>
+                                </select>
+                                <label for="competitionLevel" class="select-label">Competition Level</label>
+                            </div>
+                            
+                            <button type="submit" class="button button-primary" id="runEvaluation">
+                                <span class="material-icons-round">analytics</span>
+                                Run AI Analysis
+                            </button>
+                        </form>
+                        
+                        <!-- Results Section -->
+                        <div class="evaluation-results" id="evaluationResults" style="display: none;">
+                            <div class="results-header">
+                                <span class="material-icons-round result-icon">check_circle</span>
+                                <h4>Analysis Complete</h4>
+                            </div>
+                            
+                            <div class="result-cards">
+                                <div class="result-card">
+                                    <span class="result-label">Opportunity Score</span>
+                                    <span class="result-value" id="opportunityScore">0</span>
+                                </div>
+                                <div class="result-card">
+                                    <span class="result-label">Success Probability</span>
+                                    <span class="result-value" id="failureProbability">0%</span>
+                                </div>
+                                <div class="result-card">
+                                    <span class="result-label">Risk Level</span>
+                                    <span class="result-value risk-badge" id="riskLevel">Low</span>
+                                </div>
+                            </div>
+                            
+                            <div class="recommendation-card" id="recommendation">
+                                <span class="material-icons-round">lightbulb</span>
+                                <p>Analyzing recommendation...</p>
+                            </div>
                         </div>
-                        <div class="result-metrics">
-                            <div class="metric">
-                                <span class="metric-label">Opportunity Score</span>
-                                <span class="metric-value" id="opportunityScore">—</span>
-                            </div>
-                            <div class="metric">
-                                <span class="metric-label">Failure Probability</span>
-                                <span class="metric-value" id="failureProbability">—</span>
-                            </div>
-                            <div class="metric">
-                                <span class="metric-label">Risk Level</span>
-                                <span class="metric-value" id="riskLevel">—</span>
-                            </div>
-                        </div>
-                        <div class="result-recommendation" id="recommendation"></div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- iOS-style Bottom Tab Bar -->
+        <nav class="tab-bar">
+            <a href="#" class="tab-item active">
+                <span class="material-icons-round">dashboard</span>
+                <span class="tab-label">Dashboard</span>
+            </a>
+            <a href="#" class="tab-item">
+                <span class="material-icons-round">folder</span>
+                <span class="tab-label">Ventures</span>
+            </a>
+            <a href="#" class="tab-item">
+                <span class="material-icons-round">insights</span>
+                <span class="tab-label">Analytics</span>
+            </a>
+            <a href="#" class="tab-item">
+                <span class="material-icons-round">settings</span>
+                <span class="tab-label">Settings</span>
+            </a>
+        </nav>
     </div>
 
-    <script src="app.js"></script>
+    <script src="/static/app.js"></script>
 </body>
 </html>

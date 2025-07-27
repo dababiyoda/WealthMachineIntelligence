@@ -1,58 +1,369 @@
-// WealthMachine Ultra-Modern UI - Critical Precision Interface
+// WealthMachine - Modern UI JavaScript
+// Material Design + iOS Inspired Interactions
+
 class WealthMachineApp {
     constructor() {
-        this.isDarkMode = true;
-        this.apiBase = 'http://localhost:5000';
+        this.apiBase = window.location.origin;
         this.authToken = null;
-        this.data = {
-            ventures: [],
-            agents: [],
-            dashboard: {}
-        };
-        
+        this.isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        this.currentTab = 'dashboard';
+        this.ventures = [];
+        this.agents = [];
         this.init();
     }
 
     async init() {
-        this.setupEventListeners();
-        this.applyTheme();
         await this.authenticate();
-        await this.loadData();
-        this.render();
+        this.setupEventListeners();
+        this.loadDashboardData();
+        this.startAutoRefresh();
+        this.applyTheme();
     }
 
     setupEventListeners() {
         // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            this.toggleTheme();
-        });
-
+        document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+        
         // Modal controls
-        document.getElementById('evaluateBtn').addEventListener('click', () => {
-            this.openModal();
-        });
-
-        document.getElementById('modalClose').addEventListener('click', () => {
-            this.closeModal();
-        });
-
-        document.querySelector('.modal-backdrop').addEventListener('click', () => {
-            this.closeModal();
-        });
-
-        // Evaluation form
-        document.getElementById('runEvaluation').addEventListener('click', () => {
+        document.getElementById('evaluateBtn').addEventListener('click', () => this.showModal());
+        document.getElementById('modalClose').addEventListener('click', () => this.hideModal());
+        document.querySelector('.modal-backdrop').addEventListener('click', () => this.hideModal());
+        
+        // Form submission
+        document.getElementById('evaluationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
             this.runEvaluation();
         });
-
+        
+        // Tab navigation
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchTab(tab);
+            });
+        });
+        
+        // Notification button
+        document.getElementById('notificationBtn').addEventListener('click', () => {
+            this.showNotification('No new notifications');
+        });
+        
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.closeModal();
-            if (e.key === 'n' && (e.metaKey || e.ctrlKey)) {
+            if (e.key === 'Escape') this.hideModal();
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
-                this.openModal();
+                this.showModal();
             }
         });
+        
+        // Add ripple effect to buttons
+        this.addRippleEffect();
+    }
+
+    async authenticate() {
+        try {
+            const response = await fetch(`${this.apiBase}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'username=demo&password=demo'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.authToken = data.access_token;
+                console.log('✓ Authenticated successfully');
+            }
+        } catch (error) {
+            console.warn('Using demo authentication');
+            this.authToken = 'demo';
+        }
+    }
+
+    async loadDashboardData() {
+        try {
+            // Load all data in parallel
+            const [dashboardData, venturesData, agentsData] = await Promise.all([
+                this.fetchDashboard(),
+                this.fetchVentures(),
+                this.fetchAgents()
+            ]);
+            
+            this.updateDashboard(dashboardData);
+            this.ventures = venturesData.ventures || [];
+            this.agents = agentsData.agents || [];
+            
+            this.renderVentures();
+            this.renderAgents();
+        } catch (error) {
+            console.error('Error loading data:', error);
+            this.useOfflineData();
+        }
+    }
+
+    async fetchDashboard() {
+        const response = await fetch(`${this.apiBase}/api/v1/analytics/dashboard`, {
+            headers: { 'Authorization': `Bearer ${this.authToken}` }
+        });
+        return response.ok ? response.json() : this.getOfflineDashboard();
+    }
+
+    async fetchVentures() {
+        const response = await fetch(`${this.apiBase}/api/v1/ventures`, {
+            headers: { 'Authorization': `Bearer ${this.authToken}` }
+        });
+        return response.ok ? response.json() : this.getOfflineVentures();
+    }
+
+    async fetchAgents() {
+        const response = await fetch(`${this.apiBase}/api/v1/agents`, {
+            headers: { 'Authorization': `Bearer ${this.authToken}` }
+        });
+        return response.ok ? response.json() : this.getOfflineAgents();
+    }
+
+    updateDashboard(data) {
+        // Animate number updates
+        this.animateValue('totalVentures', 0, data.total_ventures || 0, 1000);
+        this.animateValue('monthlyRevenue', 0, data.total_monthly_revenue || 0, 1000, true);
+        this.animateValue('successRate', 0, data.ultra_low_failure_rate_percentage || 0, 1000, false, true);
+    }
+
+    animateValue(id, start, end, duration, isCurrency = false, isPercentage = false) {
+        const element = document.getElementById(id);
+        const startTime = performance.now();
+        
+        const updateValue = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Easing function
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const current = start + (end - start) * easeOutQuart;
+            
+            if (isCurrency) {
+                element.textContent = `$${(current / 1000).toFixed(1)}K`;
+            } else if (isPercentage) {
+                element.textContent = `${current.toFixed(1)}%`;
+            } else {
+                element.textContent = Math.round(current);
+            }
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateValue);
+            }
+        };
+        
+        requestAnimationFrame(updateValue);
+    }
+
+    renderVentures() {
+        const container = document.getElementById('venturesGrid');
+        
+        if (this.ventures.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-icons-round empty-icon">inventory_2</span>
+                    <h3>No ventures yet</h3>
+                    <p>Start by evaluating a new opportunity</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.ventures.map(venture => `
+            <div class="venture-card" data-venture-id="${venture.id}">
+                <div class="venture-header">
+                    <h4 class="venture-name">${venture.name}</h4>
+                    <span class="venture-type">${this.formatVentureType(venture.type)}</span>
+                </div>
+                <div class="venture-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Revenue</span>
+                        <span class="metric-value">$${(venture.revenue / 1000).toFixed(1)}K</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Risk Score</span>
+                        <span class="metric-value">${(venture.risk_score * 100).toFixed(0)}%</span>
+                    </div>
+                </div>
+                <div class="venture-status ${this.getStatusClass(venture.failure_probability)}">
+                    <span class="status-dot"></span>
+                    <span>Failure Rate: ${(venture.failure_probability * 100).toFixed(3)}%</span>
+                </div>
+            </div>
+        `).join('');
+        
+        // Add click handlers
+        container.querySelectorAll('.venture-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const ventureId = card.dataset.ventureId;
+                this.showVentureDetails(ventureId);
+            });
+        });
+    }
+
+    renderAgents() {
+        const container = document.getElementById('agentsGrid');
+        
+        container.innerHTML = this.agents.map(agent => `
+            <div class="agent-card ${agent.active ? 'active' : 'inactive'}">
+                <div class="agent-icon">
+                    <span class="material-icons-round">${this.getAgentIcon(agent.type)}</span>
+                </div>
+                <h4 class="agent-name">${agent.name}</h4>
+                <div class="agent-stats">
+                    <div class="accuracy-bar">
+                        <div class="accuracy-fill" style="width: ${agent.accuracy * 100}%"></div>
+                    </div>
+                    <span class="accuracy-text">${(agent.accuracy * 100).toFixed(0)}% Accuracy</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    formatVentureType(type) {
+        const types = {
+            'saas': 'SaaS',
+            'ecommerce': 'E-commerce',
+            'content': 'Content Platform'
+        };
+        return types[type] || type;
+    }
+
+    getStatusClass(failureProbability) {
+        if (failureProbability <= 0.0001) return 'ultra-low-risk';
+        if (failureProbability <= 0.001) return 'low-risk';
+        if (failureProbability <= 0.01) return 'medium-risk';
+        return 'high-risk';
+    }
+
+    getAgentIcon(type) {
+        const icons = {
+            'market_intelligence': 'analytics',
+            'risk_assessment': 'security',
+            'legal_compliance': 'gavel',
+            'opportunity_scout': 'explore',
+            'portfolio_optimizer': 'auto_graph'
+        };
+        return icons[type] || 'smart_toy';
+    }
+
+    showModal() {
+        const modal = document.getElementById('evaluationModal');
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        
+        // Focus on first input
+        setTimeout(() => {
+            document.getElementById('ventureName').focus();
+        }, 300);
+    }
+
+    hideModal() {
+        const modal = document.getElementById('evaluationModal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        
+        // Reset form
+        document.getElementById('evaluationForm').reset();
+        document.getElementById('evaluationResults').style.display = 'none';
+        document.getElementById('evaluationForm').style.display = 'flex';
+    }
+
+    async runEvaluation() {
+        const ventureName = document.getElementById('ventureName').value;
+        const marketSize = document.getElementById('marketSize').value;
+        const competition = document.getElementById('competitionLevel').value;
+        
+        // Show loading state
+        const button = document.getElementById('runEvaluation');
+        const originalContent = button.innerHTML;
+        button.innerHTML = '<span class="loading"></span> Analyzing...';
+        button.disabled = true;
+        
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Show results
+            document.getElementById('evaluationForm').style.display = 'none';
+            document.getElementById('evaluationResults').style.display = 'block';
+            
+            // Update results with animation
+            const score = Math.random() * 30 + 70;
+            const successProb = 99.9 + Math.random() * 0.09;
+            const riskLevel = successProb > 99.95 ? 'Ultra Low' : 'Low';
+            
+            this.animateValue('opportunityScore', 0, score, 1000);
+            document.getElementById('failureProbability').textContent = `${successProb.toFixed(2)}%`;
+            document.getElementById('riskLevel').textContent = riskLevel;
+            
+            // Update recommendation
+            document.getElementById('recommendation').innerHTML = `
+                <span class="material-icons-round">lightbulb</span>
+                <p><strong>Recommendation:</strong> This venture shows excellent potential with ultra-low risk profile. 
+                The AI analysis indicates strong market fit and minimal competition risk. 
+                Consider proceeding with MVP development.</p>
+            `;
+            
+            // Add to ventures after delay
+            setTimeout(() => {
+                this.addNewVenture({
+                    name: ventureName,
+                    marketSize: marketSize,
+                    competition: competition,
+                    score: score,
+                    successProbability: successProb
+                });
+            }, 1500);
+            
+        } catch (error) {
+            this.showNotification('Error running evaluation', 'error');
+        } finally {
+            button.innerHTML = originalContent;
+            button.disabled = false;
+        }
+    }
+
+    addNewVenture(ventureData) {
+        const newVenture = {
+            id: `venture-${Date.now()}`,
+            name: ventureData.name,
+            type: 'saas',
+            status: 'evaluating',
+            revenue: 0,
+            risk_score: (100 - ventureData.score) / 100,
+            failure_probability: (100 - ventureData.successProbability) / 100
+        };
+        
+        this.ventures.unshift(newVenture);
+        this.renderVentures();
+        this.showNotification('New venture added successfully!', 'success');
+        
+        // Update dashboard count
+        const currentCount = parseInt(document.getElementById('totalVentures').textContent) || 0;
+        this.animateValue('totalVentures', currentCount, currentCount + 1, 500);
+    }
+
+    showVentureDetails(ventureId) {
+        const venture = this.ventures.find(v => v.id === ventureId);
+        if (!venture) return;
+        
+        this.showNotification(`Viewing details for ${venture.name}`, 'info');
+    }
+
+    switchTab(tabElement) {
+        // Update active states
+        document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+        tabElement.classList.add('active');
+        
+        const tabName = tabElement.querySelector('.tab-label').textContent.toLowerCase();
+        this.currentTab = tabName;
+        
+        this.showNotification(`Switched to ${tabName}`, 'info');
     }
 
     toggleTheme() {
@@ -61,357 +372,360 @@ class WealthMachineApp {
     }
 
     applyTheme() {
-        document.body.className = this.isDarkMode ? 'dark-mode' : '';
-        localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
-    }
-
-    async authenticate() {
-        try {
-            const response = await fetch(`${this.apiBase}/auth/login?username=demo&password=demo`, {
-                method: 'POST'
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                this.authToken = data.access_token || 'demo';
-                console.log('✓ Authentication successful');
-            }
-        } catch (error) {
-            console.warn('Authentication failed, using demo mode');
-            this.authToken = 'demo';
-        }
-    }
-
-    async loadData() {
-        await Promise.all([
-            this.loadDashboard(),
-            this.loadVentures(),
-            this.loadAgents()
-        ]);
-    }
-
-    async loadDashboard() {
-        try {
-            const response = await fetch(`${this.apiBase}/api/v1/analytics/dashboard`, {
-                headers: { 'Authorization': `Bearer ${this.authToken}` }
-            });
-            
-            if (response.ok) {
-                this.data.dashboard = await response.json();
-                console.log('✓ Dashboard data loaded');
-            }
-        } catch (error) {
-            console.warn('Using fallback dashboard data');
-            this.data.dashboard = {
-                total_ventures: 2,
-                total_monthly_revenue: 23700,
-                ultra_low_failure_rate_percentage: 85.5,
-                target_achievement: 'SUCCESS'
-            };
-        }
-    }
-
-    async loadVentures() {
-        try {
-            const response = await fetch(`${this.apiBase}/api/v1/ventures`, {
-                headers: { 'Authorization': `Bearer ${this.authToken}` }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                this.data.ventures = data.ventures || [];
-                console.log('✓ Ventures data loaded');
-            }
-        } catch (error) {
-            console.warn('Using fallback ventures data');
-            this.data.ventures = [
-                {
-                    id: 'venture-1',
-                    name: 'AI-Powered SaaS Analytics',
-                    type: 'saas',
-                    status: 'mvp',
-                    revenue: 8500,
-                    risk_score: 0.15,
-                    failure_probability: 0.0008
-                },
-                {
-                    id: 'venture-2', 
-                    name: 'B2B Digital Marketplace',
-                    type: 'ecommerce',
-                    status: 'scaling',
-                    revenue: 15200,
-                    risk_score: 0.08,
-                    failure_probability: 0.0003
-                }
-            ];
-        }
-    }
-
-    async loadAgents() {
-        try {
-            const response = await fetch(`${this.apiBase}/api/v1/agents`, {
-                headers: { 'Authorization': `Bearer ${this.authToken}` }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                this.data.agents = data.agents || [];
-                console.log('✓ Agents data loaded');
-            }
-        } catch (error) {
-            console.warn('Using fallback agents data');
-            this.data.agents = [
-                {
-                    id: 'agent-1',
-                    type: 'market_intelligence',
-                    name: 'Market Intelligence',
-                    active: true,
-                    accuracy: 0.85
-                },
-                {
-                    id: 'agent-2',
-                    type: 'risk_assessment', 
-                    name: 'Risk Assessment',
-                    active: true,
-                    accuracy: 0.92
-                },
-                {
-                    id: 'agent-3',
-                    type: 'legal_compliance',
-                    name: 'Legal Compliance',
-                    active: true,
-                    accuracy: 0.88
-                }
-            ];
-        }
-    }
-
-    render() {
-        this.renderDashboard();
-        this.renderVentures();
-        this.renderAgents();
-    }
-
-    renderDashboard() {
-        const dashboard = this.data.dashboard;
-        
-        document.getElementById('totalVentures').textContent = dashboard.total_ventures || '—';
-        document.getElementById('monthlyRevenue').textContent = 
-            dashboard.total_monthly_revenue ? `$${(dashboard.total_monthly_revenue / 1000).toFixed(1)}K` : '—';
-        document.getElementById('successRate').textContent = 
-            dashboard.ultra_low_failure_rate_percentage ? `${dashboard.ultra_low_failure_rate_percentage.toFixed(1)}%` : '—';
-    }
-
-    renderVentures() {
-        const container = document.getElementById('venturesGrid');
-        
-        if (this.data.ventures.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <h3>No ventures found</h3>
-                    <p>Start by evaluating a new opportunity</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = this.data.ventures.map(venture => `
-            <div class="venture-card fade-in" onclick="app.viewVenture('${venture.id}')">
-                <div class="venture-header">
-                    <div>
-                        <div class="venture-title">${venture.name}</div>
-                        <div class="venture-type">${venture.type}</div>
-                    </div>
-                    <div class="risk-badge ${this.getRiskClass(venture.failure_probability)}">
-                        ${this.getRiskLabel(venture.failure_probability)}
-                    </div>
-                </div>
-                
-                <div class="venture-metrics">
-                    <div class="metric">
-                        <span class="metric-label">Monthly Revenue</span>
-                        <span class="metric-value">$${(venture.revenue / 1000).toFixed(1)}K</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Failure Rate</span>
-                        <span class="metric-value">${(venture.failure_probability * 100).toFixed(3)}%</span>
-                    </div>
-                </div>
-                
-                <div class="venture-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${(1 - venture.risk_score) * 100}%"></div>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    renderAgents() {
-        const container = document.getElementById('agentsGrid');
-        
-        container.innerHTML = this.data.agents.map(agent => `
-            <div class="agent-card">
-                <div class="agent-header">
-                    <div class="agent-name">${agent.name}</div>
-                    <div class="agent-status ${agent.active ? 'active' : 'inactive'}"></div>
-                </div>
-                <div class="agent-metrics">
-                    <div class="metric">
-                        <span class="metric-label">Accuracy</span>
-                        <span class="metric-value">${(agent.accuracy * 100).toFixed(1)}%</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Status</span>
-                        <span class="metric-value">${agent.active ? 'Active' : 'Inactive'}</span>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    getRiskClass(probability) {
-        if (probability <= 0.0001) return 'risk-ultra-low';
-        if (probability <= 0.001) return 'risk-low';
-        return 'risk-moderate';
-    }
-
-    getRiskLabel(probability) {
-        if (probability <= 0.0001) return 'ULTRA-LOW';
-        if (probability <= 0.001) return 'LOW';
-        return 'MODERATE';
-    }
-
-    viewVenture(ventureId) {
-        const venture = this.data.ventures.find(v => v.id === ventureId);
-        if (venture) {
-            console.log('Viewing venture:', venture);
-            // Could open detailed view modal here
-        }
-    }
-
-    openModal() {
-        document.getElementById('evaluationModal').classList.add('active');
-        document.getElementById('evaluationResults').style.display = 'none';
-        this.resetForm();
-    }
-
-    closeModal() {
-        document.getElementById('evaluationModal').classList.remove('active');
-    }
-
-    resetForm() {
-        document.getElementById('ventureName').value = '';
-        document.getElementById('marketSize').value = '';
-        document.getElementById('competitionLevel').value = 'medium';
-    }
-
-    async runEvaluation() {
-        const name = document.getElementById('ventureName').value;
-        const marketSize = document.getElementById('marketSize').value || 5000000;
-        const competition = document.getElementById('competitionLevel').value;
-
-        if (!name.trim()) {
-            alert('Please enter a venture name');
-            return;
-        }
-
-        const button = document.getElementById('runEvaluation');
-        const originalText = button.textContent;
-        button.textContent = 'Evaluating...';
-        button.disabled = true;
-
-        try {
-            // Create a demo venture first (simplified)
-            const ventureData = {
-                name: name,
-                market_size: parseInt(marketSize),
-                competition_level: competition
-            };
-
-            // Simulate AI evaluation
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            const evaluation = this.simulateEvaluation(ventureData);
-            this.displayEvaluationResults(evaluation);
-
-        } catch (error) {
-            console.error('Evaluation failed:', error);
-            alert('Evaluation failed. Please try again.');
-        } finally {
-            button.textContent = originalText;
-            button.disabled = false;
-        }
-    }
-
-    simulateEvaluation(ventureData) {
-        // Simulate AI evaluation results
-        const opportunityScore = 0.7 + Math.random() * 0.25;
-        const failureProbability = Math.max(0.0001, (1 - opportunityScore) * 0.02);
-        
-        let action, confidence, rationale;
-        
-        if (opportunityScore > 0.8 && failureProbability <= 0.0001) {
-            action = 'PROCEED_FULL';
-            confidence = 0.92;
-            rationale = 'Exceptional opportunity with ultra-low risk profile. Full resource allocation recommended.';
-        } else if (opportunityScore > 0.65 && failureProbability <= 0.001) {
-            action = 'PROCEED_CAUTIOUS';
-            confidence = 0.78;
-            rationale = 'Strong opportunity with acceptable risk. Measured approach with monitoring required.';
+        if (this.isDarkMode) {
+            document.documentElement.style.setProperty('--md-surface', '#1F2937');
+            document.documentElement.style.setProperty('--md-surface-variant', '#374151');
+            document.documentElement.style.setProperty('--md-background', '#111827');
+            document.documentElement.style.setProperty('--md-on-surface', '#F9FAFB');
+            document.documentElement.style.setProperty('--md-on-surface-variant', '#D1D5DB');
+            document.getElementById('themeToggle').querySelector('.material-icons-round').textContent = 'light_mode';
         } else {
-            action = 'EVALUATE_FURTHER';
-            confidence = 0.65;
-            rationale = 'Additional market validation required before proceeding.';
+            document.documentElement.style.setProperty('--md-surface', '#FFFFFF');
+            document.documentElement.style.setProperty('--md-surface-variant', '#F3F4F6');
+            document.documentElement.style.setProperty('--md-background', '#FAFAFA');
+            document.documentElement.style.setProperty('--md-on-surface', '#1F2937');
+            document.documentElement.style.setProperty('--md-on-surface-variant', '#6B7280');
+            document.getElementById('themeToggle').querySelector('.material-icons-round').textContent = 'dark_mode';
         }
+        
+        // Update meta theme color
+        document.querySelector('meta[name="theme-color"]').content = this.isDarkMode ? '#111827' : '#FFFFFF';
+    }
 
+    showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span class="material-icons-round notification-icon">${this.getNotificationIcon(type)}</span>
+            <span>${message}</span>
+        `;
+        
+        // Add to body
+        document.body.appendChild(notification);
+        
+        // Trigger animation
+        setTimeout(() => notification.classList.add('show'), 10);
+        
+        // Remove after delay
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    getNotificationIcon(type) {
+        const icons = {
+            'success': 'check_circle',
+            'error': 'error',
+            'warning': 'warning',
+            'info': 'info'
+        };
+        return icons[type] || 'info';
+    }
+
+    addRippleEffect() {
+        document.querySelectorAll('button, .tab-item, .stat-card').forEach(element => {
+            element.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                this.appendChild(ripple);
+                
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    }
+
+    startAutoRefresh() {
+        // Refresh data every 30 seconds
+        setInterval(() => {
+            this.loadDashboardData();
+        }, 30000);
+    }
+
+    // Offline data fallbacks
+    getOfflineDashboard() {
         return {
-            opportunity_score: opportunityScore,
-            failure_probability: failureProbability,
-            action: action,
-            confidence: confidence,
-            rationale: rationale,
-            meets_target: failureProbability <= 0.0001
+            total_ventures: 3,
+            total_monthly_revenue: 27500,
+            ultra_low_failure_rate_percentage: 92.5,
+            target_achievement: 'SUCCESS'
         };
     }
 
-    displayEvaluationResults(evaluation) {
-        document.getElementById('evaluationResults').style.display = 'block';
-        
-        document.querySelector('.result-status').textContent = evaluation.action.replace('_', ' ');
-        document.querySelector('.result-confidence').textContent = `${(evaluation.confidence * 100).toFixed(1)}% confidence`;
-        
-        document.getElementById('opportunityScore').textContent = (evaluation.opportunity_score * 100).toFixed(1) + '%';
-        document.getElementById('failureProbability').textContent = (evaluation.failure_probability * 100).toFixed(4) + '%';
-        document.getElementById('riskLevel').textContent = this.getRiskLabel(evaluation.failure_probability);
-        document.getElementById('recommendation').textContent = evaluation.rationale;
-
-        // Add animation
-        document.getElementById('evaluationResults').classList.add('slide-up');
+    getOfflineVentures() {
+        return {
+            ventures: [
+                {
+                    id: 'v1',
+                    name: 'AI Analytics Platform',
+                    type: 'saas',
+                    status: 'scaling',
+                    revenue: 12500,
+                    risk_score: 0.08,
+                    failure_probability: 0.0007
+                },
+                {
+                    id: 'v2',
+                    name: 'Smart E-commerce Hub',
+                    type: 'ecommerce',
+                    status: 'mvp',
+                    revenue: 8500,
+                    risk_score: 0.12,
+                    failure_probability: 0.0009
+                },
+                {
+                    id: 'v3',
+                    name: 'Content Creator Suite',
+                    type: 'content',
+                    status: 'growth',
+                    revenue: 6500,
+                    risk_score: 0.05,
+                    failure_probability: 0.0003
+                }
+            ]
+        };
     }
 
-    // Utility methods
-    formatNumber(num) {
-        if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
-        if (num >= 1000) return `$${(num / 1000).toFixed(1)}K`;
-        return `$${num}`;
+    getOfflineAgents() {
+        return {
+            agents: [
+                {
+                    id: 'a1',
+                    type: 'market_intelligence',
+                    name: 'Market Intelligence',
+                    active: true,
+                    accuracy: 0.89
+                },
+                {
+                    id: 'a2',
+                    type: 'risk_assessment',
+                    name: 'Risk Assessment',
+                    active: true,
+                    accuracy: 0.94
+                },
+                {
+                    id: 'a3',
+                    type: 'legal_compliance',
+                    name: 'Legal Compliance',
+                    active: true,
+                    accuracy: 0.91
+                },
+                {
+                    id: 'a4',
+                    type: 'opportunity_scout',
+                    name: 'Opportunity Scout',
+                    active: true,
+                    accuracy: 0.87
+                }
+            ]
+        };
     }
 
-    formatPercentage(num) {
-        return `${(num * 100).toFixed(2)}%`;
+    useOfflineData() {
+        this.updateDashboard(this.getOfflineDashboard());
+        this.ventures = this.getOfflineVentures().ventures;
+        this.agents = this.getOfflineAgents().agents;
+        this.renderVentures();
+        this.renderAgents();
     }
 }
 
-// Initialize the application
-const app = new WealthMachineApp();
+// Add notification styles dynamically
+const notificationStyles = `
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--md-surface);
+    color: var(--md-on-surface);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    transform: translateX(400px);
+    transition: transform 0.3s var(--ease-in-out);
+    z-index: 3000;
+    max-width: 300px;
+}
 
-// Auto-refresh data every 30 seconds
-setInterval(() => {
-    app.loadData().then(() => app.render());
-}, 30000);
+.notification.show {
+    transform: translateX(0);
+}
 
-// Performance monitoring
-window.addEventListener('load', () => {
-    console.log('✓ WealthMachine UI loaded');
-    console.log('✓ Critical precision interface active');
+.notification-icon {
+    font-size: 20px;
+}
+
+.notification-success .notification-icon { color: var(--md-secondary); }
+.notification-error .notification-icon { color: var(--md-error); }
+.notification-warning .notification-icon { color: var(--ios-yellow); }
+.notification-info .notification-icon { color: var(--md-primary); }
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.venture-card {
+    background: var(--md-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: all 0.3s var(--ease-in-out);
+}
+
+.venture-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.venture-header {
+    margin-bottom: var(--space-md);
+}
+
+.venture-name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.venture-type {
+    font-size: var(--text-sm);
+    color: var(--md-on-surface-variant);
+}
+
+.venture-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.metric {
+    text-align: center;
+}
+
+.metric-label {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--md-on-surface-variant);
+    margin-bottom: var(--space-xs);
+}
+
+.metric-value {
+    font-size: var(--text-xl);
+    font-weight: 700;
+}
+
+.venture-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-sm);
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    background: var(--md-surface-variant);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ios-gray);
+}
+
+.ultra-low-risk .status-dot { background: var(--md-secondary); }
+.low-risk .status-dot { background: var(--ios-green); }
+.medium-risk .status-dot { background: var(--ios-yellow); }
+.high-risk .status-dot { background: var(--md-error); }
+
+.agent-card {
+    background: var(--md-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s var(--ease-in-out);
+}
+
+.agent-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.agent-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--md-surface-variant);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-md);
+    color: var(--md-primary);
+}
+
+.agent-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+}
+
+.agent-stats {
+    margin-top: var(--space-md);
+}
+
+.accuracy-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--ios-gray-5);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+.accuracy-fill {
+    height: 100%;
+    background: var(--md-primary);
+    transition: width 0.3s var(--ease-in-out);
+}
+
+.accuracy-text {
+    font-size: var(--text-xs);
+    color: var(--md-on-surface-variant);
+}
+`;
+
+// Add styles to document
+const styleSheet = document.createElement('style');
+styleSheet.textContent = notificationStyles;
+document.head.appendChild(styleSheet);
+
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.app = new WealthMachineApp();
 });
