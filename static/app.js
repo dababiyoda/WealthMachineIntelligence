@@ -192,13 +192,19 @@ class WealthMachineApp {
             tab.classList.remove('active');
         });
         
-        // Find and activate the clicked tab
-        const tabElement = document.querySelector(`button[data-tab="${tabId}"]`);
+        // Find and activate the clicked tab - try multiple selectors
+        let tabElement = document.querySelector(`[data-tab="${tabId}"]`);
+        if (!tabElement) {
+            tabElement = document.querySelector(`button[data-tab="${tabId}"]`);
+        }
         console.log('Found tab element:', tabElement);
         if (tabElement) {
             tabElement.classList.add('active');
         } else {
             console.error('Tab element not found for:', tabId);
+            // Log all available tab elements for debugging
+            const allTabs = document.querySelectorAll('[data-tab]');
+            console.log('All available tabs:', Array.from(allTabs).map(t => t.getAttribute('data-tab')));
         }
         
         // Update tab content
