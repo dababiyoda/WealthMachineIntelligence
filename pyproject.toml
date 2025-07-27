@@ -1,12 +1,26 @@
 [project]
-name = "repl-nix-workspace"
-version = "0.1.0"
-description = "Add your description here"
-requires-python = ">=3.8
+name = "wealthmachine-enterprise"
+version = "1.0.0"
+description = "Enterprise-grade AI-driven digital business opportunity identification and scaling system"
+requires-python = ">=3.11"
 dependencies = [
+    "alembic>=1.16.4",
+    "celery>=5.5.3",
+    "fastapi>=0.116.1",
     "numpy>=2.2.2",
     "pandas>=2.2.3",
+    "passlib[bcrypt]>=1.7.4",
+    "prometheus-client>=0.22.1",
+    "psycopg2-binary>=2.9.10",
+    "pydantic>=2.11.7",
+    "python-dotenv>=1.1.1",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.20",
+    "redis>=6.2.0",
     "scikit-learn>=1.6.1",
+    "sqlalchemy>=2.0.41",
+    "structlog>=25.4.0",
     "tensorflow>=2.14.0",
     "transformers>=4.48.1",
+    "uvicorn>=0.35.0",
 ]

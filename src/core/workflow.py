@@ -4,7 +4,7 @@ Uses asyncio for concurrent operation management
 """
 import asyncio
 import logging
-from typing import Dict, List, Any, Callable, Coroutine
+from typing import Dict, List, Any, Callable, Coroutine, Optional
 from datetime import datetime
 
 class WorkflowStep:

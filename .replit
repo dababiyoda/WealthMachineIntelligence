@@ -1,7 +1,8 @@
-modules = ["python-3.11"]
+modules = ["python-3.11", "postgresql-16"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["glibcLocales", "libxcrypt"]
 
 [workflows]
 runButton = "Project"
@@ -14,6 +15,10 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Documentation Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "WealthMachine Enterprise"
 
 [[workflows.workflow]]
 name = "Documentation Server"
@@ -30,8 +35,21 @@ task = "shell.exec"
 args = "python -m http.server 8000"
 waitForPort = 8000
 
+[[workflows.workflow]]
+name = "WealthMachine Enterprise"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
+waitForPort = 5000
+
 [deployment]
 run = ["sh", "-c", "python -m http.server 8000"]
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
 
 [[ports]]
 localPort = 8000
