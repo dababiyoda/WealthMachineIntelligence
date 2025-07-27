@@ -4,6 +4,7 @@ Test workflow to verify the core functionality
 import asyncio
 import logging
 import sys
+import pytest
 
 from core.workflow import WorkflowEngine, WorkflowStep
 from core.knowledge_graph import KnowledgeGraph, Node, Edge
@@ -18,6 +19,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+@pytest.mark.asyncio
 async def test_workflow():
     # Initialize components
     logger.info("Initializing workflow components...")
