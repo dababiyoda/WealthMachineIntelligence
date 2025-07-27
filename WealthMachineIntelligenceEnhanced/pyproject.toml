@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "wealthmachineintelligence"
+version = "0.1.0"
+description = "Enhanced AI-driven venture orchestration platform with caching, vector search, IAM and CI/CD"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+sqlalchemy = "^2.0"
+psycopg2-binary = "^2.9"
+python-multipart = "^0.0.6"
+python-dotenv = "^1.0"
+redis = "^5.0"
+grpcio = "^1.63.0"
+pymilvus = "^2.4.1"
+python-keycloak = "^3.9.0"
+ory-client = "^1.0.0"  # hypothetical client for Ory Kratos
+prometheus-client = "^0.19.0"
+pydantic = "^2.5.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6"
+ruff = "^0.4"
+black = "^23.7"
+bandit = "^1.7"
+
+[tool.ruff]
+line-length = 100
+extend-ignore = ["E501"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
