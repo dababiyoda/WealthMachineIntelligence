@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "rules": [
     {
       "id": "market_volatility_control",
@@ -7,16 +7,8 @@
       "venture_type": "SaaSVenture",
       "condition": {
         "AND": [
-          {
-            "metric": "market_volatility",
-            "operator": "greater_than",
-            "value": 0.8
-          },
-          {
-            "metric": "risk_profile",
-            "operator": "equals",
-            "value": "High"
-          }
+          { "metric": "market_volatility", "operator": "greater_than", "value": 0.8 },
+          { "metric": "risk_profile", "operator": "equals", "value": "High" }
         ]
       },
       "action": {
@@ -34,16 +26,8 @@
       "venture_type": "SaaSVenture",
       "condition": {
         "OR": [
-          {
-            "metric": "monthly_churn_rate",
-            "operator": "greater_than",
-            "value": 0.05
-          },
-          {
-            "metric": "mrr_growth_rate",
-            "operator": "less_than",
-            "value": 0.10
-          }
+          { "metric": "monthly_churn_rate", "operator": "greater_than", "value": 0.05 },
+          { "metric": "mrr_growth_rate", "operator": "less_than", "value": 0.10 }
         ]
       },
       "action": {
@@ -61,16 +45,8 @@
       "venture_type": "EcommerceVenture",
       "condition": {
         "AND": [
-          {
-            "metric": "cart_abandonment_rate",
-            "operator": "greater_than",
-            "value": 0.7
-          },
-          {
-            "metric": "customer_acquisition_cost",
-            "operator": "greater_than",
-            "value": 50.0
-          }
+          { "metric": "cart_abandonment_rate", "operator": "greater_than", "value": 0.7 },
+          { "metric": "customer_acquisition_cost", "operator": "greater_than", "value": 50.0 }
         ]
       },
       "action": {
@@ -88,16 +64,8 @@
       "venture_type": "DigitalVenture",
       "condition": {
         "OR": [
-          {
-            "metric": "regulatory_compliance_score",
-            "operator": "less_than",
-            "value": 0.95
-          },
-          {
-            "metric": "data_protection_score",
-            "operator": "less_than",
-            "value": 0.98
-          }
+          { "metric": "regulatory_compliance_score", "operator": "less_than", "value": 0.95 },
+          { "metric": "data_protection_score", "operator": "less_than", "value": 0.98 }
         ]
       },
       "action": {
@@ -106,6 +74,25 @@
           "notify_roles": ["RegulatoryExpert", "LegalCounsel"],
           "priority": "critical",
           "required_actions": ["audit_compliance", "update_policies"]
+        }
+      }
+    },
+    {
+      "id": "high_risk_alert",
+      "name": "High Risk Alert",
+      "venture_type": "DigitalVenture",
+      "condition": {
+        "AND": [
+          { "metric": "risk_score", "operator": "greater_than", "value": 0.7 },
+          { "metric": "failure_probability", "operator": "greater_than", "value": 0.05 }
+        ]
+      },
+      "action": {
+        "type": "update_venture_status",
+        "parameters": {
+          "new_status": "High Risk",
+          "notify_roles": ["RiskManager"],
+          "priority": "critical"
         }
       }
     }
