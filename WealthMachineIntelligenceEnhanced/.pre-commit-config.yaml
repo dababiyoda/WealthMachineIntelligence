@@ -1,0 +1,20 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4  # Pin to a specific version
+    hooks:
+      - id: ruff
+        # automatically fix linting issues and format code
+        args: [--fix, --exit-zero]
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ["-r", "src", "-ll"]
+        # Fail the commit on high severity issues
+        allow_failures: false
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        language_version: python3
+        additional_dependencies: ["toml"]
