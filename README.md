@@ -90,3 +90,5 @@ The API will be available at `http://localhost:5000`.
 - Development of automated validation systems
 - Enhancement of multi-agent coordination
 - Implementation of live knowledge graph queries
+## Continuous Integration
+This project includes a basic GitHub Actions workflow located in `.github/workflows/ci.yml`. The workflow installs dependencies, runs lint checks with `ruff`, and executes the unit tests with `pytest` on every push and pull request.
