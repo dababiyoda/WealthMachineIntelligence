@@ -13,7 +13,7 @@ from fastapi.security import HTTPBearer
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 import time
-import structlog
+from src.logging_config import configure_logging, logger
 from datetime import datetime
 
 from src.database.connection import db
@@ -37,7 +37,7 @@ except ImportError as e:
             return {"status": "evaluation_completed", "venture_id": venture_id}
 
 # Configure logging
-logger = structlog.get_logger()
+configure_logging()
 
 app = FastAPI(
     title="WealthMachine Enterprise API",

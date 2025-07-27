@@ -7,13 +7,13 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-import structlog
+from sqlalchemy.exc import SQLAlchemyError
+from src.logging_config import logger
 
 from ...database.connection import get_db
 from ...database.models import AIAgent, AgentType
 from ..auth import get_current_user
 
-logger = structlog.get_logger()
 
 router = APIRouter()
 
@@ -59,8 +59,14 @@ async def list_agents(
         agents = query.all()
         return agents
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to list agents", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error listing agents")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve agents"
@@ -85,8 +91,14 @@ async def get_agents_status(
             decisions_made=agent.decisions_made
         ) for agent in agents]
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to get agents status", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error getting agents status")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve agent status"
@@ -138,8 +150,14 @@ async def activate_agent(
         
         return agent
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to activate agent", agent_id=agent_id, error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error activating agent")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to activate agent"
@@ -173,8 +191,14 @@ async def deactivate_agent(
         
         return agent
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to deactivate agent", agent_id=agent_id, error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error deactivating agent")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to deactivate agent"

@@ -8,7 +8,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import JSONResponse
 import time
-import structlog
+from src.logging_config import configure_logging, logger
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 from prometheus_client import start_http_server
 import os
@@ -20,7 +20,7 @@ from .auth import verify_token
 from .middleware import SecurityHeadersMiddleware, LoggingMiddleware
 
 # Configure structured logging
-logger = structlog.get_logger()
+configure_logging()
 
 # Prometheus metrics
 REQUEST_COUNT = Counter('wealthmachine_requests_total', 'Total requests', ['method', 'endpoint', 'status'])

@@ -8,7 +8,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
-import structlog
+from sqlalchemy.exc import SQLAlchemyError
+from src.logging_config import logger
 
 from ...database.connection import get_db
 from ...database.models import (
@@ -17,7 +18,6 @@ from ...database.models import (
 )
 from ..auth import get_current_user
 
-logger = structlog.get_logger()
 
 router = APIRouter()
 
@@ -111,8 +111,14 @@ async def get_dashboard_metrics(
             ultra_low_failure_rate=ultra_low_failure_rate
         )
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to get dashboard metrics", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error getting dashboard metrics")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve dashboard metrics"
@@ -154,8 +160,14 @@ async def get_portfolio_performance(
             roi_by_type=roi_by_type
         )
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to get portfolio performance", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error getting portfolio performance")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve portfolio performance"
@@ -202,8 +214,14 @@ async def get_risk_analysis(
             ventures_meeting_target=ventures_meeting_target
         )
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to get risk analysis", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error getting risk analysis")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve risk analysis"
@@ -246,8 +264,14 @@ async def get_top_performers(
             ) for v in ventures
         ]
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to get top performers", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error getting top performers")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve top performers"

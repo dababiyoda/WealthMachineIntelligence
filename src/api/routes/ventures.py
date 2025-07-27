@@ -7,13 +7,13 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
-import structlog
+from sqlalchemy.exc import SQLAlchemyError
+from src.logging_config import logger
 
 from ...database.connection import get_db
 from ...database.models import DigitalVenture, VentureType, VentureStatus, RiskLevel
 from ..auth import get_current_user
 
-logger = structlog.get_logger()
 
 router = APIRouter()
 
@@ -95,8 +95,14 @@ async def create_venture(
         
         return db_venture
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to create venture", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error creating venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create venture"
@@ -138,8 +144,14 @@ async def list_ventures(
             size=size
         )
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to list ventures", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error listing ventures")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve ventures"
@@ -202,8 +214,14 @@ async def update_venture(
         
         return venture
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to update venture", venture_id=venture_id, error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error updating venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update venture"
@@ -235,8 +253,14 @@ async def delete_venture(
                    venture_id=venture_id,
                    discontinued_by=current_user.get("user_id"))
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to discontinue venture", venture_id=venture_id, error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error discontinuing venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to discontinue venture"
@@ -277,8 +301,14 @@ async def launch_venture(
         
         return venture
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Failed to launch venture", venture_id=venture_id, error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error"
+        )
+    except Exception as e:
+        logger.exception("Unexpected error launching venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to launch venture"
