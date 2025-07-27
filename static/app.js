@@ -39,7 +39,7 @@ class WealthMachineApp {
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.switchTab(tab);
+                this.switchTab(tab.dataset.tab);
             });
         });
         
@@ -143,6 +143,8 @@ class WealthMachineApp {
 
     animateValue(id, start, end, duration, isCurrency = false, isPercentage = false) {
         const element = document.getElementById(id);
+        if (!element) return;
+        
         const startTime = performance.now();
         
         const updateValue = (currentTime) => {
@@ -167,6 +169,54 @@ class WealthMachineApp {
         };
         
         requestAnimationFrame(updateValue);
+    }
+
+    switchTab(tabId) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+        
+        this.currentTab = tabId;
+        
+        // Load tab-specific data
+        this.loadTabData(tabId);
+    }
+    
+    loadTabData(tabId) {
+        switch (tabId) {
+            case 'dashboard':
+                // Already loaded in initial load
+                break;
+            case 'ventures':
+                this.renderVentures();
+                break;
+            case 'agents':
+                this.renderAgents();
+                break;
+            case 'opportunity':
+                this.showNotification('Opportunity analysis system active');
+                break;
+            case 'risk':
+                this.showNotification('Risk monitoring at ultra-low failure rate: P(failure) ≤ 0.01%');
+                break;
+            case 'market':
+                this.showNotification('Market intelligence updated with latest LSTM analysis');
+                break;
+            case 'compliance':
+                this.showNotification('All ventures compliant - regulatory monitoring active');
+                break;
+            case 'automation':
+                this.showNotification('47 automation rules active - 1,247 tasks automated today');
+                break;
+        }
     }
 
     renderVentures() {

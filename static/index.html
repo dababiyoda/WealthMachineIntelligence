@@ -42,99 +42,522 @@
             </div>
         </nav>
 
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <div class="nav-scroll">
+                <button class="tab-item active" data-tab="dashboard">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-text">Dashboard</span>
+                </button>
+                <button class="tab-item" data-tab="ventures">
+                    <span class="tab-icon">🚀</span>
+                    <span class="tab-text">Ventures</span>
+                </button>
+                <button class="tab-item" data-tab="agents">
+                    <span class="tab-icon">🤖</span>
+                    <span class="tab-text">AI Agents</span>
+                </button>
+                <button class="tab-item" data-tab="opportunity">
+                    <span class="tab-icon">🎯</span>
+                    <span class="tab-text">Opportunities</span>
+                </button>
+                <button class="tab-item" data-tab="risk">
+                    <span class="tab-icon">🛡️</span>
+                    <span class="tab-text">Risk Analysis</span>
+                </button>
+                <button class="tab-item" data-tab="market">
+                    <span class="tab-icon">📈</span>
+                    <span class="tab-text">Market Intel</span>
+                </button>
+                <button class="tab-item" data-tab="compliance">
+                    <span class="tab-icon">⚖️</span>
+                    <span class="tab-text">Compliance</span>
+                </button>
+                <button class="tab-item" data-tab="automation">
+                    <span class="tab-icon">⚙️</span>
+                    <span class="tab-text">Automation</span>
+                </button>
+            </div>
+        </nav>
+
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Hero Section with Stats -->
-            <section class="hero-section">
-                <div class="container">
-                    <div class="hero-content">
-                        <div class="success-indicator">
-                            <span class="pulse-dot"></span>
-                            <span class="indicator-text">Ultra-Low Risk Mode Active</span>
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="dashboard">
+                <!-- Hero Section with Stats -->
+                <section class="hero-section">
+                    <div class="container">
+                        <div class="hero-content">
+                            <div class="success-indicator">
+                                <span class="pulse-dot"></span>
+                                <span class="indicator-text">Ultra-Low Risk Mode Active</span>
+                            </div>
+                            
+                            <h2 class="hero-title">Your Digital Ventures</h2>
+                            <p class="hero-subtitle">AI-powered business opportunities with 99.99% success rate</p>
                         </div>
                         
-                        <h2 class="hero-title">Your Digital Ventures</h2>
-                        <p class="hero-subtitle">AI-powered business opportunities with 99.99% success rate</p>
+                        <!-- Material Design Stats Cards -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <span class="material-icons-round">rocket_launch</span>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 class="stat-value" id="totalVentures">0</h3>
+                                    <p class="stat-label">Active Ventures</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card primary">
+                                <div class="stat-icon">
+                                    <span class="material-icons-round">attach_money</span>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 class="stat-value" id="monthlyRevenue">$0</h3>
+                                    <p class="stat-label">Monthly Revenue</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card success">
+                                <div class="stat-icon">
+                                    <span class="material-icons-round">verified</span>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 class="stat-value" id="successRate">0%</h3>
+                                    <p class="stat-label">Success Rate</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Material Design Stats Cards -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <span class="material-icons-round">rocket_launch</span>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-value" id="totalVentures">0</h3>
-                                <p class="stat-label">Active Ventures</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card primary">
-                            <div class="stat-icon">
-                                <span class="material-icons-round">attach_money</span>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-value" id="monthlyRevenue">$0</h3>
-                                <p class="stat-label">Monthly Revenue</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card success">
-                            <div class="stat-icon">
-                                <span class="material-icons-round">verified</span>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-value" id="successRate">0%</h3>
-                                <p class="stat-label">Success Rate</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <!-- Ventures Section -->
-            <section class="ventures-section">
-                <div class="container">
+            <!-- Ventures Tab -->
+            <div class="tab-content" id="ventures">
+                <section class="ventures-section">
+                    <div class="container">
+                        <div class="section-header">
+                            <div>
+                                <h2 class="section-title">Active Ventures</h2>
+                                <p class="section-subtitle">Your portfolio of AI-validated opportunities</p>
+                            </div>
+                            <button class="fab" id="evaluateBtn" aria-label="Add new venture">
+                                <span class="material-icons-round">add</span>
+                            </button>
+                        </div>
+                        
+                        <div class="ventures-grid" id="venturesGrid">
+                            <!-- Ventures will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- AI Agents Tab -->
+            <div class="tab-content" id="agents">
+                <section class="agents-section">
+                    <div class="container">
+                        <div class="section-header">
+                            <div>
+                                <h2 class="section-title">AI Agents</h2>
+                                <p class="section-subtitle">Intelligent systems powering your success</p>
+                            </div>
+                            <div class="system-status">
+                                <span class="status-icon success"></span>
+                                <span>All Systems Active</span>
+                            </div>
+                        </div>
+                        
+                        <div class="agents-grid" id="agentsGrid">
+                            <!-- AI Agents will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Opportunity Detection Tab -->
+            <div class="tab-content" id="opportunity">
+                <section class="container">
                     <div class="section-header">
                         <div>
-                            <h2 class="section-title">Active Ventures</h2>
-                            <p class="section-subtitle">Your portfolio of AI-validated opportunities</p>
+                            <h2 class="section-title">Opportunity Detection</h2>
+                            <p class="section-subtitle">AI-powered market analysis and venture identification</p>
                         </div>
-                        <button class="fab" id="evaluateBtn" aria-label="Add new venture">
-                            <span class="material-icons-round">add</span>
+                        <button class="primary-button" id="runOpportunityAnalysis">
+                            <span class="material-icons-round">analytics</span>
+                            Run Analysis
                         </button>
                     </div>
                     
-                    <div class="ventures-grid" id="venturesGrid">
-                        <!-- Ventures will be loaded here -->
-                        <div class="empty-state">
-                            <span class="material-icons-round empty-icon">inventory_2</span>
-                            <h3>No ventures yet</h3>
-                            <p>Start by evaluating a new opportunity</p>
+                    <div class="opportunity-grid">
+                        <div class="opportunity-card">
+                            <div class="card-header">
+                                <h3>Market Scanning</h3>
+                                <div class="status-badge active">Active</div>
+                            </div>
+                            <div class="card-content">
+                                <p>Continuous monitoring of market trends and emerging opportunities</p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                                <span class="progress-text">85% Complete</span>
+                            </div>
+                        </div>
+                        
+                        <div class="opportunity-card">
+                            <div class="card-header">
+                                <h3>SaaS Opportunities</h3>
+                                <div class="status-badge high">High Potential</div>
+                            </div>
+                            <div class="card-content">
+                                <p>B2B SaaS platforms with recurring revenue models</p>
+                                <div class="metric-list">
+                                    <div class="metric-item">
+                                        <span class="metric-label">Market Size</span>
+                                        <span class="metric-value">$127B</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Success Rate</span>
+                                        <span class="metric-value">92%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="opportunity-card">
+                            <div class="card-header">
+                                <h3>E-commerce Niches</h3>
+                                <div class="status-badge medium">Medium Potential</div>
+                            </div>
+                            <div class="card-content">
+                                <p>Specialized e-commerce platforms with low competition</p>
+                                <div class="metric-list">
+                                    <div class="metric-item">
+                                        <span class="metric-label">Niches Found</span>
+                                        <span class="metric-value">23</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Avg. ROI</span>
+                                        <span class="metric-value">340%</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <!-- AI Agents Section -->
-            <section class="agents-section">
-                <div class="container">
+            <!-- Risk Analysis Tab -->
+            <div class="tab-content" id="risk">
+                <section class="container">
                     <div class="section-header">
                         <div>
-                            <h2 class="section-title">AI Agents</h2>
-                            <p class="section-subtitle">Intelligent systems powering your success</p>
+                            <h2 class="section-title">Risk Analysis</h2>
+                            <p class="section-subtitle">Ultra-low failure rate monitoring and prediction</p>
                         </div>
-                        <div class="system-status">
-                            <span class="status-icon success"></span>
-                            <span>All Systems Active</span>
+                        <div class="risk-indicator">
+                            <span class="risk-icon">🛡️</span>
+                            <span class="risk-text">P(failure) ≤ 0.01%</span>
                         </div>
                     </div>
                     
-                    <div class="agents-grid" id="agentsGrid">
-                        <!-- AI Agents will be loaded here -->
+                    <div class="risk-dashboard">
+                        <div class="risk-overview">
+                            <div class="risk-card">
+                                <h3>Portfolio Risk Score</h3>
+                                <div class="risk-gauge">
+                                    <div class="gauge-circle">
+                                        <div class="gauge-fill" style="--percentage: 8"></div>
+                                        <div class="gauge-text">0.08%</div>
+                                    </div>
+                                </div>
+                                <p class="risk-status ultra-low">Ultra-Low Risk</p>
+                            </div>
+                            
+                            <div class="risk-factors">
+                                <h3>Risk Factors</h3>
+                                <div class="factor-list">
+                                    <div class="factor-item">
+                                        <span class="factor-name">Market Volatility</span>
+                                        <div class="factor-bar">
+                                            <div class="factor-fill" style="width: 12%"></div>
+                                        </div>
+                                        <span class="factor-value">Low</span>
+                                    </div>
+                                    <div class="factor-item">
+                                        <span class="factor-name">Competition Risk</span>
+                                        <div class="factor-bar">
+                                            <div class="factor-fill" style="width: 8%"></div>
+                                        </div>
+                                        <span class="factor-value">Very Low</span>
+                                    </div>
+                                    <div class="factor-item">
+                                        <span class="factor-name">Technology Risk</span>
+                                        <div class="factor-bar">
+                                            <div class="factor-fill" style="width: 5%"></div>
+                                        </div>
+                                        <span class="factor-value">Minimal</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-history">
+                            <h3>Risk History (10 Versions)</h3>
+                            <div class="history-chart">
+                                <div class="chart-point" style="left: 10%; bottom: 92%"></div>
+                                <div class="chart-point" style="left: 20%; bottom: 88%"></div>
+                                <div class="chart-point" style="left: 30%; bottom: 85%"></div>
+                                <div class="chart-point" style="left: 40%; bottom: 90%"></div>
+                                <div class="chart-point" style="left: 50%; bottom: 93%"></div>
+                                <div class="chart-point" style="left: 60%; bottom: 91%"></div>
+                                <div class="chart-point" style="left: 70%; bottom: 94%"></div>
+                                <div class="chart-point" style="left: 80%; bottom: 96%"></div>
+                                <div class="chart-point" style="left: 90%; bottom: 95%"></div>
+                                <div class="chart-point active" style="left: 100%; bottom: 98%"></div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
+
+            <!-- Market Intelligence Tab -->
+            <div class="tab-content" id="market">
+                <section class="container">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Market Intelligence</h2>
+                            <p class="section-subtitle">LSTM-based trend analysis and forecasting</p>
+                        </div>
+                        <button class="primary-button" id="refreshMarketData">
+                            <span class="material-icons-round">refresh</span>
+                            Refresh Data
+                        </button>
+                    </div>
+                    
+                    <div class="market-dashboard">
+                        <div class="market-trends">
+                            <div class="trend-card">
+                                <h3>AI/ML Market</h3>
+                                <div class="trend-direction up">
+                                    <span class="material-icons-round">trending_up</span>
+                                    <span>+23.4%</span>
+                                </div>
+                                <p class="trend-prediction">Strong growth predicted through Q4 2025</p>
+                            </div>
+                            
+                            <div class="trend-card">
+                                <h3>SaaS Platforms</h3>
+                                <div class="trend-direction up">
+                                    <span class="material-icons-round">trending_up</span>
+                                    <span>+18.7%</span>
+                                </div>
+                                <p class="trend-prediction">B2B segment showing sustained growth</p>
+                            </div>
+                            
+                            <div class="trend-card">
+                                <h3>E-commerce</h3>
+                                <div class="trend-direction stable">
+                                    <span class="material-icons-round">trending_flat</span>
+                                    <span>+5.2%</span>
+                                </div>
+                                <p class="trend-prediction">Steady growth in niche markets</p>
+                            </div>
+                        </div>
+                        
+                        <div class="market-insights">
+                            <h3>Key Insights</h3>
+                            <div class="insight-list">
+                                <div class="insight-item">
+                                    <div class="insight-icon">💡</div>
+                                    <div class="insight-content">
+                                        <h4>Emerging Opportunity</h4>
+                                        <p>AI-powered automation tools for small businesses showing 340% growth potential</p>
+                                    </div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-icon">⚡</div>
+                                    <div class="insight-content">
+                                        <h4>Market Gap</h4>
+                                        <p>Compliance automation for mid-size companies - underserved market worth $2.3B</p>
+                                    </div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="insight-icon">🎯</div>
+                                    <div class="insight-content">
+                                        <h4>Optimal Timing</h4>
+                                        <p>Q3 2025 identified as ideal launch window for SaaS ventures</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Compliance Tab -->
+            <div class="tab-content" id="compliance">
+                <section class="container">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Legal Compliance</h2>
+                            <p class="section-subtitle">BERT-based regulatory analysis with multi-channel notifications</p>
+                        </div>
+                        <div class="compliance-status">
+                            <span class="status-icon success"></span>
+                            <span>All Ventures Compliant</span>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-dashboard">
+                        <div class="compliance-overview">
+                            <div class="compliance-card">
+                                <h3>Regulatory Status</h3>
+                                <div class="status-grid">
+                                    <div class="status-item">
+                                        <span class="status-label">GDPR</span>
+                                        <span class="status-badge compliant">Compliant</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-label">CCPA</span>
+                                        <span class="status-badge compliant">Compliant</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-label">SOX</span>
+                                        <span class="status-badge compliant">Compliant</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-label">PCI DSS</span>
+                                        <span class="status-badge compliant">Compliant</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-channels">
+                                <h3>Notification Channels</h3>
+                                <div class="channel-list">
+                                    <div class="channel-item active">
+                                        <span class="material-icons-round">email</span>
+                                        <span>Email Alerts</span>
+                                        <div class="channel-status">Active</div>
+                                    </div>
+                                    <div class="channel-item active">
+                                        <span class="material-icons-round">sms</span>
+                                        <span>SMS Notifications</span>
+                                        <div class="channel-status">Active</div>
+                                    </div>
+                                    <div class="channel-item active">
+                                        <span class="material-icons-round">webhook</span>
+                                        <span>Webhook Integration</span>
+                                        <div class="channel-status">Active</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="compliance-updates">
+                            <h3>Recent Updates</h3>
+                            <div class="update-list">
+                                <div class="update-item">
+                                    <div class="update-date">July 27, 2025</div>
+                                    <div class="update-content">
+                                        <h4>GDPR Compliance Review</h4>
+                                        <p>All ventures reviewed and confirmed compliant with latest GDPR requirements</p>
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-date">July 25, 2025</div>
+                                    <div class="update-content">
+                                        <h4>New Regulation Alert</h4>
+                                        <p>AI Act compliance framework updated - no action required</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Automation Tab -->
+            <div class="tab-content" id="automation">
+                <section class="container">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Automation Engine</h2>
+                            <p class="section-subtitle">Rule-based automation with real-time event handling</p>
+                        </div>
+                        <button class="primary-button" id="createAutomation">
+                            <span class="material-icons-round">add_task</span>
+                            Create Rule
+                        </button>
+                    </div>
+                    
+                    <div class="automation-dashboard">
+                        <div class="automation-overview">
+                            <div class="auto-stat-card">
+                                <h3>Active Rules</h3>
+                                <div class="stat-number">47</div>
+                                <p class="stat-change">+3 this week</p>
+                            </div>
+                            <div class="auto-stat-card">
+                                <h3>Tasks Automated</h3>
+                                <div class="stat-number">1,247</div>
+                                <p class="stat-change">+156 today</p>
+                            </div>
+                            <div class="auto-stat-card">
+                                <h3>Time Saved</h3>
+                                <div class="stat-number">342h</div>
+                                <p class="stat-change">This month</p>
+                            </div>
+                        </div>
+                        
+                        <div class="automation-rules">
+                            <h3>Automation Rules</h3>
+                            <div class="rule-list">
+                                <div class="rule-item">
+                                    <div class="rule-info">
+                                        <h4>Venture Risk Monitoring</h4>
+                                        <p>Automatically assess risk when revenue drops below threshold</p>
+                                    </div>
+                                    <div class="rule-controls">
+                                        <div class="rule-status active">Active</div>
+                                        <button class="icon-button">
+                                            <span class="material-icons-round">edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="rule-item">
+                                    <div class="rule-info">
+                                        <h4>Market Opportunity Alert</h4>
+                                        <p>Send notifications when new high-potential opportunities are detected</p>
+                                    </div>
+                                    <div class="rule-controls">
+                                        <div class="rule-status active">Active</div>
+                                        <button class="icon-button">
+                                            <span class="material-icons-round">edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="rule-item">
+                                    <div class="rule-info">
+                                        <h4>Compliance Check</h4>
+                                        <p>Daily verification of regulatory compliance across all ventures</p>
+                                    </div>
+                                    <div class="rule-controls">
+                                        <div class="rule-status active">Active</div>
+                                        <button class="icon-button">
+                                            <span class="material-icons-round">edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </main>
 
         <!-- Material Design Modal -->
