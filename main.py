@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 import time
 import structlog
 from datetime import datetime
@@ -43,6 +44,9 @@ app = FastAPI(
     description="AI-driven digital business opportunity identification and scaling system",
     version="1.0.0"
 )
+
+# Mount static files for UI
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # CORS middleware
 app.add_middleware(
@@ -178,6 +182,12 @@ async def evaluate_venture(venture_id: str, current_user=Depends(get_current_use
 
 @app.get("/")
 async def root():
+    """Serve the main UI"""
+    from fastapi.responses import FileResponse
+    return FileResponse('static/index.html')
+
+@app.get("/api")
+async def api_root():
     """API root"""
     return {
         "name": "WealthMachine Enterprise API",

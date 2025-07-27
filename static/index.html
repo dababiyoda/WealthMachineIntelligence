@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthMachine</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-mode">
+    <div class="app">
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <span class="brand-symbol">◎</span>
+                    <span class="brand-text">WealthMachine</span>
+                </div>
+                
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="themeToggle">
+                        <span class="theme-icon">◐</span>
+                    </button>
+                    <div class="user-avatar">DY</div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Header Section -->
+                <section class="header-section">
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        <span>P(failure) ≤ 0.01%</span>
+                    </div>
+                    
+                    <h1 class="main-title">Ultra-Reliable Digital Opportunities</h1>
+                    <p class="main-subtitle">AI-driven identification, validation, and scaling with enterprise precision</p>
+                    
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalVentures">—</div>
+                            <div class="stat-label">Active Ventures</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="monthlyRevenue">—</div>
+                            <div class="stat-label">Monthly Revenue</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="successRate">—</div>
+                            <div class="stat-label">Target Achievement</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Ventures Grid -->
+                <section class="ventures-section">
+                    <div class="section-header">
+                        <h2>Portfolio Overview</h2>
+                        <button class="btn-primary" id="evaluateBtn">Evaluate New Opportunity</button>
+                    </div>
+                    
+                    <div class="ventures-grid" id="venturesGrid">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- AI Agents Status -->
+                <section class="agents-section">
+                    <div class="section-header">
+                        <h2>AI System Status</h2>
+                        <div class="agents-health">
+                            <span class="health-dot"></span>
+                            <span>All Systems Operational</span>
+                        </div>
+                    </div>
+                    
+                    <div class="agents-grid" id="agentsGrid">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Evaluation Modal -->
+        <div class="modal" id="evaluationModal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Venture Evaluation</h3>
+                    <button class="modal-close" id="modalClose">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="evaluation-form">
+                        <div class="form-group">
+                            <label>Venture Name</label>
+                            <input type="text" id="ventureName" placeholder="Enter venture name">
+                        </div>
+                        <div class="form-group">
+                            <label>Market Size</label>
+                            <input type="number" id="marketSize" placeholder="5000000">
+                        </div>
+                        <div class="form-group">
+                            <label>Competition Level</label>
+                            <select id="competitionLevel">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary btn-full" id="runEvaluation">Run AI Evaluation</button>
+                    </div>
+                    
+                    <div class="evaluation-results" id="evaluationResults" style="display: none;">
+                        <div class="result-header">
+                            <div class="result-status"></div>
+                            <div class="result-confidence"></div>
+                        </div>
+                        <div class="result-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Opportunity Score</span>
+                                <span class="metric-value" id="opportunityScore">—</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Failure Probability</span>
+                                <span class="metric-value" id="failureProbability">—</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Risk Level</span>
+                                <span class="metric-value" id="riskLevel">—</span>
+                            </div>
+                        </div>
+                        <div class="result-recommendation" id="recommendation"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
