@@ -57,7 +57,7 @@ async def test_workflow():
     # Execute workflow
     try:
         logger.info("Starting workflow execution...")
-        result = await workflow_engine.execute_workflow("test-workflow")
+        await workflow_engine.execute_workflow("test-workflow")
         logger.info("Workflow executed successfully")
 
         # Verify results

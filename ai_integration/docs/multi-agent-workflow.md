@@ -2,7 +2,7 @@
 
 ## Overview
 Systematic process flow for AI agent collaboration in digital business operations.
-For detailed agent lifecycle and interaction specifications, see `/ai-integration/agent-lifecycle.md`.
+For detailed agent lifecycle and interaction specifications, see `/ai_integration/docs/agent-lifecycle.md`.
 
 ## Workflow Stages
 

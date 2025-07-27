@@ -5,7 +5,7 @@ Manage and monitor AI agents in the system
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import structlog
 
@@ -54,7 +54,7 @@ async def list_agents(
         query = db.query(AIAgent)
         
         if active_only:
-            query = query.filter(AIAgent.is_active == True)
+            query = query.filter(AIAgent.is_active)
         
         agents = query.all()
         return agents

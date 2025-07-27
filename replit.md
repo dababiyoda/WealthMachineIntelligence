@@ -26,7 +26,7 @@ An advanced enterprise automation framework leveraging sophisticated multi-agent
 /loops             - Operational cycles for income generation
 /phases            - Three-phase strategic roadmap
 /automation        - Rules engine and decision-making logic
-/ai-integration    - Agent architecture and AI workflows
+/ai_integration/docs    - Agent architecture and AI workflows
 /knowledge-graph   - Query system and examples
 /src               - Core Python implementation
 ```
