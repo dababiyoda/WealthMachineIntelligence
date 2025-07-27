@@ -32,6 +32,8 @@ classes:
         type: object
       - name: market_segment
         type: object
+      - name: unit_economics_prior
+        type: object
       # New AI-specific properties
       - name: usesAIModule
         type: boolean
@@ -124,6 +126,22 @@ classes:
       - name: growth_potential
         type: number
 
+  UnitEconomicsPrior:
+    description: "Baseline financial assumptions for opportunity screening"
+    properties:
+      - name: id
+        type: string
+      - name: expected_ctr
+        type: number
+      - name: expected_cr
+        type: number
+      - name: max_cac
+        type: number
+      - name: min_ltv
+        type: number
+      - name: viability_threshold
+        type: number
+
 relationships:
   - name: contributesTo
     source: Role
@@ -148,6 +166,11 @@ relationships:
   - name: assessedBy
     source: DigitalVenture
     target: RiskProfile
+    cardinality: "one-to-one"
+
+  - name: hasUnitEconomicsPrior
+    source: DigitalVenture
+    target: UnitEconomicsPrior
     cardinality: "one-to-one"
 
   - name: implementsAI
