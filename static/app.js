@@ -4,7 +4,7 @@
 class WealthMachineApp {
     constructor() {
         this.apiBase = window.location.origin;
-        this.authToken = null;
+        this.authToken = localStorage.getItem('authToken');
         this.isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
         this.currentTab = 'dashboard';
         this.ventures = [];
@@ -63,6 +63,12 @@ class WealthMachineApp {
 
     async authenticate() {
         try {
+            // Skip authentication if we already have a token
+            if (this.authToken) {
+                console.log('✓ Using existing token');
+                return;
+            }
+            
             const response = await fetch(`${this.apiBase}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -72,11 +78,16 @@ class WealthMachineApp {
             if (response.ok) {
                 const data = await response.json();
                 this.authToken = data.access_token;
+                // Store token in localStorage for persistence
+                localStorage.setItem('authToken', this.authToken);
                 console.log('✓ Authenticated successfully');
+            } else {
+                throw new Error('Authentication failed');
             }
         } catch (error) {
-            console.warn('Using demo authentication');
+            console.warn('Authentication error, using demo token');
             this.authToken = 'demo';
+            localStorage.setItem('authToken', this.authToken);
         }
     }
 

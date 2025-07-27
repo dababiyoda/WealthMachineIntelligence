@@ -62,6 +62,10 @@ security = HTTPBearer()
 def get_current_user(credentials=Depends(security)):
     """Verify JWT token"""
     token = credentials.credentials
+    # Accept both demo_token and demo for demo purposes
+    if token in ["demo_token", "demo"]:
+        return {"user_id": "demo", "username": "demo"}
+    
     user = verify_token(token)
     if not user:
         raise HTTPException(
