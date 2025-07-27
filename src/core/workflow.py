@@ -12,7 +12,7 @@ class WorkflowStep:
     def __init__(self, 
                  step_id: str, 
                  action: Callable[..., Coroutine[Any, Any, Any]],
-                 requires: List[str] = None):
+                 requires: Optional[List[str]] = None):
         self.step_id = step_id
         self.action = action
         self.requires = requires or []
