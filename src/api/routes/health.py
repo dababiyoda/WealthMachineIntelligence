@@ -6,12 +6,12 @@ from datetime import datetime
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-import structlog
+from sqlalchemy.exc import SQLAlchemyError
+from src.logging_config import logger
 
 from ...database.connection import get_db, db
 from ..auth import get_current_user
 
-logger = structlog.get_logger()
 
 router = APIRouter()
 
@@ -72,8 +72,15 @@ async def database_health(
             response_time_ms=response_time
         )
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Database health check failed", error=str(e))
+        return DatabaseHealth(
+            connected=False,
+            pool_status={},
+            response_time_ms=-1
+        )
+    except Exception as e:
+        logger.exception("Unexpected error during database health check")
         return DatabaseHealth(
             connected=False,
             pool_status={},

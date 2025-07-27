@@ -7,9 +7,7 @@ import jwt
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from passlib.context import CryptContext
-import structlog
-
-logger = structlog.get_logger()
+from src.logging_config import logger
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

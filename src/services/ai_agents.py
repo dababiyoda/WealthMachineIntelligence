@@ -7,7 +7,8 @@ import numpy as np
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-import structlog
+from sqlalchemy.exc import SQLAlchemyError
+from src.logging_config import logger
 
 from ..database.connection import get_db
 from ..database.models import (
@@ -15,7 +16,6 @@ from ..database.models import (
     AgentType, RiskLevel, VentureStatus
 )
 
-logger = structlog.get_logger()
 
 class MarketIntelligenceService:
     """Market Intelligence Agent with LSTM-based analysis"""
@@ -70,8 +70,11 @@ class MarketIntelligenceService:
             
             return insights
             
-        except Exception as e:
+        except SQLAlchemyError as e:
             logger.error("Market analysis failed", venture_id=venture_id, error=str(e))
+            raise
+        except Exception as e:
+            logger.exception("Unexpected error during market analysis")
             raise
     
     def _calculate_opportunity_score(self, trend_score: float, market_size: float, competition: str) -> float:
@@ -191,8 +194,11 @@ class RiskAssessmentService:
                     'meets_target': failure_probability <= self.target_failure_rate
                 }
                 
-        except Exception as e:
+        except SQLAlchemyError as e:
             logger.error("Risk assessment failed", venture_id=venture_id, error=str(e))
+            raise
+        except Exception as e:
+            logger.exception("Unexpected error during risk assessment")
             raise
     
     def _assess_market_risk(self, venture: DigitalVenture) -> float:
@@ -375,8 +381,11 @@ class DecisionOrchestrator:
                 'timestamp': datetime.utcnow().isoformat()
             }
             
-        except Exception as e:
+        except SQLAlchemyError as e:
             logger.error("Venture evaluation failed", venture_id=venture_id, error=str(e))
+            raise
+        except Exception as e:
+            logger.exception("Unexpected error during venture evaluation")
             raise
     
     def _generate_final_decision(self, market_analysis: Dict[str, Any], 

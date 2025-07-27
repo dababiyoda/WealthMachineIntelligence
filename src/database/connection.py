@@ -10,29 +10,13 @@ from sqlalchemy import create_engine, event, pool
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import DBAPIError, DisconnectionError
 from dotenv import load_dotenv
-import structlog
+
+from src.logging_config import configure_logging, logger
 
 # Load environment variables
 load_dotenv()
 
-# Configure structured logging
-structlog.configure(
-    processors=[
-        structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.dev.ConsoleRenderer()
-    ],
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
-
-logger = structlog.get_logger()
+configure_logging()
 
 class DatabaseConnection:
     """Enterprise-grade database connection manager"""
