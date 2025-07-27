@@ -45,8 +45,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Mount static files for UI
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Static files will be served by our custom handler
 
 # CORS middleware
 app.add_middleware(
@@ -85,8 +84,12 @@ async def health_check():
 
 # Authentication endpoint
 @app.post("/auth/login")
-async def login(username: str, password: str):
+async def login(request: Request):
     """Login endpoint"""
+    form = await request.form()
+    username = form.get("username", "demo")
+    password = form.get("password", "demo")
+    
     user = authenticate_user(username, password)
     if not user:
         raise HTTPException(
@@ -185,6 +188,16 @@ async def root():
     """Serve the main UI"""
     from fastapi.responses import FileResponse
     return FileResponse('static/index.html')
+
+@app.get("/static/{file_path:path}")
+async def serve_static(file_path: str):
+    """Serve static files"""
+    from fastapi.responses import FileResponse
+    import os
+    file_location = f"static/{file_path}"
+    if os.path.exists(file_location):
+        return FileResponse(file_location)
+    raise HTTPException(status_code=404, detail="File not found")
 
 @app.get("/api")
 async def api_root():

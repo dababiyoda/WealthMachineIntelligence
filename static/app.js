@@ -95,6 +95,7 @@ class WealthMachineApp {
             
             this.renderVentures();
             this.renderAgents();
+            this.applyModernStyling();
         } catch (error) {
             console.error('Error loading data:', error);
             this.useOfflineData();
@@ -194,12 +195,16 @@ class WealthMachineApp {
             </div>
         `).join('');
         
-        // Add click handlers
+        // Add click handlers and ensure proper styling
         container.querySelectorAll('.venture-card').forEach(card => {
             card.addEventListener('click', () => {
                 const ventureId = card.dataset.ventureId;
                 this.showVentureDetails(ventureId);
             });
+            
+            // Force card styling
+            card.style.display = 'block';
+            card.style.listStyle = 'none';
         });
     }
 
@@ -537,6 +542,42 @@ class WealthMachineApp {
         this.agents = this.getOfflineAgents().agents;
         this.renderVentures();
         this.renderAgents();
+        
+        // Force proper styling after data load
+        this.applyModernStyling();
+    }
+    
+    applyModernStyling() {
+        // Ensure ventures are displayed as cards, not list items
+        const venturesGrid = document.getElementById('venturesGrid');
+        if (venturesGrid) {
+            venturesGrid.style.display = 'grid';
+            venturesGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
+            venturesGrid.style.gap = '24px';
+            venturesGrid.style.marginTop = '24px';
+        }
+        
+        // Style venture cards
+        document.querySelectorAll('.venture-card').forEach(card => {
+            card.style.listStyle = 'none';
+            card.style.display = 'block';
+            card.style.background = 'var(--md-surface)';
+            card.style.borderRadius = '24px';
+            card.style.padding = '24px';
+            card.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+            card.style.border = '1px solid var(--ios-gray-5)';
+            card.style.cursor = 'pointer';
+            card.style.transition = 'all 0.3s ease';
+        });
+        
+        // Style agents grid
+        const agentsGrid = document.getElementById('agentsGrid');
+        if (agentsGrid) {
+            agentsGrid.style.display = 'grid';
+            agentsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+            agentsGrid.style.gap = '24px';
+            agentsGrid.style.marginTop = '24px';
+        }
     }
 }
 
@@ -728,4 +769,27 @@ document.head.appendChild(styleSheet);
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new WealthMachineApp();
+    
+    // Debug: Force remove any list styling
+    setTimeout(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            .ventures-grid, .agents-grid {
+                display: grid !important;
+                list-style: none !important;
+            }
+            .venture-card, .agent-card {
+                display: block !important;
+                list-style: none !important;
+            }
+            ul, ol, li {
+                list-style: none !important;
+            }
+            /* Override any default browser list styling */
+            * {
+                list-style: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }, 100);
 });
