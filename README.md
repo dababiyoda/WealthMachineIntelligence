@@ -84,6 +84,38 @@ The repository now includes a `Dockerfile` and `.env.example` to simplify local 
 
 The API will be available at `http://localhost:5000`.
 
+## Local Usage Examples
+
+### Initialize the database
+
+1. Ensure your `.env` file contains a valid `DATABASE_URL` for PostgreSQL.
+2. Run one of the initialization scripts:
+
+   ```bash
+   python setup_database.py
+   ```
+
+   or
+
+   ```bash
+   python -m src.database.init_db
+   ```
+
+### Start the API server
+
+Run the application directly with Python:
+
+```bash
+python main.py
+```
+
+Or start it with Uvicorn:
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 5000
+```
+
+
 ## Future Development
 - Expansion of ontology with domain-specific extensions
 - Integration of advanced AI capabilities
