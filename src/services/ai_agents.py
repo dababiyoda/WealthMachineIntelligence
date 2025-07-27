@@ -1,6 +1,12 @@
-"""
-Production-ready AI agent services
-Enterprise-grade implementations with comprehensive error handling and monitoring
+"""Core AI agent services for market analysis and risk assessment.
+
+This module implements the algorithms that power the platform's
+intelligence features. Services rely on LSTM-style trend prediction,
+hybrid risk models and persistent storage. Async APIs allow integration
+with FastAPI endpoints or background workers.
+
+Model versions, thresholds and target failure rates are defined in the
+service constructors so deployments can adjust behaviour easily.
 """
 import asyncio
 import numpy as np

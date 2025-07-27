@@ -115,6 +115,22 @@ Or start it with Uvicorn:
 uvicorn main:app --host 0.0.0.0 --port 5000
 ```
 
+### Run the test suite
+
+Install the package in editable mode with the optional development
+dependencies and execute the unit tests with `pytest`:
+
+```bash
+pip install -e .[dev]
+pytest -q
+```
+
+Use `ruff` to run the linter locally:
+
+```bash
+ruff check .
+```
+
 
 ## Future Development
 - Expansion of ontology with domain-specific extensions
