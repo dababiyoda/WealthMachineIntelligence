@@ -2,7 +2,7 @@
 #
 ## Overview
 Comprehensive framework for AI agent deployment and orchestration in digital business operations.
-For detailed lifecycle and interaction specifications, see `/ai-integration/agent-lifecycle.md`.
+For detailed lifecycle and interaction specifications, see `/ai_integration/docs/agent-lifecycle.md`.
 
 ## Agent Types
 

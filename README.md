@@ -37,8 +37,8 @@ Strategic roadmap divided into three progressive phases of business development.
 ### /automation
 Rules and logic for automated decision-making processes.
 
-### /ai-integration
-Architecture and workflows for AI agent implementation. Key documentation includes:
+### /ai_integration
+Architecture and workflows for AI agent implementation. Documentation is located in `/ai_integration/docs` and includes:
 - `agent-architecture.md`: Comprehensive agent system design, communication flows, and scalability
 - `agent-flow.md`: Detailed step-by-step workflow for agent operations
 - `agent-lifecycle.md`: Agent initialization, state management, and maintenance
@@ -63,7 +63,7 @@ Query patterns and examples for exploring relationships between ventures, roles,
 3. Study the operational loops in `/loops`
 4. Follow the phase progression in `/phases`
 5. Implement automation rules from `/automation`
-6. Deploy AI agents according to `/ai-integration` guidelines
+6. Deploy AI agents according to `/ai_integration` guidelines
 7. Explore knowledge graph capabilities in `/knowledge-graph`
 
 ## Docker Setup

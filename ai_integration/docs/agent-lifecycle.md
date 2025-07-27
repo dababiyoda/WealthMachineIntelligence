@@ -92,7 +92,7 @@ triggers:
 ```
 
 ### 2. Workflow Integration
-- Aligned with `/ai-integration/multi-agent-workflow.md`
+- Aligned with `/ai_integration/docs/multi-agent-workflow.md`
 - Integrated with ontology constraints
 - Mapped to business processes
 - Tracked through knowledge graph
