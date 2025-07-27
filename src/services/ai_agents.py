@@ -11,15 +11,20 @@ service constructors so deployments can adjust behaviour easily.
 import asyncio
 import numpy as np
 from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
 from ..database.connection import get_db
 from ..database.models import (
-    DigitalVenture, AIAgent, RiskAssessment, AIDecision, MarketAnalysis,
-    AgentType, RiskLevel, VentureStatus
+    DigitalVenture,
+    AIAgent,
+    RiskAssessment,
+    MarketAnalysis,
+    AgentType,
+    RiskLevel,
+    VentureStatus,
 )
 
 
@@ -79,7 +84,7 @@ class MarketIntelligenceService:
         except SQLAlchemyError as e:
             logger.error("Market analysis failed", venture_id=venture_id, error=str(e))
             raise
-        except Exception as e:
+        except Exception:
             logger.exception("Unexpected error during market analysis")
             raise
     
@@ -119,11 +124,13 @@ class MarketIntelligenceService:
 
 class RiskAssessmentService:
     """Risk Assessment Agent with hybrid ML models"""
-    
+
     def __init__(self):
         self.agent_type = AgentType.RISK_ASSESSMENT
         self.model_version = "1.0.0"
         self.target_failure_rate = 0.0001  # 0.01%
+        # Pre-compute weight vector for risk score calculation
+        self._weight_vector = np.array([0.35, 0.25, 0.3, 0.1])
         
     async def assess_venture_risk(self, venture_id: str) -> Dict[str, Any]:
         """Comprehensive risk assessment using hybrid models"""
@@ -203,7 +210,7 @@ class RiskAssessmentService:
         except SQLAlchemyError as e:
             logger.error("Risk assessment failed", venture_id=venture_id, error=str(e))
             raise
-        except Exception as e:
+        except Exception:
             logger.exception("Unexpected error during risk assessment")
             raise
     
@@ -259,24 +266,11 @@ class RiskAssessmentService:
         
         return base_risk
     
-    def _calculate_hybrid_risk_score(self, market: float, operational: float, 
+    def _calculate_hybrid_risk_score(self, market: float, operational: float,
                                    financial: float, technical: float) -> float:
-        """Calculate weighted risk score using hybrid model approach"""
-        # Weights from hybrid LSTM + Random Forest model
-        weights = {
-            'market': 0.35,
-            'operational': 0.25,
-            'financial': 0.3,
-            'technical': 0.1
-        }
-        
-        weighted_score = (
-            market * weights['market'] +
-            operational * weights['operational'] +
-            financial * weights['financial'] +
-            technical * weights['technical']
-        )
-        
+        """Calculate weighted risk score using a vectorized approach"""
+        scores = np.array([market, operational, financial, technical])
+        weighted_score = float(np.dot(scores, self._weight_vector))
         return min(weighted_score, 1.0)
     
     def _convert_risk_to_probability(self, risk_score: float) -> float:
@@ -390,7 +384,7 @@ class DecisionOrchestrator:
         except SQLAlchemyError as e:
             logger.error("Venture evaluation failed", venture_id=venture_id, error=str(e))
             raise
-        except Exception as e:
+        except Exception:
             logger.exception("Unexpected error during venture evaluation")
             raise
     

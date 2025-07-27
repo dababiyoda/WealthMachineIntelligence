@@ -2,7 +2,6 @@
 Workflow engine implementation for coordinating agent activities
 Uses asyncio for concurrent operation management
 """
-import asyncio
 import logging
 from typing import Dict, List, Any, Callable, Coroutine, Optional
 from datetime import datetime
@@ -63,23 +62,30 @@ class Workflow:
             raise
 
     def _determine_execution_order(self) -> List[str]:
-        """Determine the order of step execution based on dependencies"""
-        executed = set()
-        execution_order = []
+        """Determine the order of step execution using topological sort."""
+        indegree: Dict[str, int] = {sid: 0 for sid in self.steps}
+        adjacency: Dict[str, List[str]] = {sid: [] for sid in self.steps}
 
-        def can_execute(step: WorkflowStep) -> bool:
-            return all(req in executed for req in step.requires)
+        for sid, step in self.steps.items():
+            for req in step.requires:
+                if req not in self.steps:
+                    raise ValueError(f"Unknown dependency {req} for step {sid}")
+                adjacency[req].append(sid)
+                indegree[sid] += 1
 
-        while len(executed) < len(self.steps):
-            found_next = False
-            for step_id, step in self.steps.items():
-                if step_id not in executed and can_execute(step):
-                    execution_order.append(step_id)
-                    executed.add(step_id)
-                    found_next = True
-                    break
-            if not found_next:
-                raise ValueError("Circular dependency detected in workflow")
+        queue: List[str] = [sid for sid, deg in indegree.items() if deg == 0]
+        execution_order: List[str] = []
+
+        while queue:
+            current = queue.pop(0)
+            execution_order.append(current)
+            for neighbor in adjacency[current]:
+                indegree[neighbor] -= 1
+                if indegree[neighbor] == 0:
+                    queue.append(neighbor)
+
+        if len(execution_order) != len(self.steps):
+            raise ValueError("Circular dependency detected in workflow")
 
         return execution_order
 

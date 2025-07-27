@@ -2,8 +2,7 @@
 Analytics and reporting API endpoints
 Business intelligence and performance metrics
 """
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timedelta
+from typing import List, Dict
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -13,8 +12,9 @@ from src.logging_config import logger
 
 from ...database.connection import get_db
 from ...database.models import (
-    DigitalVenture, PerformanceMetric, RiskAssessment, 
-    VentureType, VentureStatus, RiskLevel
+    DigitalVenture,
+    VentureStatus,
+    RiskLevel,
 )
 from ..auth import get_current_user
 
@@ -117,7 +117,7 @@ async def get_dashboard_metrics(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error getting dashboard metrics")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -131,33 +131,49 @@ async def get_portfolio_performance(
 ):
     """Get overall portfolio performance"""
     try:
-        ventures = db.query(DigitalVenture).filter(
+        metrics = db.query(
+            func.sum(DigitalVenture.current_valuation),
+            func.sum(DigitalVenture.monthly_revenue),
+            func.sum(DigitalVenture.monthly_expenses),
+            func.avg(DigitalVenture.risk_score),
+            func.count(DigitalVenture.id),
+        ).filter(
             DigitalVenture.status != VentureStatus.DISCONTINUED
-        ).all()
-        
-        total_valuation = sum(v.current_valuation for v in ventures)
-        monthly_revenue = sum(v.monthly_revenue for v in ventures)
-        monthly_expenses = sum(v.monthly_expenses for v in ventures)
-        
-        profit_margin = (monthly_revenue - monthly_expenses) / monthly_revenue if monthly_revenue > 0 else 0
-        average_risk_score = sum(v.risk_score for v in ventures) / len(ventures) if ventures else 0
-        
-        # ROI by venture type
-        roi_by_type = {}
-        for venture_type in VentureType:
-            type_ventures = [v for v in ventures if v.venture_type == venture_type]
-            if type_ventures:
-                type_roi = sum(v.profit_margin for v in type_ventures) / len(type_ventures)
-                roi_by_type[venture_type.value] = type_roi
-        
+        ).one()
+
+        (
+            total_valuation,
+            monthly_revenue,
+            monthly_expenses,
+            average_risk_score,
+            venture_count,
+        ) = metrics
+
+        profit_margin = (
+            (monthly_revenue - monthly_expenses) / monthly_revenue
+            if monthly_revenue and monthly_revenue > 0
+            else 0
+        )
+
+        roi_query = (
+            db.query(
+                DigitalVenture.venture_type,
+                func.avg(DigitalVenture.profit_margin),
+            )
+            .filter(DigitalVenture.status != VentureStatus.DISCONTINUED)
+            .group_by(DigitalVenture.venture_type)
+            .all()
+        )
+        roi_by_type = {vt.value: roi for vt, roi in roi_query}
+
         return PortfolioPerformance(
-            total_valuation=total_valuation,
-            monthly_revenue=monthly_revenue,
-            monthly_expenses=monthly_expenses,
+            total_valuation=total_valuation or 0,
+            monthly_revenue=monthly_revenue or 0,
+            monthly_expenses=monthly_expenses or 0,
             profit_margin=profit_margin,
-            venture_count=len(ventures),
-            average_risk_score=average_risk_score,
-            roi_by_type=roi_by_type
+            venture_count=venture_count,
+            average_risk_score=average_risk_score or 0,
+            roi_by_type=roi_by_type,
         )
         
     except SQLAlchemyError as e:
@@ -166,7 +182,7 @@ async def get_portfolio_performance(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error getting portfolio performance")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -220,7 +236,7 @@ async def get_risk_analysis(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error getting risk analysis")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -270,7 +286,7 @@ async def get_top_performers(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error getting top performers")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
