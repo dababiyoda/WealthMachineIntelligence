@@ -156,3 +156,34 @@ queries:
       cypher: |
         MATCH (v:DigitalVenture)-[:ASSESSED_BY]->(r:RiskProfile)
         RETURN v.business_model, r.risk_level, r.mitigation_strategies;
+  # Query 6: Unit economics screening
+  unit_economics_screen:
+    description: "Filter ventures that meet minimum CTR/CR requirements"
+    pattern:
+      match:
+        venture:
+          type: "DigitalVenture"
+        econ:
+          type: "UnitEconomicsPrior"
+          relationship: "hasUnitEconomicsPrior"
+          source: "venture"
+          properties:
+            expected_ctr: { $gte: "$min_ctr" }
+            expected_cr: { $gte: "$min_cr" }
+      return:
+        - venture.id
+        - venture.name
+        - econ.expected_ctr
+        - econ.expected_cr
+    example_result:
+      ventures:
+        - id: "DV100"
+          name: "High CTR SaaS"
+          expected_ctr: 0.05
+          expected_cr: 0.03
+    example_syntax:
+      cypher: |
+        MATCH (v:DigitalVenture)-[:HAS_UNIT_ECONOMICS_PRIOR]->(e:UnitEconomicsPrior)
+        WHERE e.expected_ctr >= $min_ctr AND e.expected_cr >= $min_cr
+        RETURN v.id, v.name, e.expected_ctr, e.expected_cr;
+

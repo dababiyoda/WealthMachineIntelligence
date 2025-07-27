@@ -132,7 +132,17 @@ Role → managesEcommerce → EcommerceVenture
 Role → ensuresEcommerceRegulation → EcommerceVenture
 ```
 
+
 3. Content platform connections:
 ```yaml
 Role → structuresContent → ContentPlatform
 Role → promotesContent → ContentPlatform
+```
+
+### UnitEconomicsPrior
+Defines baseline financial assumptions for screening opportunities.
+- **expected_ctr**: Optimistic click-through rate
+- **expected_cr**: Optimistic conversion rate
+- **max_cac**: Maximum customer acquisition cost
+- **min_ltv**: Minimum lifetime value per customer
+- **viability_threshold**: Required profit margin
