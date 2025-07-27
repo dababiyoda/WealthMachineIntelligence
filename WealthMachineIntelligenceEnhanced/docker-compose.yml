@@ -1,0 +1,85 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: wealthmachine
+      POSTGRES_USER: wealth
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "wealth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    # valkey is a community‑driven redis fork; drop to redis if valkey image not found
+    image: valkey/valkey:7
+    command: ["valkey-server", "--appendonly", "yes"]
+    volumes:
+      - cache_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  vector_db:
+    image: milvusdb/milvus:v2.4.1
+    container_name: milvus
+    ports:
+      - "19530:19530"  # gRPC
+      - "9091:9091"    # HTTP REST
+    volumes:
+      - milvus_data:/var/lib/milvus
+    environment:
+      MILVUS_LOG_LEVEL: info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  auth:
+    image: quay.io/keycloak/keycloak:24.0.1
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/wealthmachine
+      KC_DB_USERNAME: wealth
+      KC_DB_PASSWORD: secret
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+  api:
+    build: .
+    command: poetry run python -m src.api.main
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgresql+psycopg2://wealth:secret@db:5432/wealthmachine
+      CACHE_HOST: cache
+      CACHE_PORT: 6379
+      MILVUS_HOST: vector_db
+      MILVUS_PORT: 19530
+      AUTH_ISSUER_URL: http://auth:8080/realms/master
+      AUTH_CLIENT_ID: wealthmachine
+    depends_on:
+      - db
+      - cache
+      - vector_db
+      - auth
+    ports:
+      - "8000:8000"
+
+volumes:
+  db_data: {}
+  cache_data: {}
+  milvus_data: {}
