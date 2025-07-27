@@ -640,10 +640,11 @@ body {
 .tab-content {
   display: none;
   animation: fadeIn 0.3s var(--ease-in-out);
+  padding: var(--space-lg);
 }
 
 .tab-content.active {
-  display: block;
+  display: block !important;
 }
 
 /* Enhanced Cards */

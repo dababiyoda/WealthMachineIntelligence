@@ -41,16 +41,20 @@ class WealthMachineApp {
         
         // Tab navigation - Add delay to ensure DOM is ready
         setTimeout(() => {
-            document.querySelectorAll('.tab-item').forEach(tab => {
+            const tabs = document.querySelectorAll('.tab-item');
+            console.log('Setting up tabs:', tabs.length);
+            tabs.forEach((tab, index) => {
+                console.log(`Tab ${index}:`, tab.getAttribute('data-tab'));
                 tab.addEventListener('click', (e) => {
                     e.preventDefault();
                     const tabId = tab.getAttribute('data-tab');
+                    console.log('Tab clicked:', tabId);
                     if (tabId) {
                         this.switchTab(tabId);
                     }
                 });
             });
-        }, 100);
+        }, 500);
         
         // Notification button
         document.getElementById('notificationBtn').addEventListener('click', () => {
@@ -181,27 +185,38 @@ class WealthMachineApp {
     }
 
     switchTab(tabId) {
+        console.log('Switching to tab:', tabId);
+        
         // Update tab buttons
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.classList.remove('active');
         });
-        const tabElement = document.querySelector(`[data-tab="${tabId}"]`);
+        
+        // Find and activate the clicked tab
+        const tabElement = document.querySelector(`button[data-tab="${tabId}"]`);
+        console.log('Found tab element:', tabElement);
         if (tabElement) {
             tabElement.classList.add('active');
+        } else {
+            console.error('Tab element not found for:', tabId);
         }
         
         // Update tab content
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
+            content.style.display = 'none';
         });
+        
         const contentElement = document.getElementById(tabId);
+        console.log('Found content element:', contentElement);
         if (contentElement) {
             contentElement.classList.add('active');
+            contentElement.style.display = 'block';
+        } else {
+            console.error('Content element not found for:', tabId);
         }
         
         this.currentTab = tabId;
-        
-        // Load tab-specific data
         this.loadTabData(tabId);
     }
     
