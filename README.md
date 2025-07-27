@@ -66,6 +66,24 @@ Query patterns and examples for exploring relationships between ventures, roles,
 6. Deploy AI agents according to `/ai-integration` guidelines
 7. Explore knowledge graph capabilities in `/knowledge-graph`
 
+## Docker Setup
+The repository now includes a `Dockerfile` and `.env.example` to simplify local development.
+
+1. Copy `.env.example` to `.env` and update the values for your environment.
+2. Build the container image:
+
+   ```bash
+   docker build -t wealthmachine .
+   ```
+
+3. Run the application with your environment file:
+
+   ```bash
+   docker run --env-file .env -p 5000:5000 wealthmachine
+   ```
+
+The API will be available at `http://localhost:5000`.
+
 ## Future Development
 - Expansion of ontology with domain-specific extensions
 - Integration of advanced AI capabilities
