@@ -18,6 +18,10 @@ class WealthMachineApp {
         this.loadDashboardData();
         this.startAutoRefresh();
         this.applyTheme();
+        
+        // Debug: Log available tabs
+        console.log('Available tabs:', document.querySelectorAll('.tab-item').length);
+        console.log('Available tab content:', document.querySelectorAll('.tab-content').length);
     }
 
     setupEventListeners() {
@@ -35,13 +39,18 @@ class WealthMachineApp {
             this.runEvaluation();
         });
         
-        // Tab navigation
-        document.querySelectorAll('.tab-item').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.switchTab(tab.dataset.tab);
+        // Tab navigation - Add delay to ensure DOM is ready
+        setTimeout(() => {
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabId = tab.getAttribute('data-tab');
+                    if (tabId) {
+                        this.switchTab(tabId);
+                    }
+                });
             });
-        });
+        }, 100);
         
         // Notification button
         document.getElementById('notificationBtn').addEventListener('click', () => {
@@ -176,13 +185,19 @@ class WealthMachineApp {
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.classList.remove('active');
         });
-        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        const tabElement = document.querySelector(`[data-tab="${tabId}"]`);
+        if (tabElement) {
+            tabElement.classList.add('active');
+        }
         
         // Update tab content
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
         });
-        document.getElementById(tabId).classList.add('active');
+        const contentElement = document.getElementById(tabId);
+        if (contentElement) {
+            contentElement.classList.add('active');
+        }
         
         this.currentTab = tabId;
         
@@ -191,6 +206,7 @@ class WealthMachineApp {
     }
     
     loadTabData(tabId) {
+        console.log('Loading tab data for:', tabId);
         switch (tabId) {
             case 'dashboard':
                 // Already loaded in initial load
@@ -202,19 +218,19 @@ class WealthMachineApp {
                 this.renderAgents();
                 break;
             case 'opportunity':
-                this.showNotification('Opportunity analysis system active');
+                this.showNotification('🎯 Opportunity Detection: AI-powered market analysis active');
                 break;
             case 'risk':
-                this.showNotification('Risk monitoring at ultra-low failure rate: P(failure) ≤ 0.01%');
+                this.showNotification('🛡️ Risk Analysis: Ultra-low failure rate P(failure) ≤ 0.01%');
                 break;
             case 'market':
-                this.showNotification('Market intelligence updated with latest LSTM analysis');
+                this.showNotification('📈 Market Intelligence: LSTM trend analysis updated');
                 break;
             case 'compliance':
-                this.showNotification('All ventures compliant - regulatory monitoring active');
+                this.showNotification('⚖️ Compliance: All ventures regulatory compliant');
                 break;
             case 'automation':
-                this.showNotification('47 automation rules active - 1,247 tasks automated today');
+                this.showNotification('⚙️ Automation: 47 rules active, 1,247 tasks automated');
                 break;
         }
     }
