@@ -26,27 +26,32 @@ class DatabaseConnection:
         if not self.database_url:
             raise ValueError("DATABASE_URL environment variable not set")
         
-        # Configure engine with production settings
-        self.engine = create_engine(
-            self.database_url,
-            # Connection pool settings
-            pool_size=20,  # Number of connections to maintain
-            max_overflow=40,  # Maximum overflow connections
-            pool_timeout=30,  # Timeout for getting connection from pool
-            pool_recycle=3600,  # Recycle connections after 1 hour
-            pool_pre_ping=True,  # Verify connections before using
-            
-            # Performance settings
-            echo=False,  # Set to True for SQL debugging
-            future=True,  # Use SQLAlchemy 2.0 style
-            
-            # Connection arguments
-            connect_args={
-                "connect_timeout": 10,
-                "application_name": "wealthmachine_enterprise",
-                "options": "-c statement_timeout=30000"  # 30 second statement timeout
-            }
-        )
+        engine_kwargs = {
+            "echo": False,
+            "future": True,
+        }
+
+        if self.database_url.startswith("sqlite"):
+            engine_kwargs.update({
+                "connect_args": {"check_same_thread": False},
+                "poolclass": pool.StaticPool,
+            })
+        else:
+            engine_kwargs.update({
+                "pool_size": 20,
+                "max_overflow": 40,
+                "pool_timeout": 30,
+                "pool_recycle": 3600,
+                "pool_pre_ping": True,
+                "connect_args": {
+                    "connect_timeout": 10,
+                    "application_name": "wealthmachine_enterprise",
+                    "options": "-c statement_timeout=30000",
+                },
+            })
+
+        # Configure engine with environment specific settings
+        self.engine = create_engine(self.database_url, **engine_kwargs)
         
         # Configure session factory
         self.SessionLocal = sessionmaker(
@@ -59,9 +64,11 @@ class DatabaseConnection:
         # Set up event listeners
         self._setup_event_listeners()
         
-        logger.info("Database connection initialized", 
-                   pool_size=20, 
-                   max_overflow=40)
+        logger.info(
+            "Database connection initialized",
+            database_url=self.database_url,
+            pool_strategy="static" if self.database_url.startswith("sqlite") else "production",
+        )
     
     def _setup_event_listeners(self):
         """Set up SQLAlchemy event listeners for monitoring and error handling"""

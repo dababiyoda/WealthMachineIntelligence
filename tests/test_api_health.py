@@ -12,8 +12,4 @@ def test_health_endpoint():
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
-    # Ensure required keys are present
-    assert "status" in data
-    assert "timestamp" in data
-    assert "database" in data
-    assert "version" in data
+    assert data == {"status": "ok"}

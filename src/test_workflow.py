@@ -19,8 +19,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-@pytest.mark.asyncio
-async def test_workflow():
+async def _run_workflow() -> None:
     # Initialize components
     logger.info("Initializing workflow components...")
     workflow_engine = WorkflowEngine()
@@ -55,21 +54,20 @@ async def test_workflow():
     workflow.add_step(WorkflowStep("create-node-2", step2, requires=["create-node-1"]))
 
     # Execute workflow
-    try:
-        logger.info("Starting workflow execution...")
-        await workflow_engine.execute_workflow("test-workflow")
-        logger.info("Workflow executed successfully")
+    logger.info("Starting workflow execution...")
+    await workflow_engine.execute_workflow("test-workflow")
+    logger.info("Workflow executed successfully")
 
-        # Verify results
-        nodes = knowledge_graph.get_nodes_by_type("test")
-        logger.info(f"Created {len(nodes)} nodes")
+    # Verify results
+    nodes = knowledge_graph.get_nodes_by_type("test")
+    logger.info(f"Created {len(nodes)} nodes")
 
-        neighbors = knowledge_graph.get_neighbors("test-node-1")
-        logger.info(f"Node 1 has {len(neighbors)} neighbors")
+    neighbors = knowledge_graph.get_neighbors("test-node-1")
+    logger.info(f"Node 1 has {len(neighbors)} neighbors")
 
-    except Exception as e:
-        logger.error(f"Workflow execution failed: {str(e)}")
-        raise
+
+def test_workflow() -> None:
+    asyncio.run(_run_workflow())
 
 if __name__ == "__main__":
     logger.info("Starting test workflow script")
