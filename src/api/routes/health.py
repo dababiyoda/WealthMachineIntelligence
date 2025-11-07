@@ -15,40 +15,19 @@ from ..auth import get_current_user
 
 router = APIRouter()
 
-class SystemHealth(BaseModel):
-    status: str
-    timestamp: datetime
-    database: Dict[str, Any]
-    api: Dict[str, Any]
-    
+
+@router.get("/health")
+async def system_health() -> Dict[str, str]:
+    """Lightweight health endpoint compatible with legacy checks."""
+
+    status = "ok" if db.health_check() else "degraded"
+    return {"status": status}
+
+
 class DatabaseHealth(BaseModel):
     connected: bool
     pool_status: Dict[str, Any]
     response_time_ms: float
-
-@router.get("/health", response_model=SystemHealth)
-async def system_health():
-    """Comprehensive system health check"""
-    start_time = datetime.now()
-    
-    # Database health
-    db_healthy = db.health_check()
-    pool_status = db.get_pool_status()
-    db_response_time = (datetime.now() - start_time).total_seconds() * 1000
-    
-    return SystemHealth(
-        status="healthy" if db_healthy else "unhealthy",
-        timestamp=datetime.now(),
-        database={
-            "connected": db_healthy,
-            "pool": pool_status,
-            "response_time_ms": db_response_time
-        },
-        api={
-            "status": "operational",
-            "uptime_ms": db_response_time
-        }
-    )
 
 @router.get("/database", response_model=DatabaseHealth)
 async def database_health(

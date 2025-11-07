@@ -115,17 +115,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 async def health_check():
     """System health check"""
     db_healthy = db.health_check()
-    pool_status = db.get_pool_status()
-    
-    return {
-        "status": "healthy" if db_healthy else "unhealthy",
-        "timestamp": time.time(),
-        "database": {
-            "healthy": db_healthy,
-            "pool": pool_status
-        },
-        "version": "1.0.0"
-    }
+    return {"status": "ok" if db_healthy else "degraded"}
 
 # Metrics endpoint
 @app.get("/metrics")
