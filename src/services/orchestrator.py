@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from ..agents.specialized import (
     BusinessModelInnovatorAgent,
@@ -18,6 +18,7 @@ from ..agents.specialized import (
 from ..core.loops import IncomeStreamsLoop, TeamLoop
 from ..core.performance import PerformanceTracker, SMARTGoal
 from ..services.decision_engine import DecisionEngine
+from ..services.phase_management import PhaseManager
 from ..services.risk_management import RiskManager
 
 
@@ -29,6 +30,7 @@ class WealthMachineOrchestrator:
         decision_engine: Optional[DecisionEngine] = None,
         risk_manager: Optional[RiskManager] = None,
         performance_tracker: Optional[PerformanceTracker] = None,
+        phase_manager: Optional[PhaseManager] = None,
     ) -> None:
         self.agents = {
             "emerging_tech": EmergingTechAgent("agent-emerging-tech"),
@@ -46,6 +48,7 @@ class WealthMachineOrchestrator:
 
         self.decision_engine = decision_engine or DecisionEngine([])
         self.risk_manager = risk_manager or RiskManager()
+        self.phase_manager = phase_manager or PhaseManager()
 
         self.income_loop = IncomeStreamsLoop(
             self.agents,
@@ -77,9 +80,20 @@ class WealthMachineOrchestrator:
         cycle_result = await self.income_loop.execute_cycle(venture_id, payload)
         team_result = await self.team_loop.execute_cycle(cycle_result)
 
+        phase_decision = self.phase_manager.record_cycle(
+            venture_id,
+            metrics={
+                "opportunity_score": cycle_result.opportunity.data.get("opportunity_score", 0.0),
+                "expected_roi": cycle_result.financial.data.get("expected_roi", 0.0),
+            },
+            risk_level=cycle_result.risk.get("risk_level", "Moderate"),
+        )
+
         return {
             "venture": cycle_result.as_dict(),
             "team": team_result.as_dict(),
+            "phase": phase_decision.as_dict(),
+            "portfolio": self.phase_manager.portfolio_summary(),
         }
 
 
