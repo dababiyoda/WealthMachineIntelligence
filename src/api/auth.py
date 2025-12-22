@@ -78,7 +78,7 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
     except jwt.ExpiredSignatureError:
         logger.warning("Token expired")
         return None
-    except jwt.JWTError as e:
+    except jwt.InvalidTokenError as e:
         logger.warning("JWT decode error", error=str(e))
         return None
 
@@ -121,13 +121,11 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Dic
     """Retrieve the current user based on the access token."""
 
     if not token:
-        # Default to admin for development/test scenarios
-        return {
-            "user_id": DEMO_USERS["admin"]["user_id"],
-            "username": DEMO_USERS["admin"]["username"],
-            "role": DEMO_USERS["admin"]["role"],
-            "permissions": DEMO_USERS["admin"]["permissions"],
-        }
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     payload = verify_token(token)
     if not payload:
