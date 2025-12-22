@@ -41,6 +41,13 @@ def test_income_stream_cycle_generates_cohesive_plan() -> None:
     first_agent_snapshot = next(iter(team["performance_snapshots"].values()))
     assert first_agent_snapshot["goals"], "Performance tracker must return goal snapshots"
 
+    phase = report["phase"]
+    assert phase["decision"] in {"promote", "stabilize", "regress"}
+    assert "Phase" in phase["current_phase"]
+
+    portfolio = report["portfolio"]
+    assert "venture-async-1" in portfolio
+
 
 def test_orchestrator_runs_sync_event_loop() -> None:
     orchestrator = WealthMachineOrchestrator()
@@ -57,4 +64,4 @@ def test_orchestrator_runs_sync_event_loop() -> None:
         report = loop.run_until_complete(_run())
     finally:
         loop.close()
-    assert set(report.keys()) == {"venture", "team"}
+    assert set(report.keys()) == {"venture", "team", "phase", "portfolio"}
