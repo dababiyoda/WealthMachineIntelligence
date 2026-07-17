@@ -131,6 +131,29 @@ Use `ruff` to run the linter locally:
 ruff check .
 ```
 
+## DALEOBANKS Bridge (OpportunityPacket intake)
+
+DALEOBANKS (the media/signal engine) and WealthMachineIntelligence (this
+venture-evaluation engine) stay separate systems connected only by a stable
+wire protocol, mirrored in both repos as `venture_protocol`:
+
+- `POST /api/opportunities/intake` — accept an `OpportunityPacket`, run it
+  through the existing `NetworkWealthEngine` venture loop (opportunity
+  scoring, market, product, business model, financial, legal, marketing,
+  partnerships, risk), and return a `VentureAssessment`
+  (`go | defer | kill | needs_more_evidence`).
+- `POST /api/ventures/evaluate` — alias for the same evaluation.
+- `GET /api/ventures/{id}/assessment` — fetch a stored assessment by
+  assessment id or opportunity packet id.
+
+Hardcoded guardrails: every assessment carries
+`requires_human_approval: true`; packets with legal risk flags are killed
+and escalated to the operator; finance-flagged packets always require legal
+review and stay educational (no revenue promises, no personalized advice).
+The endpoints run locally with zero credentials; set
+`WEALTHMACHINE_INTAKE_TOKEN` to require a shared bearer token in
+deployment. On the DALEOBANKS side, point `WEALTHMACHINE_URL` at this
+server to switch its bridge from mock to HTTP mode.
 
 ## Future Development
 - Expansion of ontology with domain-specific extensions
