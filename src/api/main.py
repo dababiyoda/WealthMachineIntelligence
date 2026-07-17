@@ -15,7 +15,7 @@ import os
 from contextlib import asynccontextmanager
 
 from ..database.connection import db
-from .routes import ventures, agents, analytics, health
+from .routes import ventures, agents, analytics, health, opportunities
 from .auth import verify_token
 from .middleware import SecurityHeadersMiddleware, LoggingMiddleware
 
@@ -128,6 +128,8 @@ app.include_router(ventures.router, prefix="/api/v1/ventures", tags=["ventures"]
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
 app.include_router(health.router, prefix="/api/v1/system", tags=["system"])
+# DALEOBANKS bridge: OpportunityPacket in, VentureAssessment back.
+app.include_router(opportunities.router, prefix="/api", tags=["opportunities"])
 
 @app.get("/")
 async def root():
