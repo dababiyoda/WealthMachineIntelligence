@@ -7,7 +7,7 @@ deterministic, deny-by-default governance and evidence workflow.
 **Live institutional website:**
 [`UAT Venture Command`](https://uat-venture-command.investigatin-9078.chatgpt.site)
 
-The public route explains the doctrine, architecture, lifecycle, roles, and
+The landing route explains the doctrine, architecture, lifecycle, roles, and
 current readiness boundary. Its `/command` route uses ChatGPT-managed sign-in
 and provides a deterministic governed-action lab. That lab never executes an
 external action and is not connected to production venture or financial data.

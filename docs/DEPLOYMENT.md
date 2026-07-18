@@ -66,7 +66,7 @@ The institutional website is published at
 
 It is a separate ChatGPT Sites deployment with two surfaces:
 
-- `/` is a public explanation of the UAT doctrine, architecture, lifecycle,
+- `/` is the institutional explanation of the UAT doctrine, architecture, lifecycle,
   roles, repository status, and capability boundary;
 - `/command` uses platform-managed ChatGPT sign-in and provides an interactive
   deterministic policy lab.
@@ -77,3 +77,9 @@ Its action lab calculates and explains a bounded risk floor but cannot execute
 the proposed action. Treat it as an institutional communication and operator
 training surface until the API integration gates in `docs/CHATGPT_SITE.md`
 have cleared.
+
+The current Sites access policy is `custom` with the owner as the only allowed
+user. The deployment is live but is not a public-internet launch. The current
+workspace exposes `custom` and `workspace_all` access modes; it does not expose
+`public`. Do not widen access to the full workspace without an explicit owner
+decision, and do not describe this URL as publicly accessible.

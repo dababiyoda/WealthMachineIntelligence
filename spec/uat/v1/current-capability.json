@@ -19,8 +19,10 @@
     "repository_preview": "FastAPI operator console and governance-record API",
     "chatgpt_site": {
       "url": "https://uat-venture-command.investigatin-9078.chatgpt.site",
-      "public_route": "Institutional doctrine, architecture, lifecycle, and readiness disclosure",
+      "landing_route": "Institutional doctrine, architecture, lifecycle, and readiness disclosure",
       "authenticated_route": "ChatGPT-sign-in command room with a deterministic no-execution action lab",
+      "access_mode": "custom_owner_only",
+      "public_access_status": "not_available_in_current_workspace_policy",
       "integration_status": "published_truthful_frontend_not_connected_to_production_control_plane"
     }
   },
@@ -43,7 +45,7 @@
     "Deny missing identity, contract, capability, evidence, budget, approval, rollback, and kill-switch requirements",
     "Reconstruct an action from evidence through policy, approval, human execution, and independent verification",
     "Validate the normative UAT artifacts and governed preview through repository tests",
-    "Publish a public institutional website and ChatGPT-authenticated deterministic action lab that performs no external side effect"
+    "Publish an owner-access institutional website and ChatGPT-authenticated deterministic action lab that performs no external side effect"
   ],
   "limitations": [
     "AG0 still requires independent review; the complete AG1 and AG2 acceptance gates have not cleared",

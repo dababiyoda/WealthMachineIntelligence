@@ -6,15 +6,21 @@ The published website is
 [`UAT Venture Command`](https://uat-venture-command.investigatin-9078.chatgpt.site).
 
 It makes the UAT doctrine reviewable without overstating the current system.
-The public experience explains the institution, its evidence-gated venture
+The landing experience explains the institution, its evidence-gated venture
 lifecycle, twelve parent roles, operating guarantee, and current readiness
 boundary. The command room is protected by ChatGPT-managed sign-in.
+
+The current access policy is `custom` and allows the owner only. This is a live
+production deployment, but it is not public internet access. The current
+workspace makes `custom` and `workspace_all` available and does not offer a
+`public` mode. Access must not be widened or described as public without a new,
+explicit owner decision and a platform-supported access mode.
 
 ## Implemented website behavior
 
 The website provides:
 
-- a responsive public institutional presentation;
+- a responsive institutional presentation;
 - explicit disclosure that external autonomy is `none`;
 - direct traceability to the governed-preview GitHub release;
 - a ChatGPT-authenticated command overview;
@@ -79,7 +85,7 @@ The ChatGPT Sites release was built through its locked production pipeline and
 verified as a deployed production URL on 2026-07-18. Its automated rendered
 HTML checks confirm:
 
-- the public doctrine and truth boundary render;
+- the institutional doctrine and truth boundary render;
 - an anonymous command-room request redirects to ChatGPT sign-in;
 - an authenticated request renders the command room;
 - the command room exposes the `external autonomy: none` boundary.

@@ -22,7 +22,7 @@
   tags, provenance, and an SBOM.
 - Added a locked dependency graph and CI vulnerability audit; removed the
   vulnerable JOSE dependency from the preview token path.
-- Published the UAT Venture Command ChatGPT website with a public institutional
+- Published the UAT Venture Command ChatGPT website with an owner-access institutional
   surface, ChatGPT-managed command-room sign-in, and a deterministic
   no-execution action lab. The website remains isolated from production data
   and external tools.
