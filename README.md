@@ -54,7 +54,9 @@ paths.
 
 Authentication also fails closed by default: anonymous requests do not become
 admins, demo identities require `ALLOW_DEMO_AUTH=true` outside production, and
-production rejects demo auth or a short/default JWT secret. Application-time
+production rejects demo auth, a short/default JWT secret, or default
+issuer/audience values. JWT verification binds the signature, algorithm,
+expiry, subject, issuer, audience, role, and permission shape. Application-time
 schema creation is disabled unless `AUTO_CREATE_SCHEMA=true` in a non-production
 environment; production migrations must use a separate operator identity.
 

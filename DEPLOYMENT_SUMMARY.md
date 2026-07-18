@@ -21,7 +21,10 @@ compliance, or a real-world venture failure rate.
 
 ## Release blockers
 
-- [ ] Remove demo credentials and validate authentication/authorization end to end.
+- [x] Remove the JWT test stub; verify signature, expiry, subject, issuer,
+  audience, role, and permission shape; forbid demo auth in production.
+- [ ] Replace the local shared-secret reference with a production workforce IdP,
+  user lifecycle/revocation, signing-key rotation, and end-to-end deployment tests.
 - [ ] Inventory every consequential runtime and administrative side-effect path.
 - [ ] Make gateway mediation and downstream policy unavoidable.
 - [ ] Remove direct consequential credentials and unrestricted egress from agent runtimes.

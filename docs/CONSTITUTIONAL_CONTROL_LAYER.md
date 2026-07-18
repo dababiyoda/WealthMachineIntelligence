@@ -137,14 +137,18 @@ Venture CRUD and agent-record activation are not agent autonomy paths. They now
 require an explicitly authenticated user with the `admin` role and permission;
 missing credentials never default to an administrator. Local demo identities
 are disabled unless `ALLOW_DEMO_AUTH=true`, and that setting is rejected in
-production. Each mutation records an intent/outcome pair in a separate
-hash-chained admin ledger.
+production. The reference verifier checks a fixed algorithm, signature, expiry,
+subject, issuer, audience, and the signed role/permission shape; arbitrary
+bearer strings and tokens for another service fail closed. Each mutation records
+an intent/outcome pair in a separate hash-chained admin ledger.
 
 An `AIAgent.is_active` database flag is operational metadata, not a capability
 grant. Only the root-controlled policy engine can issue action authority. The
 current admin ledger is not transactionally coupled to the database and remains
 tamper-evident rather than independently anchored, so production still requires
-cryptographic human identity and a durable audit/outbox design.
+a workforce identity provider with account lifecycle and signing-key rotation,
+plus a durable audit/outbox design. The HS256 verifier is a controlled-pilot
+reference, not a substitute for that identity system.
 
 ## Evidence Ledger guarantees and limits
 
