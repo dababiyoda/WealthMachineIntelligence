@@ -76,12 +76,6 @@ class WealthMachineApp {
 
     async authenticate() {
         try {
-            // Skip authentication if we already have a token
-            if (this.authToken) {
-                console.log('✓ Using existing token');
-                return;
-            }
-            
             const response = await fetch(`${this.apiBase}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -91,28 +85,29 @@ class WealthMachineApp {
             if (response.ok) {
                 const data = await response.json();
                 this.authToken = data.access_token;
-                // Store token in localStorage for persistence
                 localStorage.setItem('authToken', this.authToken);
-                console.log('✓ Authenticated successfully');
+                console.log('✓ Local simulation identity established');
             } else {
                 throw new Error('Authentication failed');
             }
         } catch (error) {
-            console.warn('Authentication error, using demo token');
-            this.authToken = 'demo';
-            localStorage.setItem('authToken', this.authToken);
+            console.warn('Authentication unavailable; using offline simulation fixtures');
+            this.authToken = null;
+            localStorage.removeItem('authToken');
         }
     }
 
     async loadDashboardData() {
         try {
             // Load all data in parallel
-            const [dashboardData, venturesData, agentsData] = await Promise.all([
+            const [capabilityData, dashboardData, venturesData, agentsData] = await Promise.all([
+                this.fetchCapabilities(),
                 this.fetchDashboard(),
                 this.fetchVentures(),
                 this.fetchAgents()
             ]);
             
+            this.renderCapabilities(capabilityData);
             this.updateDashboard(dashboardData);
             this.ventures = venturesData.ventures || [];
             this.agents = agentsData.agents || [];
@@ -133,6 +128,11 @@ class WealthMachineApp {
         return response.ok ? response.json() : this.getOfflineDashboard();
     }
 
+    async fetchCapabilities() {
+        const response = await fetch(`${this.apiBase}/api/v1/system/capabilities`);
+        return response.ok ? response.json() : this.getOfflineCapabilities();
+    }
+
     async fetchVentures() {
         const response = await fetch(`${this.apiBase}/api/v1/ventures`, {
             headers: { 'Authorization': `Bearer ${this.authToken}` }
@@ -151,7 +151,18 @@ class WealthMachineApp {
         // Animate number updates
         this.animateValue('totalVentures', 0, data.total_ventures || 0, 1000);
         this.animateValue('monthlyRevenue', 0, data.total_monthly_revenue || 0, 1000, true);
-        this.animateValue('successRate', 0, data.ultra_low_failure_rate_percentage || 0, 1000, false, true);
+        this.animateValue('modeledCoverage', 0, data.modeled_risk_threshold_coverage || 0, 1000, false, true);
+    }
+
+    renderCapabilities(capability) {
+        const mode = document.getElementById('operatingMode');
+        const stage = document.getElementById('capabilityStage');
+        if (mode) {
+            mode.textContent = `${capability.operating_mode || 'restricted'} mode — evidence not verified`;
+        }
+        if (stage) {
+            stage.textContent = (capability.declared_stage || 'unknown restricted stage').replaceAll('_', ' ');
+        }
     }
 
     animateValue(id, start, end, duration, isCurrency = false, isPercentage = false) {
@@ -239,19 +250,19 @@ class WealthMachineApp {
                 this.renderAgents();
                 break;
             case 'opportunity':
-                this.showNotification('🎯 Opportunity Detection: AI-powered market analysis active');
+                this.showNotification('🎯 Opportunity hypotheses: external evidence is required');
                 break;
             case 'risk':
-                this.showNotification('🛡️ Risk Analysis: Ultra-low failure rate P(failure) ≤ 0.01%');
+                this.showNotification('🛡️ Risk review: heuristic index is uncalibrated and non-authorizing');
                 break;
             case 'market':
-                this.showNotification('📈 Market Intelligence: LSTM trend analysis updated');
+                this.showNotification('📈 Market sandbox: no validated forecast is connected');
                 break;
             case 'compliance':
-                this.showNotification('⚖️ Compliance: All ventures regulatory compliant');
+                this.showNotification('⚖️ Compliance status: not assessed; qualified review required');
                 break;
             case 'automation':
-                this.showNotification('⚙️ Automation: 47 rules active, 1,247 tasks automated');
+                this.showNotification('⚙️ Automation: illustrative rules only; production execution disabled');
                 break;
         }
     }
@@ -278,17 +289,17 @@ class WealthMachineApp {
                 </div>
                 <div class="venture-metrics">
                     <div class="metric">
-                        <span class="metric-label">Revenue</span>
+                        <span class="metric-label">Recorded Revenue (Unverified)</span>
                         <span class="metric-value">$${(venture.revenue / 1000).toFixed(1)}K</span>
                     </div>
                     <div class="metric">
-                        <span class="metric-label">Risk Score</span>
-                        <span class="metric-value">${(venture.risk_score * 100).toFixed(0)}%</span>
+                        <span class="metric-label">Heuristic Risk Index</span>
+                        <span class="metric-value">${Number(venture.heuristic_risk_index ?? venture.risk_score ?? 0).toFixed(2)}</span>
                     </div>
                 </div>
-                <div class="venture-status ${this.getStatusClass(venture.failure_probability)}">
+                <div class="venture-status ${this.getStatusClass(venture.heuristic_risk_index ?? venture.risk_score ?? 1)}">
                     <span class="status-dot"></span>
-                    <span>Failure Rate: ${(venture.failure_probability * 100).toFixed(3)}%</span>
+                    <span>Evidence: ${venture.evidence_status || 'unverified'}</span>
                 </div>
             </div>
         `).join('');
@@ -308,6 +319,17 @@ class WealthMachineApp {
 
     renderAgents() {
         const container = document.getElementById('agentsGrid');
+
+        if (this.agents.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-icons-round empty-icon">smart_toy</span>
+                    <h3>No connected agent evaluations</h3>
+                    <p>Performance remains unknown until a versioned evaluation is linked.</p>
+                </div>
+            `;
+            return;
+        }
         
         container.innerHTML = this.agents.map(agent => `
             <div class="agent-card ${agent.active ? 'active' : 'inactive'}">
@@ -317,9 +339,9 @@ class WealthMachineApp {
                 <h4 class="agent-name">${agent.name}</h4>
                 <div class="agent-stats">
                     <div class="accuracy-bar">
-                        <div class="accuracy-fill" style="width: ${agent.accuracy * 100}%"></div>
+                        <div class="accuracy-fill" style="width: 0%"></div>
                     </div>
-                    <span class="accuracy-text">${(agent.accuracy * 100).toFixed(0)}% Accuracy</span>
+                    <span class="accuracy-text">Performance unverified</span>
                 </div>
             </div>
         `).join('');
@@ -334,10 +356,10 @@ class WealthMachineApp {
         return types[type] || type;
     }
 
-    getStatusClass(failureProbability) {
-        if (failureProbability <= 0.0001) return 'ultra-low-risk';
-        if (failureProbability <= 0.001) return 'low-risk';
-        if (failureProbability <= 0.01) return 'medium-risk';
+    getStatusClass(heuristicRiskIndex) {
+        if (heuristicRiskIndex <= 0.2) return 'ultra-low-risk';
+        if (heuristicRiskIndex <= 0.35) return 'low-risk';
+        if (heuristicRiskIndex <= 0.5) return 'medium-risk';
         return 'high-risk';
     }
 
@@ -384,7 +406,7 @@ class WealthMachineApp {
         // Show loading state
         const button = document.getElementById('runEvaluation');
         const originalContent = button.innerHTML;
-        button.innerHTML = '<span class="loading"></span> Analyzing...';
+        button.innerHTML = '<span class="loading"></span> Simulating...';
         button.disabled = true;
         
         try {
@@ -397,19 +419,18 @@ class WealthMachineApp {
             
             // Update results with animation
             const score = Math.random() * 30 + 70;
-            const successProb = 99.9 + Math.random() * 0.09;
-            const riskLevel = successProb > 99.95 ? 'Ultra Low' : 'Low';
+            const heuristicRiskIndex = Math.random() * 0.6 + 0.2;
+            const riskLevel = heuristicRiskIndex <= 0.35 ? 'Lower modeled band' : 'Evidence required';
             
             this.animateValue('opportunityScore', 0, score, 1000);
-            document.getElementById('failureProbability').textContent = `${successProb.toFixed(2)}%`;
+            document.getElementById('heuristicRiskIndex').textContent = heuristicRiskIndex.toFixed(2);
             document.getElementById('riskLevel').textContent = riskLevel;
             
             // Update recommendation
             document.getElementById('recommendation').innerHTML = `
                 <span class="material-icons-round">lightbulb</span>
-                <p><strong>Recommendation:</strong> This venture shows excellent potential with ultra-low risk profile. 
-                The AI analysis indicates strong market fit and minimal competition risk. 
-                Consider proceeding with MVP development.</p>
+                <p><strong>Simulation only:</strong> this output is not market proof or permission to build.
+                Verify the problem and buyer, then run the smallest reversible test capable of disproving the thesis.</p>
             `;
             
             // Add to ventures after delay
@@ -419,7 +440,7 @@ class WealthMachineApp {
                     marketSize: marketSize,
                     competition: competition,
                     score: score,
-                    successProbability: successProb
+                    heuristicRiskIndex: heuristicRiskIndex
                 });
             }, 1500);
             
@@ -439,12 +460,13 @@ class WealthMachineApp {
             status: 'evaluating',
             revenue: 0,
             risk_score: (100 - ventureData.score) / 100,
-            failure_probability: (100 - ventureData.successProbability) / 100
+            heuristic_risk_index: ventureData.heuristicRiskIndex,
+            evidence_status: 'client_side_simulation_fixture'
         };
         
         this.ventures.unshift(newVenture);
         this.renderVentures();
-        this.showNotification('New venture added successfully!', 'success');
+        this.showNotification('Simulation fixture added; no venture was launched', 'info');
         
         // Update dashboard count
         const currentCount = parseInt(document.getElementById('totalVentures').textContent) || 0;
@@ -556,85 +578,43 @@ class WealthMachineApp {
     }
 
     // Offline data fallbacks
+    getOfflineCapabilities() {
+        return {
+            declared_stage: 'unknown_restricted',
+            operating_mode: 'offline simulation',
+            authorized_external_autonomy: 'none',
+            runtime_enforced: false
+        };
+    }
+
     getOfflineDashboard() {
         return {
-            total_ventures: 3,
-            total_monthly_revenue: 27500,
-            ultra_low_failure_rate_percentage: 92.5,
-            target_achievement: 'SUCCESS'
+            total_ventures: 0,
+            total_monthly_revenue: 0,
+            modeled_risk_threshold_coverage: 0,
+            evidence: {
+                operating_mode: 'offline simulation',
+                evidence_status: 'no connected source'
+            }
         };
     }
 
     getOfflineVentures() {
         return {
-            ventures: [
-                {
-                    id: 'v1',
-                    name: 'AI Analytics Platform',
-                    type: 'saas',
-                    status: 'scaling',
-                    revenue: 12500,
-                    risk_score: 0.08,
-                    failure_probability: 0.0007
-                },
-                {
-                    id: 'v2',
-                    name: 'Smart E-commerce Hub',
-                    type: 'ecommerce',
-                    status: 'mvp',
-                    revenue: 8500,
-                    risk_score: 0.12,
-                    failure_probability: 0.0009
-                },
-                {
-                    id: 'v3',
-                    name: 'Content Creator Suite',
-                    type: 'content',
-                    status: 'growth',
-                    revenue: 6500,
-                    risk_score: 0.05,
-                    failure_probability: 0.0003
-                }
-            ]
+            ventures: [],
+            evidence: { operating_mode: 'offline simulation', evidence_status: 'no connected source' }
         };
     }
 
     getOfflineAgents() {
         return {
-            agents: [
-                {
-                    id: 'a1',
-                    type: 'market_intelligence',
-                    name: 'Market Intelligence',
-                    active: true,
-                    accuracy: 0.89
-                },
-                {
-                    id: 'a2',
-                    type: 'risk_assessment',
-                    name: 'Risk Assessment',
-                    active: true,
-                    accuracy: 0.94
-                },
-                {
-                    id: 'a3',
-                    type: 'legal_compliance',
-                    name: 'Legal Compliance',
-                    active: true,
-                    accuracy: 0.91
-                },
-                {
-                    id: 'a4',
-                    type: 'opportunity_scout',
-                    name: 'Opportunity Scout',
-                    active: true,
-                    accuracy: 0.87
-                }
-            ]
+            agents: [],
+            evidence: { operating_mode: 'offline simulation', evidence_status: 'no connected source' }
         };
     }
 
     useOfflineData() {
+        this.renderCapabilities(this.getOfflineCapabilities());
         this.updateDashboard(this.getOfflineDashboard());
         this.ventures = this.getOfflineVentures().ventures;
         this.agents = this.getOfflineAgents().agents;

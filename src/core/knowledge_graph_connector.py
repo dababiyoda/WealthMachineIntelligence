@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 from typing import Dict, Any, List, Optional
 
-from .knowledge_graph import knowledge_graph, Node, Edge
+from .knowledge_graph import knowledge_graph, Node
 
 try:
     # Try to import database models and session manager.  These imports
@@ -201,11 +201,9 @@ class KnowledgeGraphConnector:
     def store_risk_assessment(self, venture_id: str, risk_data: Dict[str, Any]) -> None:
         """Persist a risk assessment into the database and graph.
 
-        The ``risk_data`` should include keys like ``risk_score``,
-        ``failure_probability``, ``risk_level`` and ``recommendations``.  A
-        new ``RiskAssessment`` record is created and linked to the
-        venture.  Additionally, the latest risk information is stored on
-        the venture node.
+        ``risk_data`` contains an uncalibrated heuristic risk index, a legacy
+        ordered review band, recommendations, and an evidence disclosure. It
+        MUST NOT contain or imply a venture failure probability.
         """
         logger.info("Storing risk assessment", extra={"venture_id": venture_id, "risk_data": risk_data})
 
@@ -216,14 +214,16 @@ class KnowledgeGraphConnector:
                         venture_id=venture_id,
                         agent_id=risk_data.get("agent_id", "unknown"),
                         risk_score=risk_data.get("risk_score", 0.0),
-                        failure_probability=risk_data.get("failure_probability", 0.0),
+                        heuristic_risk_index=risk_data.get(
+                            "heuristic_risk_index", risk_data.get("risk_score", 0.0)
+                        ),
                         market_risk=risk_data.get("market_risk", 0.0),
                         operational_risk=risk_data.get("operational_risk", 0.0),
                         financial_risk=risk_data.get("financial_risk", 0.0),
                         technical_risk=risk_data.get("technical_risk", 0.0),
                         risk_level=risk_data.get("risk_level"),
                         recommendations=risk_data.get("recommendations", []),
-                        confidence_level=risk_data.get("confidence_level", 0.0),
+                        heuristic_confidence=0.0,
                         model_version=risk_data.get("model_version", "unknown"),
                         features_used=risk_data.get("features_used", []),
                     )
@@ -231,7 +231,9 @@ class KnowledgeGraphConnector:
                     venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
                     if venture:
                         venture.risk_score = risk_data.get("risk_score", venture.risk_score)
-                        venture.failure_probability = risk_data.get("failure_probability", venture.failure_probability)
+                        venture.heuristic_risk_index = risk_data.get(
+                            "heuristic_risk_index", venture.heuristic_risk_index
+                        )
                         venture.risk_level = risk_data.get("risk_level", venture.risk_level)
             except Exception as exc:  # pragma: no cover
                 logger.warning("Skipping risk assessment DB persistence", exc_info=exc)
@@ -241,13 +243,15 @@ class KnowledgeGraphConnector:
         if node:
             node.update({
                 "risk_score": risk_data.get("risk_score"),
-                "failure_probability": risk_data.get("failure_probability"),
+                "heuristic_risk_index": risk_data.get("heuristic_risk_index"),
+                "evidence_status": risk_data.get("evidence_status"),
                 "risk_level": risk_data.get("risk_level").value if hasattr(risk_data.get("risk_level"), 'value') else risk_data.get("risk_level"),
             })
         else:
             knowledge_graph.add_node(Node(venture_id, "DigitalVenture", {
                 "risk_score": risk_data.get("risk_score"),
-                "failure_probability": risk_data.get("failure_probability"),
+                "heuristic_risk_index": risk_data.get("heuristic_risk_index"),
+                "evidence_status": risk_data.get("evidence_status"),
                 "risk_level": risk_data.get("risk_level"),
             }))
 

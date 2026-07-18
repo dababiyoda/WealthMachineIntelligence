@@ -4,7 +4,9 @@ Each agent inherits from :class:`~src.agents.base.BaseAgent` and
 encapsulates domain specific heuristics that power the Income Streams
 and Team loops.  The behaviours implemented here are intentionally
 deterministic so they can be exercised in automated tests while still
-mirroring the qualitative reasoning the human playbooks describe.
+mirroring the qualitative reasoning the human playbooks describe. They are
+test fixtures, not autonomous enterprise agents, and cannot authorize an
+external action.
 """
 
 from __future__ import annotations
@@ -25,7 +27,7 @@ class AgentOutput:
 
 
 class SpecializedAgent(BaseAgent):
-    """Base class for specialised Wealth Machine agents."""
+    """Base class for deterministic, recommendation-only test fixtures."""
 
     role_name: str
     capabilities: List[str]
@@ -287,4 +289,3 @@ __all__ = [
     "MarketingAgent",
     "NetworkingAgent",
 ]
-

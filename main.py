@@ -1,48 +1,32 @@
-"""
-WealthMachine Enterprise API Server
-Production-ready FastAPI application
+"""Local UAT simulation API.
+
+This entrypoint is an architectural skeleton, not a production or autonomous
+venture operator. Its current limits are exposed through the capability API.
 """
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import uvicorn
 from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
-import time
-from src.logging_config import configure_logging, logger
+from src.logging_config import configure_logging
 from datetime import datetime
 
+from src.core.epistemic import current_capability_record, evidence_disclosure
 from src.database.connection import db
-try:
-    from src.api.auth import verify_token, authenticate_user, create_access_token
-    from src.services.ai_agents import DecisionOrchestrator
-except ImportError as e:
-    print(f"Import warning: {e}")
-    # Fallback implementations for missing modules
-    def verify_token(token):
-        return {"user_id": "demo", "username": "demo"} if token == "demo" else None
-    
-    def authenticate_user(username, password):
-        return {"user_id": "demo", "username": "demo"} if username == "demo" else None
-    
-    def create_access_token(data):
-        return "demo_token"
-    
-    class DecisionOrchestrator:
-        async def evaluate_venture_opportunity(self, venture_id):
-            return {"status": "evaluation_completed", "venture_id": venture_id}
+from src.api.auth import (
+    authenticate_user,
+    create_access_token,
+    get_current_user,
+)
 
 # Configure logging
 configure_logging()
 
 app = FastAPI(
-    title="WealthMachine Enterprise API",
-    description="AI-driven digital business opportunity identification and scaling system",
-    version="1.0.0"
+    title="UAT Simulation API",
+    description="Evidence-labeled architecture skeleton for governed venture experiments",
+    version="0.1.0"
 )
 
 # Static files will be served by our custom handler
@@ -56,24 +40,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Authentication
-security = HTTPBearer()
-
-def get_current_user(credentials=Depends(security)):
-    """Verify JWT token"""
-    token = credentials.credentials
-    # Accept both demo_token and demo for demo purposes
-    if token in ["demo_token", "demo"]:
-        return {"user_id": "demo", "username": "demo"}
-    
-    user = verify_token(token)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials"
-        )
-    return user
-
 # Health check
 @app.get("/health")
 async def health_check():
@@ -83,7 +49,8 @@ async def health_check():
         "status": "healthy" if db_healthy else "unhealthy",
         "timestamp": datetime.now().isoformat(),
         "database": {"healthy": db_healthy},
-        "version": "1.0.0"
+        "version": "0.1.0",
+        "operating_mode": current_capability_record()["operating_mode"]
     }
 
 # Authentication endpoint
@@ -120,11 +87,12 @@ async def list_ventures_simple(current_user=Depends(get_current_user)):
                         "type": v.venture_type.value,
                         "status": v.status.value,
                         "revenue": v.monthly_revenue,
-                        "risk_score": v.risk_score,
-                        "failure_probability": v.failure_probability
+                        "heuristic_risk_index": v.risk_score,
+                        "evidence_status": "unverified_local_record"
                     } for v in ventures
                 ],
-                "count": len(ventures)
+                "count": len(ventures),
+                "evidence": evidence_disclosure("local DigitalVenture records; records may be simulation fixtures")
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -143,9 +111,11 @@ async def list_agents_simple(current_user=Depends(get_current_user)):
                         "type": a.agent_type.value,
                         "name": a.name,
                         "active": a.is_active,
-                        "accuracy": a.accuracy
+                        "reported_accuracy": a.accuracy,
+                        "evidence_status": "unverified_seed_or_operator_input"
                     } for a in agents
-                ]
+                ],
+                "evidence": evidence_disclosure("local AIAgent records; performance fields are not independently evaluated")
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -155,24 +125,34 @@ async def dashboard_simple(current_user=Depends(get_current_user)):
     """Dashboard metrics (simplified)"""
     try:
         with db.get_session() as session:
-            from src.database.models import DigitalVenture, RiskLevel
+            from src.database.models import DigitalVenture
             from sqlalchemy import func
             
             total_ventures = session.query(DigitalVenture).count()
             total_revenue = session.query(func.sum(DigitalVenture.monthly_revenue)).scalar() or 0
             
-            ultra_low_risk = session.query(DigitalVenture).filter(
-                DigitalVenture.failure_probability <= 0.0001
+            below_review_threshold = session.query(DigitalVenture).filter(
+                DigitalVenture.risk_score <= 0.2
             ).count()
             
-            success_rate = (ultra_low_risk / total_ventures * 100) if total_ventures > 0 else 0
+            modeled_coverage = (
+                below_review_threshold / total_ventures * 100
+                if total_ventures > 0
+                else 0
+            )
             
             return {
                 "total_ventures": total_ventures,
                 "total_monthly_revenue": total_revenue,
-                "ventures_meeting_target": ultra_low_risk,
-                "ultra_low_failure_rate_percentage": success_rate,
-                "target_achievement": "SUCCESS" if success_rate > 80 else "IN_PROGRESS"
+                "modeled_risk_threshold_count": below_review_threshold,
+                "modeled_risk_threshold_coverage": modeled_coverage,
+                "threshold": {
+                    "metric": "uncalibrated_heuristic_risk_index",
+                    "operator": "less_than_or_equal",
+                    "value": 0.2,
+                    "decision_authority": "none"
+                },
+                "evidence": evidence_disclosure("local DigitalVenture records; values may be simulation fixtures")
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -181,8 +161,11 @@ async def dashboard_simple(current_user=Depends(get_current_user)):
 async def evaluate_venture(venture_id: str, current_user=Depends(get_current_user)):
     """Evaluate venture using AI agents"""
     try:
+        from src.services.ai_agents import DecisionOrchestrator
+
         orchestrator = DecisionOrchestrator()
         evaluation = await orchestrator.evaluate_venture_opportunity(venture_id)
+        evaluation["evidence"] = evidence_disclosure("simulation DecisionOrchestrator")
         return evaluation
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -207,10 +190,10 @@ async def serve_static(file_path: str):
 async def api_root():
     """API root"""
     return {
-        "name": "WealthMachine Enterprise API",
-        "version": "1.0.0",
-        "description": "AI-driven digital business opportunity identification system",
-        "target": "P(failure) ≤ 0.01%",
+        "name": "UAT Simulation API",
+        "version": "0.1.0",
+        "description": "Evidence-labeled architecture skeleton for governed venture experiments",
+        "capability": current_capability_record(),
         "endpoints": {
             "health": "/health",
             "login": "/auth/login",
@@ -220,7 +203,16 @@ async def api_root():
         }
     }
 
+
+@app.get("/api/v1/system/capabilities")
+async def capabilities():
+    """Return the versioned, fail-closed current-capability record."""
+
+    return current_capability_record()
+
 if __name__ == "__main__":
+    import uvicorn
+
     uvicorn.run(
         app,
         host="0.0.0.0",

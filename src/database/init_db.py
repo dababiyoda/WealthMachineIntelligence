@@ -1,10 +1,10 @@
 """
-Database initialization script
-Creates tables and populates with initial data for WealthMachine Enterprise
+Database initialization script.
+
+Seed records are explicit simulation fixtures. They are not production
+outcomes, audited financials, model evaluations, or compliance evidence.
 """
-import asyncio
 from datetime import datetime
-from sqlalchemy.orm import Session
 
 from .connection import db, get_db
 from .models import (
@@ -31,49 +31,50 @@ def populate_initial_data():
                 print("✅ Initial data already exists")
                 return True
             
-            # Create AI agents
+            # Create simulation component fixtures. Performance remains zero
+            # until linked evaluation evidence exists.
             agents = [
                 AIAgent(
                     agent_type=AgentType.MARKET_INTELLIGENCE,
                     name="Market Intelligence Agent",
-                    version="1.0.0",
-                    model_type="LSTM + Sentiment Analysis",
+                    version="simulation-1.0.0",
+                    model_type="Unvalidated simulation placeholder",
                     is_active=True,
-                    accuracy=0.85,
-                    success_rate=0.82,
+                    accuracy=0.0,
+                    success_rate=0.0,
                     decisions_made=0,
                     last_activity=datetime.utcnow()
                 ),
                 AIAgent(
                     agent_type=AgentType.RISK_ASSESSMENT,
                     name="Risk Assessment Agent", 
-                    version="1.0.0",
-                    model_type="Hybrid LSTM + Random Forest",
+                    version="simulation-1.0.0",
+                    model_type="Unvalidated simulation placeholder",
                     is_active=True,
-                    accuracy=0.92,
-                    success_rate=0.89,
+                    accuracy=0.0,
+                    success_rate=0.0,
                     decisions_made=0,
                     last_activity=datetime.utcnow()
                 ),
                 AIAgent(
                     agent_type=AgentType.LEGAL_COMPLIANCE,
                     name="Legal Compliance Agent",
-                    version="1.0.0", 
-                    model_type="BERT + Regulatory NLP",
+                    version="simulation-1.0.0",
+                    model_type="Unvalidated simulation placeholder",
                     is_active=True,
-                    accuracy=0.88,
-                    success_rate=0.91,
+                    accuracy=0.0,
+                    success_rate=0.0,
                     decisions_made=0,
                     last_activity=datetime.utcnow()
                 ),
                 AIAgent(
                     agent_type=AgentType.FINANCIAL_STRATEGIST,
                     name="Financial Strategy Agent",
-                    version="1.0.0",
-                    model_type="Monte Carlo + Portfolio Optimization", 
+                    version="simulation-1.0.0",
+                    model_type="Unvalidated simulation placeholder",
                     is_active=True,
-                    accuracy=0.90,
-                    success_rate=0.87,
+                    accuracy=0.0,
+                    success_rate=0.0,
                     decisions_made=0,
                     last_activity=datetime.utcnow()
                 )
@@ -82,11 +83,11 @@ def populate_initial_data():
             for agent in agents:
                 session.add(agent)
             
-            # Create sample digital ventures
+            # Create unmistakably labeled simulation venture fixtures.
             sample_ventures = [
                 DigitalVenture(
-                    name="AI-Powered SaaS Analytics Platform",
-                    description="Enterprise analytics platform with AI-driven insights",
+                    name="[SIMULATION FIXTURE] SaaS Analytics Platform",
+                    description="Synthetic record for local interface and workflow tests",
                     venture_type=VentureType.SAAS,
                     status=VentureStatus.MVP,
                     initial_investment=50000.0,
@@ -95,7 +96,7 @@ def populate_initial_data():
                     profit_margin=0.62,
                     risk_level=RiskLevel.LOW,
                     risk_score=0.15,
-                    failure_probability=0.0008, # 0.08% - meets ultra-low target
+                    heuristic_risk_index=0.15,
                     customer_count=127,
                     churn_rate=0.03,
                     growth_rate=0.18,
@@ -103,8 +104,8 @@ def populate_initial_data():
                     automation_level=0.75
                 ),
                 DigitalVenture(
-                    name="Digital Marketplace for B2B Tools",
-                    description="Curated marketplace for enterprise software solutions",
+                    name="[SIMULATION FIXTURE] B2B Tools Marketplace",
+                    description="Synthetic record for local interface and workflow tests",
                     venture_type=VentureType.ECOMMERCE,
                     status=VentureStatus.SCALING,
                     initial_investment=75000.0,
@@ -113,7 +114,7 @@ def populate_initial_data():
                     profit_margin=0.55,
                     risk_level=RiskLevel.ULTRA_LOW,
                     risk_score=0.08,
-                    failure_probability=0.0003, # 0.03% - ultra-low risk
+                    heuristic_risk_index=0.08,
                     customer_count=89,
                     churn_rate=0.02,
                     growth_rate=0.22,
@@ -121,8 +122,8 @@ def populate_initial_data():
                     automation_level=0.85
                 ),
                 DigitalVenture(
-                    name="Content Creation AI Platform",
-                    description="AI-powered content generation for digital marketing",
+                    name="[SIMULATION FIXTURE] Content Platform",
+                    description="Synthetic record for local interface and workflow tests",
                     venture_type=VentureType.CONTENT_PLATFORM,
                     status=VentureStatus.VALIDATION,
                     initial_investment=30000.0,
@@ -131,7 +132,7 @@ def populate_initial_data():
                     profit_margin=0.14,
                     risk_level=RiskLevel.MODERATE,
                     risk_score=0.35,
-                    failure_probability=0.012, # 1.2% - above target, needs optimization
+                    heuristic_risk_index=0.35,
                     customer_count=45,
                     churn_rate=0.08,
                     growth_rate=0.12,

@@ -49,7 +49,7 @@ class PortfolioRunResult:
 
 
 class NetworkWealthEngine:
-    """High-level facade that operationalises the master plan."""
+    """High-level facade for local, non-authorizing master-plan simulations."""
 
     def __init__(
         self,

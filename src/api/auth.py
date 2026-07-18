@@ -3,9 +3,10 @@ Authentication and authorization module
 JWT token handling and user management
 """
 import os
-import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
+
+from jose import ExpiredSignatureError, JWTError, jwt
 
 try:  # pragma: no cover - dependency may be unavailable in tests
     from passlib.context import CryptContext  # type: ignore
@@ -22,7 +23,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto") if CryptContex
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 # JWT settings
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+_DEVELOPMENT_SECRET = "local-simulation-secret-not-for-production"
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", _DEVELOPMENT_SECRET)
+if os.getenv("ENVIRONMENT") == "production" and SECRET_KEY == _DEVELOPMENT_SECRET:
+    raise RuntimeError("JWT_SECRET_KEY is required in production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -54,9 +58,9 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     to_encode = data.copy()
     
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -75,14 +79,15 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
             "role": payload.get("role", "user"),
             "permissions": payload.get("permissions", [])
         }
-    except jwt.ExpiredSignatureError:
+    except ExpiredSignatureError:
         logger.warning("Token expired")
         return None
-    except jwt.JWTError as e:
+    except JWTError as e:
         logger.warning("JWT decode error", error=str(e))
         return None
 
-# For demo purposes - in production, integrate with real user database
+# Local simulation identities only. The current capability record explicitly
+# prohibits treating this dictionary as an enterprise identity control plane.
 DEMO_USERS = {
     "admin": {
         "user_id": "admin-123",
@@ -121,13 +126,10 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Dic
     """Retrieve the current user based on the access token."""
 
     if not token:
-        # Default to admin for development/test scenarios
-        return {
-            "user_id": DEMO_USERS["admin"]["user_id"],
-            "username": DEMO_USERS["admin"]["username"],
-            "role": DEMO_USERS["admin"]["role"],
-            "permissions": DEMO_USERS["admin"]["permissions"],
-        }
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication credentials are required",
+        )
 
     payload = verify_token(token)
     if not payload:

@@ -1,7 +1,12 @@
 # WealthMachineOntology_DigitalAI Project
 
 ## Overview
-An advanced enterprise automation framework leveraging sophisticated multi-agent AI architecture for intelligent workflow design. The system focuses on comprehensive business process optimization through adaptive automation and flexible knowledge infrastructure for digital wealth generation.
+This file describes historical implementation intent. The current repository is
+a simulation and architecture skeleton governed by
+`docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md` and
+`spec/uat/v1/current-capability.json`. References below to AI models,
+production operation, performance, or compliance are design targets unless
+supported by versioned evidence.
 
 ## Project Architecture
 
@@ -52,11 +57,11 @@ An advanced enterprise automation framework leveraging sophisticated multi-agent
 ## Recent Changes
 - **July 27, 2025**: Initial project documentation and architecture review
 - **July 27, 2025**: Comprehensive WealthMachine analysis completed
-- **July 27, 2025**: Enterprise-grade production system implemented
+- **July 27, 2025**: Historical production-readiness claim recorded; not substantiated
 - Framework includes comprehensive AI-driven agent lifecycle management
-- Hybrid weighting system implemented for risk assessment (P(failure) ≤ 0.01%)
+- An uncalibrated heuristic risk index was implemented for simulation
 - Multi-agent orchestration with specialized roles defined
-- Ultra-low failure rate system design validated
+- No venture-outcome probability has been validated
 - PostgreSQL database with comprehensive schema deployed
 - FastAPI production server with authentication and monitoring
 - AI agents service layer with LSTM + Random Forest models
@@ -66,19 +71,19 @@ An advanced enterprise automation framework leveraging sophisticated multi-agent
 - Focus on enterprise-level automation solutions
 - Emphasis on AI-driven decision making
 - Preference for scalable digital business models
-- Target ultra-low failure rates (P(failure) ≤ 0.01%)
+- Prefer bounded, reversible experiments and explicit downside limits
 - Focus on compounding returns and resiliency
 - Interest in systematic digital opportunity identification
 
 ## Project Status
-- Framework: **Enterprise Production Ready**
-- Documentation: **Comprehensive** 
-- AI Integration: **Advanced Multi-Agent System**
-- Database: **PostgreSQL with Complete Schema**
-- API Server: **FastAPI Running on Port 5000**
-- Authentication: **JWT-based Security**
-- Monitoring: **Prometheus Metrics + Structured Logging**
-- Deployment: **Production Server Operational**
+- Framework: **Simulation and architecture skeleton**
+- Acceptance stage: **AG0 candidate pending independent review**
+- AI integration: **Deterministic and synthetic fixtures; not validated models**
+- Database: **Schema scaffolding with explicitly labeled simulation seed data**
+- API server: **Local demonstration entrypoints**
+- Authentication: **Local demo identities; not an enterprise control plane**
+- Monitoring: **Instrumentation scaffolding; no production assurance claim**
+- External autonomy: **Not authorized**
 
 ## Next Steps
 - User requesting GitHub wealth machine project review

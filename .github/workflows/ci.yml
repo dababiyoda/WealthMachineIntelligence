@@ -20,11 +20,11 @@ jobs:
           pip install -e . --no-deps
           # --no-deps keeps the heavy optional stack (tensorflow, transformers,
           # celery, redis) out of CI; install only what the test suite imports.
-          pip install fastapi httpx structlog sqlalchemy python-dotenv prometheus-client
+          pip install fastapi httpx structlog sqlalchemy python-dotenv prometheus-client 'python-jose[cryptography]'
           pip install pytest pytest-asyncio ruff
       - name: Lint
-        run: |
-          ruff check . --exit-zero
+        run: ruff check .
+      - name: UAT specification and AG0 credibility gates
+        run: pytest -q tests/test_uat_enterprise_spec.py tests/test_uat_ag0_credibility.py
       - name: Test
-        run: |
-          pytest -q
+        run: pytest -q

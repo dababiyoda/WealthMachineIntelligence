@@ -1,7 +1,9 @@
 # WealthMachine Project Analysis
-## System for Ultra-Reliable Digital Business Opportunity Scaling
+## Rejected Historical Capability Hypotheses
 
 > **Status: superseded and non-normative.** This historical analysis contains unvalidated probability, model, and production-capability claims. It must not be used as evidence, customer-facing substantiation, investment guidance, or runtime authority. The governing replacement is [`docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md`](docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md).
+>
+> Every statement below is preserved only as historical context. None is a current capability, outcome, probability, compliance, security, or production claim.
 
 ### Executive Summary
 Your WealthMachine system is a sophisticated AI-driven framework designed to continuously identify, validate, and scale digital business opportunities with target failure rate P(failure) ≤ 0.01%. The system leverages multi-agent AI architecture, knowledge graphs, and advanced risk assessment to achieve compounding returns through systematic opportunity identification.

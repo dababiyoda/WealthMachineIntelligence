@@ -171,8 +171,8 @@ The migration MUST preserve useful contracts while preventing simulation code fr
 | `src/services/ai_agents.py` | Quarantine | Random trend values and formula-derived failure probabilities MUST NOT enter production decisions or customer-facing claims. |
 | `src/core/knowledge_graph_connector.py` | Convert to a projection adapter | A graph MAY support discovery. It MUST NOT silently become authoritative when the database fails. Consequential writes fail closed. |
 | `src/database/models.py` | Migrate | Replace ambiguous probability fields with typed claims, evidence, decisions, actions, and measured outcomes. Use migrations and preserve legacy records as simulation data. |
-| `static/index.html` and `static/app.js` | Node AG0 remediation | Remove `99.99% success rate`, `P(failure) <= 0.01%`, and synthetic risk claims. Lead with active bottleneck, evidence, approvals, exposure, and control status. |
-| root `jwt.py` | Remove before any security claim | The file accepts any token and returns a test identity. Test doubles MUST live outside production import paths. |
+| `static/index.html` and `static/app.js` | AG0 candidate remediated | The interface now leads with its simulation boundary, removes unsupported outcome and probability claims, and labels hypotheses, fixtures, risk indexes, and unknown evidence. Independent review remains required. |
+| root `jwt.py` | Removed in the AG0 candidate | JWT handling now uses the declared dependency, missing and arbitrary tokens fail closed, and regression tests protect the boundary. Enterprise identity remains an AG1 requirement. |
 | `.github/workflows/ci.yml` | Harden | Lint MUST become blocking. Add secret, dependency, schema, policy, adversarial, and supply-chain checks in staged gates. |
 | `WealthMachineIntelligenceEnhanced/` | Resolve duplication | Select one source of truth. Archive or remove the duplicate tree after migration evidence shows nothing required is lost. |
 | `main.py` and `src/api/main.py` | Consolidate entrypoint | One documented production entrypoint with one authentication and configuration path. |
@@ -1087,8 +1087,8 @@ Every confirmed failure MUST produce a regression test, control change, or expli
 ### 24.1 GPS lock
 
 - **Destination:** UAT can take one real opportunity from source-bound signal through paid, repeatable Venture Pod operation, then use verified reusable assets to make a second venture reach proof faster or cheaper, while all consequential actions remain attributable, bounded, reversible where possible, and human-controlled where reserved.
-- **Current position:** 29 simulation tests pass; the repository contains useful orchestration and bridge scaffolding but lacks the authoritative Evidence Plane and external control plane. Unsupported probability claims and an unsafe root JWT test stub remain.
-- **Active node:** AG0, epistemic credibility.
+- **Current position:** 58 repository tests pass in the AG0 candidate; the claim inventory, current-capability record, simulation disclosures, heuristic-risk terminology, forged-token rejection, and blocking lint gate exist. The repository still lacks the authoritative Evidence Plane and durable external control plane.
+- **Active node:** AG0 independent review, epistemic credibility.
 - **Active gate:** current interfaces and models blur simulation scores, probabilities, evidence, and capability claims.
 - **Gate-crossing evidence:** every consequential repository claim is either source-traceable, measured, or explicitly labeled simulation, heuristic, hypothesis, or target.
 - **Active Single Bottleneck Metric:** credible claim coverage, defined as consequential claims with valid evidence or an explicit non-factual label divided by all consequential claims inventoried.
@@ -1161,6 +1161,11 @@ The machine-readable acceptance gates are `spec/uat/v1/production-acceptance-gat
 5. Label simulation entrypoints and outputs.
 6. Make lint blocking and fail CI on specification-integrity tests.
 7. Publish a current-capability and limitation record.
+
+The AG0 implementation candidate completes these seven repository changes and
+records them in `spec/uat/v1/ag0-claim-inventory.json`. AG0 does not clear until
+an independent reviewer confirms the inventory, dispositions, and required
+evaluations. External autonomy remains held.
 
 ### 25.2 AG1 and AG2: build one control/evidence vertical slice
 

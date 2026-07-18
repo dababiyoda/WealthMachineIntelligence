@@ -5,8 +5,9 @@ The production repository ships with an advanced
 autonomous Wealth Machine orchestration we also need an in-memory
 fallback so the loops can execute without a configured database.  The
 ``RiskManager`` defined here delegates to the existing service when it
-is available and gracefully degrades to a deterministic heuristic that
-produces actionable metrics for decision making.
+is available and otherwise returns a deterministic simulation heuristic.
+The heuristic is an uncalibrated review index, not a failure probability,
+and carries no authority to approve investment or another external action.
 """
 
 from __future__ import annotations
@@ -53,22 +54,23 @@ class RiskManager:
         buffer_component = max(0.0, 0.2 - risk_buffer) * 0.2
 
         risk_score = round(min(1.0, max(0.0, opportunity_component + execution_component + roi_component + buffer_component)), 3)
-        failure_probability = round(min(1.0, risk_score * 0.55), 3)
-
         risk_level = self._determine_risk_level(risk_score)
         recommendations = self._generate_recommendations(risk_level, metrics)
 
         return {
             "agent_id": "heuristic-risk-manager",
             "risk_score": risk_score,
-            "failure_probability": failure_probability,
+            "heuristic_risk_index": risk_score,
             "market_risk": round(opportunity_component, 3),
             "operational_risk": round(execution_component, 3),
             "financial_risk": round(roi_component, 3),
             "technical_risk": round(buffer_component, 3),
             "risk_level": risk_level,
             "recommendations": recommendations,
-            "confidence_level": 0.72,
+            "evidence_status": "simulation_heuristic_unvalidated",
+            "risk_semantics": "uncalibrated_heuristic_index_not_probability",
+            "confidence_status": "not_calibrated",
+            "authority": "recommendation_only",
             "model_version": "heuristic-1.0",
             "features_used": ["opportunity_score", "execution_confidence", "expected_roi", "risk_buffer"],
         }
@@ -88,17 +90,17 @@ class RiskManager:
     @staticmethod
     def _generate_recommendations(risk_level: str, metrics: Dict[str, Any]) -> Dict[str, Any]:
         base_actions = {
-            "Ultra Low": ["Accelerate investment", "Document success patterns"],
-            "Low": ["Proceed with standard oversight", "Share playbooks across ventures"],
-            "Moderate": ["Proceed with caution", "Add contingency reviews"],
-            "High": ["Mitigate key risks", "Delay scaling"],
-            "Very High": ["Pause venture", "Re-evaluate fundamentals"],
+            "Ultra Low": ["Prioritize external validation", "Document supporting and contradicting evidence"],
+            "Low": ["Run a bounded evidence test", "Maintain standard review"],
+            "Moderate": ["Reduce the largest uncertainty", "Add contingency review"],
+            "High": ["Mitigate the dominant modeled factor", "Do not scale from this score"],
+            "Very High": ["Recommend a hold", "Re-evaluate the underlying assumptions"],
         }
         return {
             "actions": base_actions[risk_level],
             "metrics": metrics,
+            "authority": "recommendation_only",
         }
 
 
 __all__ = ["RiskManager"]
-

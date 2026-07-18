@@ -84,7 +84,7 @@
       "condition": {
         "AND": [
           { "metric": "risk_score", "operator": "greater_than", "value": 0.7 },
-          { "metric": "failure_probability", "operator": "greater_than", "value": 0.05 }
+          { "metric": "heuristic_risk_index", "operator": "greater_than", "value": 0.7 }
         ]
       },
       "action": {
