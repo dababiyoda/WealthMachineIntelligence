@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 from ..control.graph_adapter import KnowledgeGraphActionAdapter
@@ -83,7 +83,7 @@ class WealthMachineOrchestrator:
                 measurable={"cycles": 12},
                 achievable="Calibrated to weekly cadences",
                 relevant="Directly supports venture throughput",
-                time_bound=datetime.utcnow() + timedelta(days=90),
+                time_bound=datetime.now(timezone.utc) + timedelta(days=90),
             )
             self.performance_tracker.register_goal(goal)
 

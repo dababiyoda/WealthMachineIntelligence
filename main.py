@@ -1,36 +1,39 @@
-"""
-WealthMachine Enterprise API Server
-Production-ready FastAPI application
-"""
+"""Legacy-compatible local server for the WealthMachine prototype."""
 import sys
 import os
+from pathlib import Path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
-import time
-from src.logging_config import configure_logging, logger
+from src.logging_config import configure_logging
 from datetime import datetime
 
 from src.database.connection import db
 try:
-    from src.api.auth import verify_token, authenticate_user, create_access_token
+    from src.api.auth import (
+        authenticate_user,
+        create_access_token,
+        validate_auth_configuration,
+        verify_token,
+    )
     from src.services.ai_agents import DecisionOrchestrator
 except ImportError as e:
     print(f"Import warning: {e}")
-    # Fallback implementations for missing modules
+    # Fail-closed fallbacks for incomplete local installations.
     def verify_token(token):
-        return {"user_id": "demo", "username": "demo"} if token == "demo" else None
+        return None
     
     def authenticate_user(username, password):
-        return {"user_id": "demo", "username": "demo"} if username == "demo" else None
+        return None
     
     def create_access_token(data):
-        return "demo_token"
+        raise RuntimeError("authentication module unavailable")
+
+    def validate_auth_configuration():
+        raise RuntimeError("authentication module unavailable")
     
     class DecisionOrchestrator:
         async def evaluate_venture_opportunity(self, venture_id):
@@ -39,19 +42,34 @@ except ImportError as e:
 # Configure logging
 configure_logging()
 
+IS_PRODUCTION = os.getenv("ENVIRONMENT", "development").lower() == "production"
+if IS_PRODUCTION:
+    validate_auth_configuration()
+
+STATIC_ROOT = (Path(__file__).resolve().parent / "static").resolve()
+
 app = FastAPI(
-    title="WealthMachine Enterprise API",
-    description="AI-driven digital business opportunity identification and scaling system",
+    title="WealthMachine Controlled-Pilot API",
+    description="Evidence-gated venture analysis prototype",
     version="1.0.0"
 )
 
 # Static files will be served by our custom handler
 
 # CORS middleware
+allowed_origins = (
+    [
+        origin.strip()
+        for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
+    if IS_PRODUCTION
+    else ["*"]
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
@@ -62,8 +80,11 @@ security = HTTPBearer()
 def get_current_user(credentials=Depends(security)):
     """Verify JWT token"""
     token = credentials.credentials
-    # Accept both demo_token and demo for demo purposes
-    if token in ["demo_token", "demo"]:
+    demo_enabled = (
+        os.getenv("ENVIRONMENT", "development").lower() != "production"
+        and os.getenv("ALLOW_DEMO_AUTH", "false").lower() == "true"
+    )
+    if demo_enabled and token in ["demo_token", "demo"]:
         return {"user_id": "demo", "username": "demo"}
     
     user = verify_token(token)
@@ -91,8 +112,8 @@ async def health_check():
 async def login(request: Request):
     """Login endpoint"""
     form = await request.form()
-    username = form.get("username", "demo")
-    password = form.get("password", "demo")
+    username = form.get("username", "")
+    password = form.get("password", "")
     
     user = authenticate_user(username, password)
     if not user:
@@ -155,7 +176,7 @@ async def dashboard_simple(current_user=Depends(get_current_user)):
     """Dashboard metrics (simplified)"""
     try:
         with db.get_session() as session:
-            from src.database.models import DigitalVenture, RiskLevel
+            from src.database.models import DigitalVenture
             from sqlalchemy import func
             
             total_ventures = session.query(DigitalVenture).count()
@@ -199,15 +220,14 @@ async def evaluate_venture(venture_id: str, current_user=Depends(get_current_use
 async def root():
     """Serve the main UI"""
     from fastapi.responses import FileResponse
-    return FileResponse('static/index.html')
+    return FileResponse(STATIC_ROOT / "index.html")
 
 @app.get("/static/{file_path:path}")
 async def serve_static(file_path: str):
     """Serve static files"""
     from fastapi.responses import FileResponse
-    import os
-    file_location = f"static/{file_path}"
-    if os.path.exists(file_location):
+    file_location = (STATIC_ROOT / file_path).resolve()
+    if STATIC_ROOT in file_location.parents and file_location.is_file():
         return FileResponse(file_location)
     raise HTTPException(status_code=404, detail="File not found")
 

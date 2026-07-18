@@ -3,10 +3,8 @@ Enterprise-grade database models for WealthMachine
 Implements comprehensive tracking of digital ventures, AI agents, and performance metrics
 """
 from sqlalchemy import Column, String, Float, Integer, DateTime, Boolean, JSON, ForeignKey, Text, Index, Enum as SQLEnum
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
-from datetime import datetime
 import enum
 import uuid
 

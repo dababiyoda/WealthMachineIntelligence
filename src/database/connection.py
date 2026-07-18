@@ -2,8 +2,8 @@
 Database connection management with production-grade features
 Includes connection pooling, retry logic, and monitoring
 """
+import hmac
 import os
-import logging
 from contextlib import contextmanager
 from typing import Generator
 from sqlalchemy import create_engine, event, pool
@@ -127,11 +127,21 @@ class DatabaseConnection:
         Base.metadata.create_all(bind=self.engine)
         logger.info("Database tables created successfully")
     
-    def drop_tables(self):
-        """Drop all tables (use with caution!)"""
+    def drop_tables(self, *, confirmation_token: str):
+        """Drop all tables only under explicit offline break-glass control."""
+
+        expected = os.getenv("DATABASE_DROP_CONFIRMATION", "")
+        enabled = os.getenv("ALLOW_SCHEMA_DROP", "false").lower() == "true"
+        if not enabled or not expected or not hmac.compare_digest(
+            confirmation_token,
+            expected,
+        ):
+            raise PermissionError(
+                "schema drop requires ALLOW_SCHEMA_DROP=true and an exact confirmation token"
+            )
         from .models import Base
         Base.metadata.drop_all(bind=self.engine)
-        logger.warning("All database tables dropped")
+        logger.warning("All database tables dropped under break-glass control")
     
     def get_pool_status(self) -> dict:
         """Get connection pool statistics"""

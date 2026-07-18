@@ -3,16 +3,17 @@ Digital ventures API endpoints
 CRUD operations and business logic for digital business opportunities
 """
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
 from ...database.connection import get_db
 from ...database.models import DigitalVenture, VentureType, VentureStatus, RiskLevel
-from ..auth import get_current_user
+from ..admin_audit import record_admin_intent, record_admin_outcome
+from ..auth import get_current_user, require_admin_user
 
 
 router = APIRouter()
@@ -37,6 +38,8 @@ class VentureUpdate(BaseModel):
     churn_rate: Optional[float] = Field(None, ge=0, le=1)
 
 class VentureResponse(VentureBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     status: VentureStatus
     current_valuation: float
@@ -54,9 +57,6 @@ class VentureResponse(VentureBase):
     created_at: datetime
     updated_at: Optional[datetime]
     
-    class Config:
-        from_attributes = True
-
 class VentureList(BaseModel):
     ventures: List[VentureResponse]
     total: int
@@ -66,10 +66,16 @@ class VentureList(BaseModel):
 @router.post("/", response_model=VentureResponse, status_code=status.HTTP_201_CREATED)
 async def create_venture(
     venture: VentureCreate,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Create a new digital venture"""
+    """Create a venture through the authenticated human-admin plane."""
+    action_id = record_admin_intent(
+        current_user,
+        action_type="admin.venture.create",
+        resource="venture:new",
+        changed_fields=venture.model_dump().keys(),
+    )
     try:
         # Create venture with initial risk assessment
         db_venture = DigitalVenture(
@@ -92,16 +98,39 @@ async def create_venture(
                    name=db_venture.name,
                    type=db_venture.venture_type.value,
                    created_by=current_user.get("user_id"))
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.create",
+            resource=f"venture:{db_venture.id}",
+            status="succeeded",
+        )
         
         return db_venture
         
     except SQLAlchemyError as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.create",
+            resource="venture:new",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.error("Failed to create venture", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
     except Exception as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.create",
+            resource="venture:new",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.exception("Unexpected error creating venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -150,7 +179,7 @@ async def list_ventures(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error listing ventures")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -178,10 +207,10 @@ async def get_venture(
 async def update_venture(
     venture_id: str,
     venture_update: VentureUpdate,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Update a venture"""
+    """Update a venture through the authenticated human-admin plane."""
     venture = db.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
     
     if not venture:
@@ -190,9 +219,15 @@ async def update_venture(
             detail="Venture not found"
         )
     
+    update_data = venture_update.model_dump(exclude_unset=True)
+    action_id = record_admin_intent(
+        current_user,
+        action_type="admin.venture.update",
+        resource=f"venture:{venture_id}",
+        changed_fields=update_data.keys(),
+    )
     try:
         # Update fields
-        update_data = venture_update.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(venture, field, value)
         
@@ -211,16 +246,39 @@ async def update_venture(
                    venture_id=venture_id,
                    updated_by=current_user.get("user_id"),
                    changes=list(update_data.keys()))
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.update",
+            resource=f"venture:{venture_id}",
+            status="succeeded",
+        )
         
         return venture
         
     except SQLAlchemyError as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.update",
+            resource=f"venture:{venture_id}",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.error("Failed to update venture", venture_id=venture_id, error=str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
     except Exception as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.update",
+            resource=f"venture:{venture_id}",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.exception("Unexpected error updating venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -230,10 +288,10 @@ async def update_venture(
 @router.delete("/{venture_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_venture(
     venture_id: str,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Delete a venture"""
+    """Discontinue a venture through the authenticated human-admin plane."""
     venture = db.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
     
     if not venture:
@@ -242,24 +300,53 @@ async def delete_venture(
             detail="Venture not found"
         )
     
+    action_id = record_admin_intent(
+        current_user,
+        action_type="admin.venture.discontinue",
+        resource=f"venture:{venture_id}",
+        changed_fields=("status", "discontinued_at"),
+    )
     try:
         # Instead of hard delete, mark as discontinued
         venture.status = VentureStatus.DISCONTINUED
-        venture.discontinued_at = datetime.utcnow()
+        venture.discontinued_at = datetime.now(timezone.utc)
         
         db.commit()
         
         logger.info("Venture discontinued",
                    venture_id=venture_id,
                    discontinued_by=current_user.get("user_id"))
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.discontinue",
+            resource=f"venture:{venture_id}",
+            status="succeeded",
+        )
         
     except SQLAlchemyError as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.discontinue",
+            resource=f"venture:{venture_id}",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.error("Failed to discontinue venture", venture_id=venture_id, error=str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
     except Exception as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.discontinue",
+            resource=f"venture:{venture_id}",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.exception("Unexpected error discontinuing venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -269,10 +356,10 @@ async def delete_venture(
 @router.post("/{venture_id}/launch", response_model=VentureResponse)
 async def launch_venture(
     venture_id: str,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Launch a venture (move from ideation to MVP)"""
+    """Launch a venture through the authenticated human-admin plane."""
     venture = db.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
     
     if not venture:
@@ -287,9 +374,15 @@ async def launch_venture(
             detail="Venture must be in ideation status to launch"
         )
     
+    action_id = record_admin_intent(
+        current_user,
+        action_type="admin.venture.launch",
+        resource=f"venture:{venture_id}",
+        changed_fields=("status", "launched_at", "automation_level"),
+    )
     try:
         venture.status = VentureStatus.MVP
-        venture.launched_at = datetime.utcnow()
+        venture.launched_at = datetime.now(timezone.utc)
         venture.automation_level = 0.3  # Increase automation on launch
         
         db.commit()
@@ -298,16 +391,39 @@ async def launch_venture(
         logger.info("Venture launched",
                    venture_id=venture_id,
                    launched_by=current_user.get("user_id"))
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.launch",
+            resource=f"venture:{venture_id}",
+            status="succeeded",
+        )
         
         return venture
         
     except SQLAlchemyError as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.launch",
+            resource=f"venture:{venture_id}",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.error("Failed to launch venture", venture_id=venture_id, error=str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
     except Exception as e:
+        record_admin_outcome(
+            current_user,
+            action_id=action_id,
+            action_type="admin.venture.launch",
+            resource=f"venture:{venture_id}",
+            status="failed",
+            error_type=type(e).__name__,
+        )
         logger.exception("Unexpected error launching venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

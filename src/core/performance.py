@@ -17,7 +17,7 @@ structure for orchestration logic to reason about performance trends.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, DefaultDict, Dict, List, Optional
 
 from collections import defaultdict
@@ -120,7 +120,7 @@ class PerformanceTracker:
             raise KeyError(f"Goal {goal_id} is not registered")
         goal.progress = min(1.0, max(0.0, goal.progress + increment))
         goal.history.append({
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "increment": increment,
             "note": note,
         })
@@ -154,4 +154,3 @@ class PerformanceTracker:
 
 
 __all__ = ["SMARTGoal", "PerformanceTracker"]
-

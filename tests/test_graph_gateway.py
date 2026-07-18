@@ -187,3 +187,32 @@ def test_graph_client_and_risk_manager_are_proposal_only_without_gateway() -> No
     assert proposal["execution_status"] == "proposed"
     assert risk["persistence"]["execution_status"] == "proposed"
     assert knowledge_graph.get_node(cell_id) is None
+
+
+def test_risk_persistence_cannot_mint_its_own_agent_identity() -> None:
+    cell_id = "graph-risk-no-identity"
+    agent_id = "risk-assessment-service"
+    policy, gateway = _plane(cell_id)
+    _grant(policy, cell_id, "persist_risk_assessment", agent_id)
+    KnowledgeGraphActionAdapter(gateway, KnowledgeGraphConnector())
+    client = GraphIntentClient(
+        gateway,
+        agent_id=agent_id,
+        context_fingerprint=CONTEXT,
+    )
+
+    result = client.submit(
+        "persist_risk_assessment",
+        cell_id,
+        {
+            "assessment": {
+                "agent_id": None,
+                "risk_score": 0.2,
+                "failure_probability": 0.004,
+            }
+        },
+    )
+
+    assert result["policy_disposition"] == "allow"
+    assert result["execution_status"] == "failed"
+    assert knowledge_graph.get_node(cell_id) is None

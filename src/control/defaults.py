@@ -49,6 +49,12 @@ DEFAULT_ACTIONS = (
         description="Persist internal venture metrics with explicit provenance.",
     ),
     ActionDefinition(
+        "persist_market_analysis",
+        RiskTier.REVERSIBLE_INTERNAL,
+        AutonomyStage.SUPERVISED_CANARY,
+        description="Persist a synthetic or observed market-analysis artifact.",
+    ),
+    ActionDefinition(
         "persist_sentiment",
         RiskTier.REVERSIBLE_INTERNAL,
         AutonomyStage.SUPERVISED_CANARY,

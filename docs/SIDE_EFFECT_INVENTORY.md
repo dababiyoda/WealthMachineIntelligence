@@ -13,11 +13,11 @@ or network routes.
 | `core/loops.py` | Persist derived opportunity, market-alignment, and ROI metrics. | R1 | **Gateway-mediated; proposal-only without a gateway.** Uses `persist_venture_opportunities` and `persist_venture_metrics`. | Reconcile receipts with durable downstream state and independently classify provenance. |
 | `services/risk_management.py` | Persist heuristic risk assessment. | R1 | **Gateway-mediated; proposal-only without a gateway.** Heuristic provenance and uncalibrated status are retained. | Split append-only assessment evidence from mutable venture state in the durable schema. |
 | `services/market_monitor.py` | Persist randomized/demo metrics on a schedule. | R1 | **Gateway-mediated; proposal-only by default.** Payload is marked `randomized_demo_simulation` and not production evidence. | Keep disabled in production or isolate in a demo cell with shadow-stage grants. |
-| `services/ai_agents.py:MarketIntelligenceService` | Insert market-analysis database records. | R1 | Direct database transaction. | Route through evidence persistence with provenance; remove production claims from simulated model outputs. |
-| `services/ai_agents.py:RiskAssessmentService` | Insert risk assessment and mutate venture risk fields. | R1/R2 if used for capital decisions | Direct database transaction. | Split append-only assessment from venture-state mutation; require policy for the latter. |
-| `services/ai_agents.py:_get_agent_id` | Create persistent agent identity record. | R2 | Direct database transaction. | Move identity provisioning to root-human control; do not let an agent mint its own persistent authority. |
-| `api/routes/ventures.py` | Create, update, soft-delete/restore, and change venture state. | R1–R3 by payload | Authenticated API, outside cell policy. | Separate human-admin route from agent route; route agent calls through registered intents and classify fields. |
-| `api/routes/agents.py` | Activate/deactivate or update persistent agents. | R3/R4 when authority changes | Authenticated API, outside cell policy. | Restrict to root-human administration and ledger every authority-impacting change. |
+| `services/ai_agents.py:MarketIntelligenceService` | Persist synthetic market analysis. | R1 | **Gateway-mediated; proposal-only by default.** Uses `persist_market_analysis` and labels randomized output non-production evidence. | Replace simulation with validated sources before it enters an evidence promotion lane. |
+| `services/ai_agents.py:RiskAssessmentService` | Read venture state and request risk-assessment persistence. | R1/R2 if used for capital decisions | **Read-only analysis plus gateway intent.** It no longer writes venture/assessment rows directly and cannot create an agent record. Persistence requires a root-provisioned agent ID. | Split append-only assessment evidence from mutable venture state in the durable schema. |
+| Retired: `services/ai_agents.py:_get_agent_id` | Previously created a persistent agent record during risk analysis. | R2 | **Removed.** Analysis cannot mint a persistent identity or authority record. | Provision workload and database identities through the human/root administration process. |
+| `api/routes/ventures.py` | Create, update, discontinue, and launch venture records. | Human administrative plane | **Explicit authenticated admin only; anonymous and ordinary users fail closed.** Each mutation writes a hash-chained intent/outcome audit pair. | Replace demo identity store, make audit/outcome transactional, and use field-specific dual control where material. |
+| `api/routes/agents.py` | Activate/deactivate persistent agent records. | Human administrative plane | **Explicit authenticated admin only with hash-chained audit.** `is_active` does not create a capability grant. | Bind administrators to cryptographic identities and add durable transactional audit/outbox. |
 | `api/routes/opportunities.py` | Evaluate and retain in-memory assessment objects. | R0/R1 | Explicitly recommendation-only. | Add durable evidence provenance; never convert an assessment directly into an execution grant. |
 | `auth/keycloak.py` | Fetch JWKS for token verification. | R0 external read | Direct network read. | Pin issuer/audience, cache safely, and allowlist egress; no venture capability needed. |
 | `control/evidence.py` | Append control evidence to JSONL. | Trusted control write | Inside control plane. | Move to transactional, independently anchored storage with separate auditor access. |
@@ -31,8 +31,8 @@ agent identity from reaching them:
 | --- | --- | --- |
 | `setup_database.py`, `database/init_db.py` | Seed ventures and agents. | Offline deployment administrator. |
 | `database/connection.py:create_tables` | Create schema. | Migration identity. |
-| `database/connection.py:drop_tables` | Destructive schema removal. | Break-glass human dual control; unavailable to application/agent identities. |
-| `api/main.py` startup | Calls schema creation. | Remove from production runtime; use migrations. |
+| `database/connection.py:drop_tables` | Destructive schema removal. | Requires explicit `ALLOW_SCHEMA_DROP=true` plus a constant-time confirmation token; keep callable only by an offline break-glass identity. Dual-human workflow remains a deployment requirement. |
+| `api/main.py` startup | Schema creation is disabled by default and forbidden in production. | Add controlled, reviewed migration tooling under a separate identity. |
 
 ## Common choke point
 
@@ -46,14 +46,16 @@ identity, credential broker, and network policy unavailable to agent processes.
 
 ## Coverage accounting
 
-Ten current action types are mediated in code: four rule actions and six
-knowledge-graph persistence actions. The complete production denominator is
-still unknown because direct SQL paths, deployment configuration, and external
-connectors are not fully mediated or represented by this static scan. Therefore
-the honest baseline is:
+Eleven current action types are mediated in code: four rule actions and seven
+knowledge-graph persistence actions. The scanned agent services contain no
+remaining direct SQL write call. Human-administrator CRUD, offline database
+administration, deployment configuration, and external connectors are separate
+denominators and are not yet production-proven. Therefore the honest baseline
+is:
 
-- **Code-mediated:** ten registered action types, with connector bypass tests;
-- **Known direct runtime mutation families:** at least five in the table above;
+- **Code-mediated agent actions:** eleven registered action types, with connector bypass tests;
+- **Known agent-service direct SQL write families:** zero in this static scan;
+- **Human-admin direct database families:** two, role-gated and hash-chain audited but not transactionally coupled;
 - **Deployment credential/egress coverage:** unverified; and
 - **Verified mediated side-effect coverage:** not yet reportable as a percentage.
 

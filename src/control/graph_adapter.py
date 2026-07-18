@@ -14,6 +14,7 @@ GRAPH_MUTATION_ACTIONS = frozenset(
     {
         "persist_venture_opportunities",
         "persist_venture_metrics",
+        "persist_market_analysis",
         "persist_sentiment",
         "persist_predictions",
         "persist_forecast",
@@ -57,6 +58,11 @@ class KnowledgeGraphActionAdapter:
                 venture_id,
                 self._mapping(payload, "metrics"),
             )
+        elif action_type == "persist_market_analysis":
+            self.connector.store_market_analysis(
+                venture_id,
+                self._mapping(payload, "analysis"),
+            )
         elif action_type == "persist_sentiment":
             self.connector.store_sentiment(
                 venture_id,
@@ -73,9 +79,14 @@ class KnowledgeGraphActionAdapter:
                 self._mapping(payload, "forecast"),
             )
         elif action_type == "persist_risk_assessment":
+            assessment = self._mapping(payload, "assessment")
+            if not assessment.get("agent_id"):
+                raise ValueError(
+                    "risk persistence requires a root-provisioned persistent agent_id"
+                )
             self.connector.store_risk_assessment(
                 venture_id,
-                self._mapping(payload, "assessment"),
+                assessment,
             )
         else:
             raise ValueError(f"unsupported graph mutation action: {action_type}")

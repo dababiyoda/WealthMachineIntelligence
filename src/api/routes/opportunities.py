@@ -41,7 +41,7 @@ async def _evaluate(payload: Dict[str, Any], authorization: str | None) -> Dict[
     except ValueError as exc:
         # Contract violation in the inbound packet — untrusted input.
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)
         )
 
 

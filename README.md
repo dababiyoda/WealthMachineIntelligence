@@ -52,6 +52,12 @@ durable transactional state, independently anchored evidence, credential
 brokering, egress enforcement, and a verified inventory of all side-effect
 paths.
 
+Authentication also fails closed by default: anonymous requests do not become
+admins, demo identities require `ALLOW_DEMO_AUTH=true` outside production, and
+production rejects demo auth or a short/default JWT secret. Application-time
+schema creation is disabled unless `AUTO_CREATE_SCHEMA=true` in a non-production
+environment; production migrations must use a separate operator identity.
+
 ## Directory Structure
 
 ### /ontology

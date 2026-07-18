@@ -58,7 +58,7 @@ async def database_health(
             pool_status={},
             response_time_ms=-1
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error during database health check")
         return DatabaseHealth(
             connected=False,

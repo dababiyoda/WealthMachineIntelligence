@@ -249,7 +249,7 @@ async def get_risk_analysis(
 @router.get("/top-performers", response_model=List[VentureMetrics])
 async def get_top_performers(
     limit: int = Query(10, ge=1, le=50),
-    metric: str = Query("revenue", regex="^(revenue|growth|roi|automation)$"),
+    metric: str = Query("revenue", pattern="^(revenue|growth|roi|automation)$"),
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
