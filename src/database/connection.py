@@ -3,7 +3,6 @@ Database connection management with production-grade features
 Includes connection pooling, retry logic, and monitoring
 """
 import os
-import logging
 from contextlib import contextmanager
 from typing import Generator
 from sqlalchemy import create_engine, event, pool
@@ -19,7 +18,7 @@ load_dotenv()
 configure_logging()
 
 class DatabaseConnection:
-    """Enterprise-grade database connection manager"""
+    """Database connection manager for the current simulation skeleton."""
     
     def __init__(self):
         self.database_url = os.getenv('DATABASE_URL')

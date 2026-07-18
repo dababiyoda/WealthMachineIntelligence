@@ -1,11 +1,12 @@
 """
-Standalone database setup script
+Standalone local simulation-database setup script.
+
+All inserted records are synthetic fixtures, not operating outcomes.
 """
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from datetime import datetime
 from src.database.connection import db, get_db
 from src.database.models import (
     Base, AIAgent, DigitalVenture, AgentType, VentureType, VentureStatus, RiskLevel
@@ -13,7 +14,7 @@ from src.database.models import (
 
 def setup_database():
     """Setup database with tables and initial data"""
-    print("🚀 Setting up WealthMachine Enterprise Database...")
+    print("🚀 Setting up the UAT local simulation database...")
     
     try:
         # Create all tables
@@ -32,29 +33,29 @@ def setup_database():
                 AIAgent(
                     agent_type=AgentType.MARKET_INTELLIGENCE,
                     name="Market Intelligence Agent",
-                    version="1.0.0",
-                    model_type="LSTM + Sentiment Analysis",
+                    version="simulation-1.0.0",
+                    model_type="Unvalidated simulation placeholder",
                     is_active=True,
-                    accuracy=0.85,
-                    success_rate=0.82
+                    accuracy=0.0,
+                    success_rate=0.0
                 ),
                 AIAgent(
                     agent_type=AgentType.RISK_ASSESSMENT,
                     name="Risk Assessment Agent", 
-                    version="1.0.0",
-                    model_type="Hybrid LSTM + Random Forest",
+                    version="simulation-1.0.0",
+                    model_type="Unvalidated simulation placeholder",
                     is_active=True,
-                    accuracy=0.92,
-                    success_rate=0.89
+                    accuracy=0.0,
+                    success_rate=0.0
                 ),
                 AIAgent(
                     agent_type=AgentType.LEGAL_COMPLIANCE,
                     name="Legal Compliance Agent",
-                    version="1.0.0", 
-                    model_type="BERT + Regulatory NLP",
+                    version="simulation-1.0.0",
+                    model_type="Unvalidated simulation placeholder",
                     is_active=True,
-                    accuracy=0.88,
-                    success_rate=0.91
+                    accuracy=0.0,
+                    success_rate=0.0
                 )
             ]
             
@@ -64,8 +65,8 @@ def setup_database():
             # Sample ventures
             ventures = [
                 DigitalVenture(
-                    name="AI-Powered SaaS Analytics",
-                    description="Enterprise analytics with AI insights",
+                    name="[SIMULATION FIXTURE] SaaS Analytics",
+                    description="Synthetic record for local interface and workflow tests",
                     venture_type=VentureType.SAAS,
                     status=VentureStatus.MVP,
                     initial_investment=50000.0,
@@ -73,15 +74,15 @@ def setup_database():
                     monthly_expenses=3200.0,
                     risk_level=RiskLevel.LOW,
                     risk_score=0.15,
-                    failure_probability=0.0008, # 0.08% - meets target
+                    heuristic_risk_index=0.15,
                     customer_count=127,
                     churn_rate=0.03,
                     ai_enabled=True,
                     automation_level=0.75
                 ),
                 DigitalVenture(
-                    name="B2B Digital Marketplace",
-                    description="Curated enterprise software marketplace",
+                    name="[SIMULATION FIXTURE] B2B Marketplace",
+                    description="Synthetic record for local interface and workflow tests",
                     venture_type=VentureType.ECOMMERCE,
                     status=VentureStatus.SCALING,
                     initial_investment=75000.0,
@@ -89,7 +90,7 @@ def setup_database():
                     monthly_expenses=6800.0,
                     risk_level=RiskLevel.ULTRA_LOW,
                     risk_score=0.08,
-                    failure_probability=0.0003, # 0.03% - ultra-low
+                    heuristic_risk_index=0.08,
                     customer_count=89,
                     churn_rate=0.02,
                     ai_enabled=True,

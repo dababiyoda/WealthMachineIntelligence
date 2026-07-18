@@ -1,12 +1,8 @@
-"""Core AI agent services for market analysis and risk assessment.
+"""Quarantined market and risk simulation services.
 
-This module implements the algorithms that power the platform's
-intelligence features. Services rely on LSTM-style trend prediction,
-hybrid risk models and persistent storage. Async APIs allow integration
-with FastAPI endpoints or background workers.
-
-Model versions, thresholds and target failure rates are defined in the
-service constructors so deployments can adjust behaviour easily.
+The formulas and random values in this module are deterministic or synthetic
+test scaffolding. They are not trained, calibrated, or externally validated
+models, and their outputs carry recommendation-only authority.
 """
 import asyncio
 import numpy as np
@@ -29,17 +25,16 @@ from ..database.models import (
 
 
 class MarketIntelligenceService:
-    """Market Intelligence Agent with LSTM-based analysis"""
+    """Generate a synthetic market-analysis fixture for local simulations."""
     
     def __init__(self):
         self.agent_type = AgentType.MARKET_INTELLIGENCE
-        self.model_version = "1.0.0"
-        self.confidence_threshold = 0.7
+        self.model_version = "simulation-heuristic-1.0"
         
     async def analyze_market_opportunity(self, venture_id: str, market_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze market opportunity using AI models"""
+        """Generate an unvalidated market hypothesis from provided inputs."""
         try:
-            # Simulate LSTM prediction (in production, use real trained model)
+            # Synthetic value for simulation only; this is not an LSTM output.
             trend_score = np.random.uniform(0.3, 0.9)
             market_size = market_data.get('market_size', 1000000)
             competition_level = market_data.get('competition_level', 'medium')
@@ -52,14 +47,17 @@ class MarketIntelligenceService:
             # Generate insights
             insights = {
                 'opportunity_score': opportunity_score,
-                'trend_prediction': trend_score,
-                'market_timing': 'favorable' if opportunity_score > 0.6 else 'challenging',
+                'simulated_trend_index': trend_score,
+                'market_timing_hypothesis': 'favorable' if opportunity_score > 0.6 else 'challenging',
                 'key_trends': [
                     'AI automation adoption increasing',
                     'Digital transformation accelerating',
                     'SaaS market expanding'
                 ],
-                'recommendations': self._generate_recommendations(opportunity_score)
+                'recommendations': self._generate_recommendations(opportunity_score),
+                'evidence_status': 'simulation_heuristic_unvalidated',
+                'confidence_status': 'not_calibrated',
+                'authority': 'recommendation_only',
             }
             
             # Store analysis in database
@@ -69,7 +67,10 @@ class MarketIntelligenceService:
                     market_size=market_size,
                     opportunity_score=opportunity_score,
                     key_trends=insights['key_trends'],
-                    lstm_prediction={'trend_score': trend_score},
+                    lstm_prediction={
+                        'simulated_trend_index': trend_score,
+                        'evidence_status': 'simulation_heuristic_unvalidated',
+                    },
                     analyzed_at=datetime.utcnow()
                 )
                 session.add(analysis)
@@ -105,35 +106,35 @@ class MarketIntelligenceService:
         """Generate actionable recommendations"""
         if opportunity_score > 0.8:
             return [
-                "Proceed with full investment",
-                "Fast-track development",
-                "Allocate premium resources"
+                "Prioritize external buyer validation",
+                "Design the smallest reversible test",
+                "Do not release capital from this score alone"
             ]
         elif opportunity_score > 0.6:
             return [
-                "Proceed with measured investment",
                 "Conduct additional market validation",
-                "Monitor competitive landscape"
+                "Monitor contradicting evidence",
+                "Prepare a bounded experiment for human review"
             ]
         else:
             return [
                 "Consider alternative markets",
-                "Delay launch until conditions improve",
-                "Reduce initial investment"
+                "Gather stronger problem and buyer evidence",
+                "Recommend a hold until the active uncertainty is reduced"
             ]
 
 class RiskAssessmentService:
-    """Risk Assessment Agent with hybrid ML models"""
+    """Generate an uncalibrated heuristic risk index for simulation review."""
 
     def __init__(self):
         self.agent_type = AgentType.RISK_ASSESSMENT
-        self.model_version = "1.0.0"
-        self.target_failure_rate = 0.0001  # 0.01%
+        self.model_version = "simulation-heuristic-1.0"
+        self.review_threshold = 0.2
         # Pre-compute weight vector for risk score calculation
         self._weight_vector = np.array([0.35, 0.25, 0.3, 0.1])
         
     async def assess_venture_risk(self, venture_id: str) -> Dict[str, Any]:
-        """Comprehensive risk assessment using hybrid models"""
+        """Calculate a non-probabilistic simulation index."""
         try:
             with get_db() as session:
                 venture = session.query(DigitalVenture).filter(
@@ -149,25 +150,22 @@ class RiskAssessmentService:
                 financial_risk = self._assess_financial_risk(venture)
                 technical_risk = self._assess_technical_risk(venture)
                 
-                # Hybrid model prediction (LSTM + Random Forest simulation)
+                # Weighted simulation heuristic; no trained hybrid model exists.
                 risk_score = self._calculate_hybrid_risk_score(
                     market_risk, operational_risk, financial_risk, technical_risk
                 )
                 
-                failure_probability = self._convert_risk_to_probability(risk_score)
-                risk_level = self._determine_risk_level(failure_probability)
+                risk_level = self._determine_risk_level(risk_score)
                 
                 # Generate recommendations
-                recommendations = self._generate_risk_recommendations(
-                    risk_score, failure_probability
-                )
+                recommendations = self._generate_risk_recommendations(risk_score)
                 
                 # Store assessment
                 assessment = RiskAssessment(
                     venture_id=venture_id,
                     agent_id=self._get_agent_id(session),
                     risk_score=risk_score,
-                    failure_probability=failure_probability,
+                    heuristic_risk_index=risk_score,
                     market_risk=market_risk,
                     operational_risk=operational_risk,
                     financial_risk=financial_risk,
@@ -175,14 +173,14 @@ class RiskAssessmentService:
                     risk_level=risk_level,
                     recommendations=recommendations,
                     model_version=self.model_version,
-                    confidence_level=0.85,
+                    heuristic_confidence=0.0,
                     assessed_at=datetime.utcnow()
                 )
                 session.add(assessment)
                 
                 # Update venture risk metrics
                 venture.risk_score = risk_score
-                venture.failure_probability = failure_probability
+                venture.heuristic_risk_index = risk_score
                 venture.risk_level = risk_level
                 
                 session.commit()
@@ -190,12 +188,11 @@ class RiskAssessmentService:
                 logger.info("Risk assessment completed",
                            venture_id=venture_id,
                            risk_score=risk_score,
-                           failure_probability=failure_probability,
-                           meets_target=failure_probability <= self.target_failure_rate)
+                           evidence_status="simulation_heuristic_unvalidated")
                 
                 return {
                     'risk_score': risk_score,
-                    'failure_probability': failure_probability,
+                    'heuristic_risk_index': risk_score,
                     'risk_level': risk_level.value,
                     'risk_factors': {
                         'market': market_risk,
@@ -204,7 +201,10 @@ class RiskAssessmentService:
                         'technical': technical_risk
                     },
                     'recommendations': recommendations,
-                    'meets_target': failure_probability <= self.target_failure_rate
+                    'below_review_threshold': risk_score <= self.review_threshold,
+                    'evidence_status': 'simulation_heuristic_unvalidated',
+                    'confidence_status': 'not_calibrated',
+                    'authority': 'recommendation_only',
                 }
                 
         except SQLAlchemyError as e:
@@ -273,35 +273,28 @@ class RiskAssessmentService:
         weighted_score = float(np.dot(scores, self._weight_vector))
         return min(weighted_score, 1.0)
     
-    def _convert_risk_to_probability(self, risk_score: float) -> float:
-        """Convert risk score to failure probability"""
-        # Exponential decay to achieve ultra-low failure rates
-        # Target: P(failure) ≤ 0.01% for low-risk ventures
-        return min(risk_score ** 2 * 0.1, 0.5)
-    
-    def _determine_risk_level(self, failure_probability: float) -> RiskLevel:
-        """Determine risk level based on failure probability"""
-        if failure_probability <= 0.0001:  # ≤ 0.01%
+    def _determine_risk_level(self, risk_score: float) -> RiskLevel:
+        """Map an uncalibrated index into legacy ordered review bands."""
+        if risk_score <= 0.2:
             return RiskLevel.ULTRA_LOW
-        elif failure_probability <= 0.001:  # ≤ 0.1%
+        elif risk_score <= 0.35:
             return RiskLevel.LOW
-        elif failure_probability <= 0.01:   # ≤ 1%
+        elif risk_score <= 0.5:
             return RiskLevel.MODERATE
-        elif failure_probability <= 0.05:   # ≤ 5%
+        elif risk_score <= 0.7:
             return RiskLevel.HIGH
         else:
             return RiskLevel.VERY_HIGH
     
-    def _generate_risk_recommendations(self, risk_score: float, 
-                                     failure_probability: float) -> List[str]:
-        """Generate risk mitigation recommendations"""
+    def _generate_risk_recommendations(self, risk_score: float) -> List[str]:
+        """Generate non-authorizing risk-review suggestions."""
         recommendations = []
         
-        if failure_probability > self.target_failure_rate:
+        if risk_score > self.review_threshold:
             recommendations.extend([
-                "Increase automation level to reduce operational risk",
                 "Implement additional market validation",
-                "Consider phased rollout strategy"
+                "Investigate the dominant modeled risk factor",
+                "Use a reversible test before requesting more authority"
             ])
         
         if risk_score > 0.5:
@@ -311,8 +304,10 @@ class RiskAssessmentService:
                 "Monitor key risk indicators closely"
             ])
         
-        if failure_probability <= self.target_failure_rate:
-            recommendations.append("Venture meets ultra-low failure rate target")
+        if risk_score <= self.review_threshold:
+            recommendations.append(
+                "Heuristic is below the review threshold; external evidence is still required"
+            )
         
         return recommendations
     
@@ -390,34 +385,29 @@ class DecisionOrchestrator:
     
     def _generate_final_decision(self, market_analysis: Dict[str, Any], 
                                risk_analysis: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate final investment decision based on AI analyses"""
+        """Generate a non-authorizing simulation recommendation."""
         opportunity_score = market_analysis['opportunity_score']
-        failure_probability = risk_analysis['failure_probability']
-        meets_target = risk_analysis['meets_target']
+        heuristic_risk_index = risk_analysis['heuristic_risk_index']
+        below_review_threshold = risk_analysis['below_review_threshold']
         
-        # Decision matrix
-        if opportunity_score > 0.7 and meets_target:
-            action = "PROCEED_FULL"
-            confidence = 0.9
-            rationale = "High opportunity, ultra-low risk"
-        elif opportunity_score > 0.6 and failure_probability <= 0.001:
-            action = "PROCEED_CAUTIOUS"
-            confidence = 0.8
-            rationale = "Good opportunity, acceptable risk"
-        elif opportunity_score > 0.5 and failure_probability <= 0.01:
-            action = "PROCEED_MINIMAL"
-            confidence = 0.6
-            rationale = "Moderate opportunity, managed risk"
+        # Simulation recommendation matrix. No branch authorizes execution.
+        if opportunity_score > 0.7 and below_review_threshold:
+            action = "RECOMMEND_BOUNDED_VALIDATION"
+            rationale = "Modeled priority is high; seek decisive external evidence"
+        elif opportunity_score > 0.5 and heuristic_risk_index <= 0.5:
+            action = "RECOMMEND_MORE_EVIDENCE"
+            rationale = "The simulation is inconclusive; reduce the active uncertainty"
         else:
-            action = "HOLD"
-            confidence = 0.7
-            rationale = "Risk-reward profile not favorable"
+            action = "RECOMMEND_HOLD"
+            rationale = "Do not advance from the current unvalidated inputs"
         
         return {
             'action': action,
-            'confidence': confidence,
+            'action_authority': 'none',
+            'confidence_status': 'not_calibrated',
             'rationale': rationale,
             'opportunity_score': opportunity_score,
-            'failure_probability': failure_probability,
-            'meets_ultra_low_risk_target': meets_target
+            'heuristic_risk_index': heuristic_risk_index,
+            'below_review_threshold': below_review_threshold,
+            'evidence_status': 'simulation_heuristic_unvalidated',
         }

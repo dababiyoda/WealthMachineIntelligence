@@ -14,6 +14,8 @@
     "threat_model": "spec/uat/v1/threat-model.json",
     "evaluation_suite": "spec/uat/v1/evaluation-suite.json",
     "production_acceptance_gates": "spec/uat/v1/production-acceptance-gates.json",
+    "current_capability": "spec/uat/v1/current-capability.json",
+    "ag0_claim_inventory": "spec/uat/v1/ag0-claim-inventory.json",
     "agent_contract_schema": "spec/uat/v1/schemas/agent-contract.schema.json",
     "evidence_record_schema": "spec/uat/v1/schemas/evidence-record.schema.json",
     "action_request_schema": "spec/uat/v1/schemas/action-request.schema.json"

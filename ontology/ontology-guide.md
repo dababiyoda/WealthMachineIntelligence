@@ -71,7 +71,7 @@ preferredDataSource:
 
 ### AI Process Requirements
 - **Rule**: "AT LEAST ONE AIProcess MUST BE LINKED IF current_phase IN ['Phase2', 'Phase3']"
-- **Purpose**: Guarantees AI integration in mature ventures
+- **Purpose**: Requires an approved AI-module reference in the historical ontology model
 - **Validation**: Checked during phase advancement
 
 ## Knowledge Graph Integration

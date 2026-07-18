@@ -1556,6 +1556,29 @@ body {
 }
 
 /* Dark Mode Styles */
+.truth-boundary-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  align-items: center;
+  padding: var(--space-sm) var(--space-xl);
+  border-bottom: 1px solid #f59e0b;
+  background: #fffbeb;
+  color: #78350f;
+  font-size: var(--text-sm);
+}
+
+.truth-boundary-banner div {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+
+.truth-boundary-banner p {
+  margin: 0;
+  text-align: right;
+}
+
 @media (prefers-color-scheme: dark) {
   .navbar {
     background: rgba(31, 41, 55, 0.8);
@@ -1574,10 +1597,25 @@ body {
     background: var(--md-surface-variant);
     border-color: var(--md-surface-variant);
   }
+
+  .truth-boundary-banner {
+    background: #451a03;
+    color: #fef3c7;
+  }
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .truth-boundary-banner {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .truth-boundary-banner p {
+    text-align: left;
+  }
+
   .hero-title {
     font-size: var(--text-3xl);
   }

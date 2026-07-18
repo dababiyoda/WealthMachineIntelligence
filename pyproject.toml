@@ -1,7 +1,7 @@
 [project]
 name = "wealthmachine-enterprise"
 version = "1.0.0"
-description = "Enterprise-grade AI-driven digital business opportunity identification and scaling system"
+description = "Evidence-labeled simulation and architecture skeleton for governed venture experiments"
 requires-python = ">=3.11"
 dependencies = [
     "alembic>=1.16.4",

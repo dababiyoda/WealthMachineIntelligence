@@ -1,6 +1,6 @@
 {
   "spec_version": "1.0.0-draft",
-  "current_declared_stage": "pre_AG0_simulation_skeleton",
+  "current_declared_stage": "AG0_candidate_pending_independent_review",
   "production_claim_rule": "The system may not describe itself as autonomous, enterprise-grade, secure, compliant, calibrated, or production-ready until the specifically relevant gate evidence exists and is independently reviewable.",
   "gates": [
     {

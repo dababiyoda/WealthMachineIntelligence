@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "wealthmachineintelligence"
 version = "0.1.0"
-description = "Enhanced AI-driven venture orchestration platform with caching, vector search, IAM and CI/CD"
+description = "Legacy duplicate prototype; not the normative or production UAT implementation"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
@@ -29,6 +29,8 @@ bandit = "^1.7"
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
 extend-ignore = ["E501"]
 
 [tool.black]

@@ -1,12 +1,11 @@
 """
-Enterprise-grade database models for WealthMachine
-Implements comprehensive tracking of digital ventures, AI agents, and performance metrics
+Legacy database models for the UAT simulation skeleton.
+
+Fields do not establish verified venture, model, financial, or risk outcomes.
 """
 from sqlalchemy import Column, String, Float, Integer, DateTime, Boolean, JSON, ForeignKey, Text, Index, Enum as SQLEnum
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
-from datetime import datetime
 import enum
 import uuid
 
@@ -33,12 +32,12 @@ class VentureType(enum.Enum):
     SUBSCRIPTION_BOX = "subscription_box"
 
 class RiskLevel(enum.Enum):
-    """Risk assessment levels"""
-    ULTRA_LOW = "ultra_low"  # P(failure) ≤ 0.01%
-    LOW = "low"              # P(failure) ≤ 0.1%
-    MODERATE = "moderate"    # P(failure) ≤ 1%
-    HIGH = "high"            # P(failure) ≤ 5%
-    VERY_HIGH = "very_high"  # P(failure) > 5%
+    """Legacy ordered bands for an uncalibrated heuristic risk index."""
+    ULTRA_LOW = "ultra_low"
+    LOW = "low"
+    MODERATE = "moderate"
+    HIGH = "high"
+    VERY_HIGH = "very_high"
 
 class AgentType(enum.Enum):
     """AI Agent types in the system"""
@@ -69,7 +68,10 @@ class DigitalVenture(Base):
     # Risk assessment
     risk_level = Column(SQLEnum(RiskLevel), default=RiskLevel.MODERATE)
     risk_score = Column(Float, default=0.5)  # 0-1 scale
-    failure_probability = Column(Float, default=0.01)  # Target ≤ 0.01%
+    # The physical column name is retained for database compatibility. The
+    # value is an uncalibrated heuristic index and MUST NOT be represented as
+    # an empirical probability.
+    heuristic_risk_index = Column("failure_probability", Float, default=0.5)
     
     # Growth metrics
     customer_count = Column(Integer, default=0)
@@ -176,8 +178,9 @@ class RiskAssessment(Base):
     
     # Risk metrics
     risk_score = Column(Float, nullable=False)  # 0-1 scale
-    failure_probability = Column(Float, nullable=False)  # Percentage
-    confidence_level = Column(Float, nullable=False)  # 0-1 scale
+    # Legacy physical names are retained for migration compatibility only.
+    heuristic_risk_index = Column("failure_probability", Float, nullable=False)
+    heuristic_confidence = Column("confidence_level", Float, nullable=False)
     
     # Risk factors
     market_risk = Column(Float, default=0.0)

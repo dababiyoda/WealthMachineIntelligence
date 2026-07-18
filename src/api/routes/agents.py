@@ -5,7 +5,7 @@ Manage and monitor AI agents in the system
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
@@ -22,16 +22,21 @@ class AgentResponse(BaseModel):
     agent_type: AgentType
     name: str
     version: str
-    accuracy: float
+    reported_accuracy: float = Field(validation_alias="accuracy")
     decisions_made: int
-    success_rate: float
+    reported_success_rate: float = Field(validation_alias="success_rate")
     model_type: Optional[str]
     is_active: bool
     last_activity: Optional[datetime]
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
+    evidence_status: str = "unverified_seed_or_operator_input"
+    limitations: List[str] = Field(
+        default_factory=lambda: [
+            "Reported performance fields have no linked evaluation or outcome evidence."
+        ]
+    )
+
+    model_config = ConfigDict(from_attributes=True)
 
 class AgentStatus(BaseModel):
     id: str
@@ -39,9 +44,10 @@ class AgentStatus(BaseModel):
     name: str
     is_active: bool
     last_activity: Optional[datetime]
-    accuracy: float
-    success_rate: float
+    reported_accuracy: float
+    reported_success_rate: float
     decisions_made: int
+    evidence_status: str = "unverified_seed_or_operator_input"
 
 @router.get("/", response_model=List[AgentResponse])
 async def list_agents(
@@ -65,7 +71,7 @@ async def list_agents(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error listing agents")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -86,8 +92,8 @@ async def get_agents_status(
             name=agent.name,
             is_active=agent.is_active,
             last_activity=agent.last_activity,
-            accuracy=agent.accuracy,
-            success_rate=agent.success_rate,
+            reported_accuracy=agent.accuracy,
+            reported_success_rate=agent.success_rate,
             decisions_made=agent.decisions_made
         ) for agent in agents]
         
@@ -97,7 +103,7 @@ async def get_agents_status(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error getting agents status")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -156,7 +162,7 @@ async def activate_agent(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error activating agent")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -197,7 +203,7 @@ async def deactivate_agent(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error deactivating agent")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -1,9 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 from typing import List
 
-from ..database.connection import create_tables, get_db
+from ..database.connection import create_tables
 from ..cache import get_cache
 from ..vector_db import get_vector_store
 from ..auth.keycloak import verify_token

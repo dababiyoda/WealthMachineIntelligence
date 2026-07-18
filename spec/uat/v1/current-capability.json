@@ -1,0 +1,39 @@
+{
+  "spec_version": "1.0.0-draft",
+  "record_version": "2026-07-18.1",
+  "as_of": "2026-07-18",
+  "declared_stage": "AG0_candidate_pending_independent_review",
+  "operating_mode": "simulation",
+  "runtime_enforced": false,
+  "authorized_external_autonomy": "none",
+  "authority": "recommendation_only",
+  "data_status": "unverified_local_records_or_fixtures",
+  "risk_output_semantics": "uncalibrated_heuristic_index",
+  "demonstrated_capabilities": [
+    "Run deterministic, local opportunity and portfolio simulations",
+    "Accept the versioned DALEOBANKS OpportunityPacket compatibility contract",
+    "Render local database records and explicitly labeled offline fixtures",
+    "Validate the normative UAT artifacts through repository tests"
+  ],
+  "limitations": [
+    "No venture has been proven through paid, repeatable operation by this repository",
+    "No model or heuristic is calibrated to predict venture failure probability",
+    "Financial, market, compliance, agent-performance, and risk values may be seed data or operator inputs and are not independently audited",
+    "Authentication is suitable only for local demonstration and is not an enterprise identity control plane",
+    "Agent contracts, evidence gates, budgets, approvals, isolation, audit, and kill switches are specified but not yet enforced as a complete runtime",
+    "No output authorizes spending, contracting, publication, production deployment, hiring, legal representation, or another irreversible action"
+  ],
+  "prohibited_claims": [
+    "guaranteed wealth or venture success",
+    "empirical failure probability derived from a heuristic score",
+    "legal or regulatory compliance without qualified review and evidence",
+    "production-grade, secure, autonomous, or enterprise-ready operation before the relevant acceptance gate clears"
+  ],
+  "permitted_cycle_outcomes": [
+    "progress",
+    "proof",
+    "correction",
+    "protection"
+  ],
+  "review_required": true
+}

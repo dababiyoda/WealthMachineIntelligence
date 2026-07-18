@@ -2,7 +2,7 @@
 Analytics and reporting API endpoints
 Business intelligence and performance metrics
 """
-from typing import List, Dict
+from typing import Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -11,6 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
 from ...database.connection import get_db
+from ...core.epistemic import evidence_disclosure
 from ...database.models import (
     DigitalVenture,
     VentureStatus,
@@ -21,13 +22,28 @@ from ..auth import get_current_user
 
 router = APIRouter()
 
+
+class EvidenceDisclosure(BaseModel):
+    operating_mode: str
+    evidence_status: str
+    source: str
+    risk_semantics: str
+    authority: str
+    limitations: List[str]
+
+
+def disclosure(source: str) -> EvidenceDisclosure:
+    return EvidenceDisclosure(**evidence_disclosure(source))
+
+
 class DashboardMetrics(BaseModel):
     total_ventures: int
     active_ventures: int
     total_revenue: float
     average_roi: float
     low_risk_ventures: int
-    ultra_low_failure_rate: float
+    modeled_low_risk_coverage: float
+    evidence: EvidenceDisclosure
     
 class VentureMetrics(BaseModel):
     venture_id: str
@@ -35,8 +51,9 @@ class VentureMetrics(BaseModel):
     monthly_revenue: float
     growth_rate: float
     risk_score: float
-    failure_probability: float
+    heuristic_risk_index: float
     automation_level: float
+    evidence: EvidenceDisclosure
 
 class PortfolioPerformance(BaseModel):
     total_valuation: float
@@ -46,14 +63,16 @@ class PortfolioPerformance(BaseModel):
     venture_count: int
     average_risk_score: float
     roi_by_type: Dict[str, float]
+    evidence: EvidenceDisclosure
 
 class RiskAnalysis(BaseModel):
     ultra_low_risk_count: int
     low_risk_count: int
     moderate_risk_count: int
     high_risk_count: int
-    average_failure_probability: float
-    ventures_meeting_target: int  # P(failure) ≤ 0.01%
+    average_heuristic_risk_index: float
+    ventures_below_review_threshold: int
+    evidence: EvidenceDisclosure
 
 @router.get("/dashboard", response_model=DashboardMetrics)
 async def get_dashboard_metrics(
@@ -95,12 +114,16 @@ async def get_dashboard_metrics(
             DigitalVenture.risk_level.in_([RiskLevel.ULTRA_LOW, RiskLevel.LOW])
         ).count()
         
-        # Ultra-low failure rate (target ≤ 0.01%)
-        ultra_low_failure_ventures = db.query(DigitalVenture).filter(
-            DigitalVenture.failure_probability <= 0.0001
+        # This is an uncalibrated review index, not a failure probability.
+        ventures_below_review_threshold = db.query(DigitalVenture).filter(
+            DigitalVenture.risk_score <= 0.2
         ).count()
         
-        ultra_low_failure_rate = (ultra_low_failure_ventures / total_ventures * 100) if total_ventures > 0 else 0
+        modeled_low_risk_coverage = (
+            ventures_below_review_threshold / total_ventures * 100
+            if total_ventures > 0
+            else 0
+        )
         
         return DashboardMetrics(
             total_ventures=total_ventures,
@@ -108,7 +131,8 @@ async def get_dashboard_metrics(
             total_revenue=revenue_sum,
             average_roi=average_roi,
             low_risk_ventures=low_risk_ventures,
-            ultra_low_failure_rate=ultra_low_failure_rate
+            modeled_low_risk_coverage=modeled_low_risk_coverage,
+            evidence=disclosure("local DigitalVenture records; records may be simulation fixtures"),
         )
         
     except SQLAlchemyError as e:
@@ -174,6 +198,7 @@ async def get_portfolio_performance(
             venture_count=venture_count,
             average_risk_score=average_risk_score or 0,
             roi_by_type=roi_by_type,
+            evidence=disclosure("local DigitalVenture records; financial fields are not independently audited"),
         )
         
     except SQLAlchemyError as e:
@@ -213,12 +238,13 @@ async def get_risk_analysis(
             DigitalVenture.risk_level.in_([RiskLevel.HIGH, RiskLevel.VERY_HIGH])
         ).count()
         
-        # Average failure probability
-        avg_failure_prob = db.query(func.avg(DigitalVenture.failure_probability)).scalar() or 0
+        # Average uncalibrated heuristic index.
+        average_heuristic_risk_index = db.query(
+            func.avg(DigitalVenture.risk_score)
+        ).scalar() or 0
         
-        # Ventures meeting target (P(failure) ≤ 0.01%)
-        ventures_meeting_target = db.query(DigitalVenture).filter(
-            DigitalVenture.failure_probability <= 0.0001
+        ventures_below_review_threshold = db.query(DigitalVenture).filter(
+            DigitalVenture.risk_score <= 0.2
         ).count()
         
         return RiskAnalysis(
@@ -226,8 +252,9 @@ async def get_risk_analysis(
             low_risk_count=low_risk,
             moderate_risk_count=moderate_risk,
             high_risk_count=high_risk,
-            average_failure_probability=avg_failure_prob,
-            ventures_meeting_target=ventures_meeting_target
+            average_heuristic_risk_index=average_heuristic_risk_index,
+            ventures_below_review_threshold=ventures_below_review_threshold,
+            evidence=disclosure("local DigitalVenture heuristic risk fields; no outcome calibration"),
         )
         
     except SQLAlchemyError as e:
@@ -246,7 +273,7 @@ async def get_risk_analysis(
 @router.get("/top-performers", response_model=List[VentureMetrics])
 async def get_top_performers(
     limit: int = Query(10, ge=1, le=50),
-    metric: str = Query("revenue", regex="^(revenue|growth|roi|automation)$"),
+    metric: str = Query("revenue", pattern="^(revenue|growth|roi|automation)$"),
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -275,8 +302,9 @@ async def get_top_performers(
                 monthly_revenue=v.monthly_revenue,
                 growth_rate=v.growth_rate,
                 risk_score=v.risk_score,
-                failure_probability=v.failure_probability,
-                automation_level=v.automation_level
+                heuristic_risk_index=v.risk_score,
+                automation_level=v.automation_level,
+                evidence=disclosure("local DigitalVenture record; values are not independently audited"),
             ) for v in ventures
         ]
         

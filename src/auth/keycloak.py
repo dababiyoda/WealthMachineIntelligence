@@ -6,7 +6,7 @@ JSON Web Tokens (JWTs) using the appropriate public key. It raises
 KeycloakAuthError on validation errors such as signature mismatch,
 expiration, or audience mismatch.
 """
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
 import time
 import requests
 from jose import jwk, jwt

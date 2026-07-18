@@ -1,0 +1,179 @@
+{
+  "spec_version": "1.0.0-draft",
+  "inventory_version": "2026-07-18.1",
+  "gate": "AG0",
+  "review_status": "candidate_pending_independent_review",
+  "coverage": {
+    "consequential_claim_classes_inventoried": 15,
+    "claim_classes_with_a_compliant_disposition": 15,
+    "credible_claim_coverage": 1.0,
+    "measurement": "Repository search plus manual review of the operator interface, API responses, fixtures, risk services, authentication path, and deployment documents"
+  },
+  "claims": [
+    {
+      "id": "AG0-CLAIM-001",
+      "location": ["static/index.html", "static/app.js"],
+      "claim": "The system or its ventures have a 99.99 percent success rate.",
+      "type": "unsupported_outcome_claim",
+      "support": [],
+      "contradiction": ["No production outcome or retention dataset exists in the repository."],
+      "disposition": "removed",
+      "owner": "data_evidence_knowledge_steward",
+      "test": "test_operator_interface_contains_no_guaranteed_outcome_claims"
+    },
+    {
+      "id": "AG0-CLAIM-002",
+      "location": ["static/index.html", "main.py", "src/api/routes/analytics.py", "src/services/risk_management.py"],
+      "claim": "Formula-derived risk scores are venture failure probabilities.",
+      "type": "misclassified_heuristic",
+      "support": [],
+      "contradiction": ["The values have no observed outcome calibration or validation dataset."],
+      "disposition": "renamed_to_uncalibrated_heuristic_risk_index",
+      "owner": "data_evidence_knowledge_steward",
+      "test": "test_heuristic_risk_output_is_not_a_probability_or_authority"
+    },
+    {
+      "id": "AG0-CLAIM-003",
+      "location": ["static/index.html"],
+      "claim": "Hard-coded market sizes, growth rates, ROI, and launch timing are current market evidence.",
+      "type": "unsourced_market_claim",
+      "support": [],
+      "contradiction": ["The interface contains no source, observation date, methodology, or integrity record."],
+      "disposition": "replaced_with_explicit_hypotheses_requiring_evidence",
+      "owner": "strategic_market_analyst",
+      "test": "test_operator_interface_contains_no_unsourced_market_numbers"
+    },
+    {
+      "id": "AG0-CLAIM-004",
+      "location": ["static/index.html"],
+      "claim": "All ventures comply with GDPR, CCPA, SOX, and PCI DSS.",
+      "type": "unsupported_legal_claim",
+      "support": [],
+      "contradiction": ["No venture-specific scope, legal review, audit, or control evidence is connected to the interface."],
+      "disposition": "replaced_with_not_assessed_and_legal_review_required",
+      "owner": "regulatory_legal_risk_analyst",
+      "test": "test_operator_interface_does_not_claim_compliance"
+    },
+    {
+      "id": "AG0-CLAIM-005",
+      "location": ["static/index.html"],
+      "claim": "The system has executed specific automation counts and saved measured hours.",
+      "type": "fabricated_operational_metric",
+      "support": [],
+      "contradiction": ["No event source or time-tracking evidence is wired to these values."],
+      "disposition": "replaced_with_not_connected",
+      "owner": "security_reliability_incident",
+      "test": "test_operator_interface_contains_no_fabricated_operational_metrics"
+    },
+    {
+      "id": "AG0-CLAIM-006",
+      "location": ["src/database/init_db.py", "src/api/routes/agents.py"],
+      "claim": "Seeded agent accuracy and success-rate fields are validated performance.",
+      "type": "unsupported_agent_metric",
+      "support": [],
+      "contradiction": ["The values were manually seeded without an evaluation suite or outcome references."],
+      "disposition": "zeroed_in_fixtures_and_exposed_only_as_unverified_reported_metrics",
+      "owner": "adversarial_assurance_red_team",
+      "test": "test_seed_records_are_explicitly_simulated"
+    },
+    {
+      "id": "AG0-CLAIM-007",
+      "location": ["src/services/ai_agents.py"],
+      "claim": "Random values and fixed formulas constitute predictive AI evidence and may authorize proceeding.",
+      "type": "unsupported_model_capability",
+      "support": [],
+      "contradiction": ["The implementation is a simulation without a trained, evaluated, or calibrated production model."],
+      "disposition": "quarantined_as_simulation_and_recommendation_only",
+      "owner": "adversarial_assurance_red_team",
+      "test": "test_current_capability_record_denies_external_authority"
+    },
+    {
+      "id": "AG0-CLAIM-008",
+      "location": ["static/app.js"],
+      "claim": "Offline fallback ventures, revenue, agent accuracy, and risk values are real operating results.",
+      "type": "unlabeled_fixture",
+      "support": [],
+      "contradiction": ["The values are hard-coded client-side fixtures."],
+      "disposition": "replaced_with_zero_or_unknown_values_and_simulation_disclosure",
+      "owner": "data_evidence_knowledge_steward",
+      "test": "test_offline_fallback_is_explicitly_simulated"
+    },
+    {
+      "id": "AG0-CLAIM-009",
+      "location": ["DEPLOYMENT_SUMMARY.md", "WEALTHMACHINE_ANALYSIS.md", "replit.md"],
+      "claim": "Legacy deployment and analysis documents prove ultra-reliable production behavior.",
+      "type": "superseded_capability_claim",
+      "support": [],
+      "contradiction": ["The current runtime lacks the evidence, control, and assurance planes required by the normative specification."],
+      "disposition": "marked_superseded_and_rewritten_as_historical_unvalidated_targets",
+      "owner": "portfolio_governor",
+      "test": "test_legacy_documents_cannot_be_mistaken_for_current_assurance"
+    },
+    {
+      "id": "AG0-CLAIM-010",
+      "location": ["main.py", "src/api/main.py", "pyproject.toml"],
+      "claim": "The current application is production-ready or enterprise-grade.",
+      "type": "unsupported_maturity_claim",
+      "support": [],
+      "contradiction": ["The declared acceptance stage remains below the durable control-plane gate."],
+      "disposition": "replaced_with_simulation_and_architecture_skeleton_language",
+      "owner": "portfolio_governor",
+      "test": "test_runtime_descriptions_match_current_capability_record"
+    },
+    {
+      "id": "AG0-CLAIM-011",
+      "location": ["jwt.py", "src/api/auth.py"],
+      "claim": "JWT identity is verified while a production-path stub accepts arbitrary tokens.",
+      "type": "false_security_claim",
+      "support": [],
+      "contradiction": ["The root test double returned a fixed identity for every token."],
+      "disposition": "production_path_stub_removed_and_invalid_tokens_fail_closed",
+      "owner": "security_reliability_incident",
+      "test": "test_arbitrary_token_is_rejected_and_root_jwt_stub_is_absent"
+    },
+    {
+      "id": "AG0-CLAIM-012",
+      "location": ["src/api/auth.py"],
+      "claim": "Protected endpoints authenticate callers while a missing token silently receives administrator identity.",
+      "type": "false_authorization_claim",
+      "support": [],
+      "contradiction": ["The previous fallback granted the demo administrator without credentials."],
+      "disposition": "missing_credentials_now_denied",
+      "owner": "security_reliability_incident",
+      "test": "test_missing_token_is_rejected"
+    },
+    {
+      "id": "AG0-CLAIM-013",
+      "location": ["src/database/init_db.py"],
+      "claim": "Seed ventures and financial values are observed production records.",
+      "type": "unlabeled_fixture",
+      "support": [],
+      "contradiction": ["The records are generated by the initialization script."],
+      "disposition": "names_and_descriptions_labeled_simulation_fixture",
+      "owner": "data_evidence_knowledge_steward",
+      "test": "test_seed_records_are_explicitly_simulated"
+    },
+    {
+      "id": "AG0-CLAIM-014",
+      "location": ["spec/uat/v1/current-capability.json", "main.py", "src/api/main.py"],
+      "claim": "Operators can determine the system's current capabilities, limitations, evidence status, and authorized autonomy.",
+      "type": "verified_repository_capability",
+      "support": ["Versioned capability record", "Capability API", "Operator simulation banner"],
+      "contradiction": [],
+      "disposition": "published_with_review_date_and_safe_fallback",
+      "owner": "data_evidence_knowledge_steward",
+      "test": "test_current_capability_record_is_complete_and_fail_closed"
+    },
+    {
+      "id": "AG0-CLAIM-015",
+      "location": ["src/network_my_networth/system.py", "src/agents/specialized.py"],
+      "claim": "The deterministic orchestration facade and specialist heuristics are autonomous enterprise agents.",
+      "type": "unsupported_autonomy_claim",
+      "support": [],
+      "contradiction": ["The components execute local deterministic rules and retain in-memory state."],
+      "disposition": "explicitly_labeled_simulation_and_test_fixture",
+      "owner": "portfolio_governor",
+      "test": "test_current_capability_record_denies_external_authority"
+    }
+  ]
+}

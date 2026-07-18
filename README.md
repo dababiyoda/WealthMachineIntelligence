@@ -9,6 +9,13 @@ The governing target architecture is [UAT Enterprise System Specification](docs/
 
 The current application is a simulation and architectural skeleton. It is not a production autonomous venture operator, and its heuristic scores are not validated probabilities. Runtime authority must not expand until the applicable acceptance gates in the specification are implemented and independently verified.
 
+The machine-readable current truth boundary is
+[`spec/uat/v1/current-capability.json`](spec/uat/v1/current-capability.json).
+AG0 remediation and claim coverage are recorded in
+[`spec/uat/v1/ag0-claim-inventory.json`](spec/uat/v1/ag0-claim-inventory.json).
+The implementation is an AG0 candidate pending independent review; external
+autonomy remains unauthorized.
+
 ## Core Principles
 
 ### Digital-First Approach

@@ -1,20 +1,21 @@
-"""
-Enterprise FastAPI application for WealthMachine
-Production-ready API with authentication, monitoring, and comprehensive endpoints
+"""UAT simulation and architecture-skeleton API.
+
+The presence of authentication, monitoring, or endpoints here is not evidence
+that the AG1 control plane or later production-acceptance gates have cleared.
 """
 from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import JSONResponse
-import time
 from src.logging_config import configure_logging, logger
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import Counter, Histogram, generate_latest
 from prometheus_client import start_http_server
 import os
 from contextlib import asynccontextmanager
 
 from ..database.connection import db
+from ..core.epistemic import current_capability_record
 from .routes import ventures, agents, analytics, health, opportunities
 from .auth import verify_token
 from .middleware import SecurityHeadersMiddleware, LoggingMiddleware
@@ -30,7 +31,7 @@ REQUEST_DURATION = Histogram('wealthmachine_request_duration_seconds', 'Request 
 async def lifespan(app: FastAPI):
     """Application lifespan management"""
     # Startup
-    logger.info("Starting WealthMachine Enterprise API")
+    logger.info("Starting UAT simulation API")
     
     # Initialize database
     try:
@@ -51,9 +52,9 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down WealthMachine Enterprise API")
 
 app = FastAPI(
-    title="WealthMachine Enterprise API",
-    description="AI-driven digital business opportunity identification and scaling system",
-    version="1.0.0",
+    title="UAT Simulation API",
+    description="Evidence-labeled architecture skeleton for governed venture experiments",
+    version="0.1.0",
     lifespan=lifespan,
     docs_url="/docs" if os.getenv("ENVIRONMENT") != "production" else None,
     redoc_url="/redoc" if os.getenv("ENVIRONMENT") != "production" else None
@@ -135,13 +136,21 @@ app.include_router(opportunities.router, prefix="/api", tags=["opportunities"])
 async def root():
     """API root endpoint"""
     return {
-        "name": "WealthMachine Enterprise API",
-        "version": "1.0.0",
-        "description": "AI-driven digital business opportunity identification and scaling system",
+        "name": "UAT Simulation API",
+        "version": "0.1.0",
+        "description": "Evidence-labeled architecture skeleton for governed venture experiments",
+        "capability": current_capability_record(),
         "docs": "/docs",
         "health": "/health",
         "metrics": "/metrics"
     }
+
+
+@app.get("/api/v1/system/capabilities")
+async def capabilities():
+    """Return the versioned, fail-closed current-capability record."""
+
+    return current_capability_record()
 
 if __name__ == "__main__":
     import uvicorn

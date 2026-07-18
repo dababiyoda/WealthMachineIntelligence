@@ -5,7 +5,7 @@ CRUD operations and business logic for digital business opportunities
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
@@ -45,7 +45,8 @@ class VentureResponse(VentureBase):
     profit_margin: float
     risk_level: RiskLevel
     risk_score: float
-    failure_probability: float
+    risk_semantics: str = "uncalibrated_heuristic_index"
+    evidence_status: str = "unverified_local_record"
     customer_count: int
     churn_rate: float
     growth_rate: float
@@ -54,8 +55,7 @@ class VentureResponse(VentureBase):
     created_at: datetime
     updated_at: Optional[datetime]
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class VentureList(BaseModel):
     ventures: List[VentureResponse]
@@ -101,7 +101,7 @@ async def create_venture(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error creating venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -150,7 +150,7 @@ async def list_ventures(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error listing ventures")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -220,7 +220,7 @@ async def update_venture(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error updating venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -259,7 +259,7 @@ async def delete_venture(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error discontinuing venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -307,7 +307,7 @@ async def launch_venture(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database error"
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Unexpected error launching venture")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
