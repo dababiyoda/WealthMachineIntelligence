@@ -43,6 +43,24 @@ def test_production_rejects_default_or_short_jwt_secret(monkeypatch) -> None:
         auth.validate_auth_configuration()
 
 
+def test_production_requires_an_explicit_host_allowlist(monkeypatch) -> None:
+    from src.api import main as api_main
+
+    monkeypatch.delenv("ALLOWED_HOSTS", raising=False)
+    with pytest.raises(RuntimeError, match="ALLOWED_HOSTS"):
+        api_main._configured_trusted_hosts("production")
+
+    monkeypatch.setenv("ALLOWED_HOSTS", "*")
+    with pytest.raises(RuntimeError, match="cannot contain"):
+        api_main._configured_trusted_hosts("production")
+
+    monkeypatch.setenv("ALLOWED_HOSTS", "api.example.com, health.example.com")
+    assert api_main._configured_trusted_hosts("production") == [
+        "api.example.com",
+        "health.example.com",
+    ]
+
+
 def test_human_admin_dependency_rejects_ordinary_user() -> None:
     with pytest.raises(HTTPException) as exc_info:
         asyncio.run(

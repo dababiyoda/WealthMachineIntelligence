@@ -21,6 +21,7 @@ identity, credentials, and egress policy.
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
 from ..control.execution_context import require_authorized_execution
@@ -195,7 +196,10 @@ class KnowledgeGraphConnector:
                             competitive_advantages=analysis_data.get("competitive_advantages", []),
                             lstm_prediction=analysis_data.get("prediction", {}),
                             sentiment_analysis=analysis_data.get("sentiment", {}),
-                            analyzed_at=analysis_data.get("analyzed_at"),
+                            analyzed_at=(
+                                analysis_data.get("analyzed_at")
+                                or datetime.now(timezone.utc)
+                            ),
                         )
                     )
             except Exception as exc:  # pragma: no cover

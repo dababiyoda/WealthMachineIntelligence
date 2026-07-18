@@ -15,6 +15,25 @@ from .routes import ventures, agents, analytics, health, opportunities
 from .auth import validate_auth_configuration, verify_token
 from .middleware import SecurityHeadersMiddleware, LoggingMiddleware
 
+
+def _configured_trusted_hosts(environment: str) -> list[str]:
+    hosts = [
+        host.strip()
+        for host in os.getenv("ALLOWED_HOSTS", "").split(",")
+        if host.strip()
+    ]
+    if environment == "production":
+        if not hosts:
+            raise RuntimeError(
+                "ALLOWED_HOSTS must name at least one explicit host in production"
+            )
+        if "*" in hosts:
+            raise RuntimeError(
+                "ALLOWED_HOSTS cannot contain '*' in production"
+            )
+        return hosts
+    return hosts or ["*"]
+
 # Configure structured logging
 configure_logging()
 
@@ -63,16 +82,9 @@ app = FastAPI(
 )
 
 # Security middleware
-is_production = os.getenv("ENVIRONMENT", "development").lower() == "production"
-allowed_hosts = (
-    [
-        host.strip()
-        for host in os.getenv("ALLOWED_HOSTS", "").split(",")
-        if host.strip()
-    ]
-    if is_production
-    else ["*"]
-)
+environment = os.getenv("ENVIRONMENT", "development").lower()
+is_production = environment == "production"
+allowed_hosts = _configured_trusted_hosts(environment)
 app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=allowed_hosts,
