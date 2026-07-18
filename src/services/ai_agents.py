@@ -7,7 +7,7 @@ execution authority. Async APIs allow integration with FastAPI endpoints or
 background workers.
 """
 import asyncio
-import numpy as np
+import random
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -38,7 +38,7 @@ class MarketIntelligenceService:
         """Analyze market opportunity using AI models"""
         try:
             # Simulate LSTM prediction (in production, use real trained model)
-            trend_score = np.random.uniform(0.3, 0.9)
+            trend_score = random.uniform(0.3, 0.9)
             market_size = market_data.get('market_size', 1000000)
             competition_level = market_data.get('competition_level', 'medium')
             
@@ -133,8 +133,8 @@ class RiskAssessmentService:
         self.agent_type = AgentType.RISK_ASSESSMENT
         self.model_version = "1.0.0"
         self.legacy_score_threshold = 0.0001
-        # Pre-compute weight vector for risk score calculation
-        self._weight_vector = np.array([0.35, 0.25, 0.3, 0.1])
+        # Pre-compute weights without requiring a numerical runtime dependency.
+        self._weight_vector = (0.35, 0.25, 0.3, 0.1)
         
     async def assess_venture_risk(self, venture_id: str) -> Dict[str, Any]:
         """Comprehensive risk assessment using hybrid models"""
@@ -282,9 +282,11 @@ class RiskAssessmentService:
     
     def _calculate_hybrid_risk_score(self, market: float, operational: float,
                                    financial: float, technical: float) -> float:
-        """Calculate weighted risk score using a vectorized approach"""
-        scores = np.array([market, operational, financial, technical])
-        weighted_score = float(np.dot(scores, self._weight_vector))
+        """Calculate the weighted heuristic risk score."""
+        scores = (market, operational, financial, technical)
+        weighted_score = sum(
+            score * weight for score, weight in zip(scores, self._weight_vector)
+        )
         return min(weighted_score, 1.0)
     
     def _convert_risk_to_probability(self, risk_score: float) -> float:
