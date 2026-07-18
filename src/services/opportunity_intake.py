@@ -26,6 +26,7 @@ from typing import Any, Dict, Optional
 from uuid import uuid4
 
 from src.network_my_networth.system import NetworkWealthEngine
+from src.services.adversarial import build_cases, severe_unresolved
 from src.services.venture_protocol import (
     FINANCE_EDUCATION_FLAG,
     LEGAL_RISK_FLAGS,
@@ -146,6 +147,10 @@ class OpportunityIntakeService:
         legal_flags = sorted(LEGAL_RISK_FLAGS & set(packet["risk_flags"]))
         finance = FINANCE_EDUCATION_FLAG in packet["risk_flags"]
 
+        # The committee argues with itself before any verdict is written.
+        cases = build_cases(packet, score, alignment)
+        severe = severe_unresolved(cases)
+
         reasons = []
         if legal_flags:
             go_no_go, risk_level = "kill", "high"
@@ -162,6 +167,15 @@ class OpportunityIntakeService:
             comparison = "meets" if score >= threshold else "is below"
             reasons.append(f"opportunity score {score} {comparison} the {threshold} threshold")
             reasons.append(f"engine risk level: {venture['risk'].get('risk_level', 'Moderate')}")
+        if severe and go_no_go == "go":
+            # A high score may not erase a severe unresolved risk.
+            go_no_go = "needs_more_evidence"
+            reasons.append(
+                f"severe unresolved adversarial case(s) cap the verdict: {severe}"
+            )
+        for case in cases:
+            if case["stance"] == "against" and case["severity"] != "low":
+                reasons.append(f"[{case['case']}] {case['argument']}")
         if finance:
             reasons.append("finance content must remain educational; no personalized advice")
 
@@ -195,6 +209,7 @@ class OpportunityIntakeService:
             ),
             "requires_human_approval": True,  # non-negotiable
             "reasons": reasons,
+            "cases": cases,  # competing arguments, disagreement preserved
             "created_at": datetime.now(timezone.utc).isoformat(),
             "schema_version": SCHEMA_VERSION,
         }
