@@ -77,7 +77,9 @@ preferredDataSource:
 ## Knowledge Graph Integration
 
 ### Query Capabilities
-The ontology supports sophisticated knowledge graph queries for real-time insights. Refer to the `/knowledge-graph` directory for:
+The historical ontology defines structured knowledge-graph query patterns. It
+does not establish live data, production integration, or real-time insight.
+Refer to the `/knowledge-graph` directory for:
 - Comprehensive query documentation in `queries.md`
 - Example query patterns in `query-examples.yaml`
 - Database integration guidelines

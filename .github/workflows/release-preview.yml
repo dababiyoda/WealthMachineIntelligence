@@ -1,0 +1,69 @@
+name: Publish governed preview image
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type PUBLISH_GOVERNED_PREVIEW to authorize the image publication"
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  verify:
+    if: ${{ inputs.confirmation == 'PUBLISH_GOVERNED_PREVIEW' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.28"
+          enable-cache: true
+      - name: Install and verify the locked dependency graph
+        run: |
+          uv sync --frozen --extra dev
+          uv pip check --python .venv/bin/python
+          .venv/bin/pip-audit --local --skip-editable --cache-dir .cache/pip-audit
+      - name: Run release gates
+        run: |
+          .venv/bin/python -m compileall -q src main.py
+          node --check static/app.js
+          .venv/bin/ruff check .
+          .venv/bin/pytest -q
+      - name: Prove the container builds before publication
+        run: docker build --tag uat-governed-preview:release-verification .
+
+  publish:
+    if: ${{ inputs.confirmation == 'PUBLISH_GOVERNED_PREVIEW' }}
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish immutable preview image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/uat-governed-preview:0.2.0-rc1-${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/uat-governed-preview:sha-${{ github.sha }}
+          provenance: mode=max
+          sbom: true
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}

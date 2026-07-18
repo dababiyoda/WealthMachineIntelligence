@@ -189,7 +189,7 @@ def test_acceptance_gates_require_reviewable_evidence_and_existing_evaluations()
     expected_gate_ids = {f"AG{number}" for number in range(8)}
     actual_gate_ids = {gate["id"] for gate in gates["gates"]}
 
-    assert gates["current_declared_stage"] == "AG0_candidate_pending_independent_review"
+    assert gates["current_declared_stage"] == "governed_preview_release_candidate"
     assert actual_gate_ids == expected_gate_ids
     for gate in gates["gates"]:
         assert gate["objective"]

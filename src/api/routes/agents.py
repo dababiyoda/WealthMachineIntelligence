@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
-from ...database.connection import get_db
+from ...database.connection import session_dependency as get_db
 from ...database.models import AIAgent, AgentType
 from ..auth import get_current_user
 
@@ -133,41 +133,11 @@ async def activate_agent(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Activate an AI agent"""
-    agent = db.query(AIAgent).filter(AIAgent.id == agent_id).first()
-    
-    if not agent:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Agent not found"
-        )
-    
-    try:
-        agent.is_active = True
-        agent.last_activity = datetime.utcnow()
-        
-        db.commit()
-        db.refresh(agent)
-        
-        logger.info("Agent activated",
-                   agent_id=agent_id,
-                   agent_type=agent.agent_type.value,
-                   activated_by=current_user.get("user_id"))
-        
-        return agent
-        
-    except SQLAlchemyError as e:
-        logger.error("Failed to activate agent", agent_id=agent_id, error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
-        )
-    except Exception:
-        logger.exception("Unexpected error activating agent")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to activate agent"
-        )
+    """Legacy activation is held behind the governed action workflow."""
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Direct agent activation is disabled; a contract and capability grant are required.",
+    )
 
 @router.post("/{agent_id}/deactivate", response_model=AgentResponse)
 async def deactivate_agent(
@@ -175,37 +145,8 @@ async def deactivate_agent(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Deactivate an AI agent"""
-    agent = db.query(AIAgent).filter(AIAgent.id == agent_id).first()
-    
-    if not agent:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Agent not found"
-        )
-    
-    try:
-        agent.is_active = False
-        
-        db.commit()
-        db.refresh(agent)
-        
-        logger.info("Agent deactivated",
-                   agent_id=agent_id,
-                   agent_type=agent.agent_type.value,
-                   deactivated_by=current_user.get("user_id"))
-        
-        return agent
-        
-    except SQLAlchemyError as e:
-        logger.error("Failed to deactivate agent", agent_id=agent_id, error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
-        )
-    except Exception:
-        logger.exception("Unexpected error deactivating agent")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to deactivate agent"
-        )
+    """Legacy deactivation is held behind the governed action workflow."""
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Direct agent state mutation is disabled; use governance or a kill switch.",
+    )

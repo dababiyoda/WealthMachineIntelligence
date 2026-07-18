@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
-from ...database.connection import get_db
+from ...database.connection import session_dependency as get_db
 from ...database.models import DigitalVenture, VentureType, VentureStatus, RiskLevel
 from ..auth import get_current_user
 
@@ -69,44 +69,11 @@ async def create_venture(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Create a new digital venture"""
-    try:
-        # Create venture with initial risk assessment
-        db_venture = DigitalVenture(
-            name=venture.name,
-            description=venture.description,
-            venture_type=venture.venture_type,
-            initial_investment=venture.initial_investment,
-            status=VentureStatus.IDEATION,
-            risk_level=RiskLevel.MODERATE,
-            ai_enabled=True,
-            automation_level=0.1  # Start with basic automation
-        )
-        
-        db.add(db_venture)
-        db.commit()
-        db.refresh(db_venture)
-        
-        logger.info("Venture created", 
-                   venture_id=db_venture.id,
-                   name=db_venture.name,
-                   type=db_venture.venture_type.value,
-                   created_by=current_user.get("user_id"))
-        
-        return db_venture
-        
-    except SQLAlchemyError as e:
-        logger.error("Failed to create venture", error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
-        )
-    except Exception:
-        logger.exception("Unexpected error creating venture")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create venture"
-        )
+    """Legacy mutation is held behind the governed action workflow."""
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Direct venture creation is disabled; submit an evidence-linked governance action.",
+    )
 
 @router.get("/", response_model=VentureList)
 async def list_ventures(
@@ -181,51 +148,11 @@ async def update_venture(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Update a venture"""
-    venture = db.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
-    
-    if not venture:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Venture not found"
-        )
-    
-    try:
-        # Update fields
-        update_data = venture_update.dict(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(venture, field, value)
-        
-        # Recalculate profit margin if revenue/expenses updated
-        if venture.monthly_revenue and venture.monthly_expenses:
-            venture.profit_margin = (venture.monthly_revenue - venture.monthly_expenses) / venture.monthly_revenue
-        
-        # Update growth rate based on customer metrics
-        if venture.customer_count and venture.churn_rate:
-            venture.growth_rate = max(0, 1 - venture.churn_rate)
-        
-        db.commit()
-        db.refresh(venture)
-        
-        logger.info("Venture updated",
-                   venture_id=venture_id,
-                   updated_by=current_user.get("user_id"),
-                   changes=list(update_data.keys()))
-        
-        return venture
-        
-    except SQLAlchemyError as e:
-        logger.error("Failed to update venture", venture_id=venture_id, error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
-        )
-    except Exception:
-        logger.exception("Unexpected error updating venture")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update venture"
-        )
+    """Legacy mutation is held behind the governed action workflow."""
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Direct venture mutation is disabled; submit an evidence-linked governance action.",
+    )
 
 @router.delete("/{venture_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_venture(
@@ -233,38 +160,11 @@ async def delete_venture(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Delete a venture"""
-    venture = db.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
-    
-    if not venture:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Venture not found"
-        )
-    
-    try:
-        # Instead of hard delete, mark as discontinued
-        venture.status = VentureStatus.DISCONTINUED
-        venture.discontinued_at = datetime.utcnow()
-        
-        db.commit()
-        
-        logger.info("Venture discontinued",
-                   venture_id=venture_id,
-                   discontinued_by=current_user.get("user_id"))
-        
-    except SQLAlchemyError as e:
-        logger.error("Failed to discontinue venture", venture_id=venture_id, error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
-        )
-    except Exception:
-        logger.exception("Unexpected error discontinuing venture")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to discontinue venture"
-        )
+    """Legacy retirement is held behind the governed action workflow."""
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Direct venture retirement is disabled; submit a governed R4 action.",
+    )
 
 @router.post("/{venture_id}/launch", response_model=VentureResponse)
 async def launch_venture(
@@ -272,44 +172,8 @@ async def launch_venture(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Launch a venture (move from ideation to MVP)"""
-    venture = db.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
-    
-    if not venture:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Venture not found"
-        )
-    
-    if venture.status != VentureStatus.IDEATION:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Venture must be in ideation status to launch"
-        )
-    
-    try:
-        venture.status = VentureStatus.MVP
-        venture.launched_at = datetime.utcnow()
-        venture.automation_level = 0.3  # Increase automation on launch
-        
-        db.commit()
-        db.refresh(venture)
-        
-        logger.info("Venture launched",
-                   venture_id=venture_id,
-                   launched_by=current_user.get("user_id"))
-        
-        return venture
-        
-    except SQLAlchemyError as e:
-        logger.error("Failed to launch venture", venture_id=venture_id, error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error"
-        )
-    except Exception:
-        logger.exception("Unexpected error launching venture")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to launch venture"
-        )
+    """Legacy launch is held behind the governed action workflow."""
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Direct venture launch is disabled; readiness evidence and human authority are required.",
+    )

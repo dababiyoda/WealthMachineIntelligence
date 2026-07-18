@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
-from ...database.connection import get_db, db
+from ...database.connection import session_dependency as get_db, db
 from ..auth import get_current_user
 
 

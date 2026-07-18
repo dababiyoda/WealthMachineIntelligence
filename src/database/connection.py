@@ -1,6 +1,8 @@
 """
-Database connection management with production-grade features
-Includes connection pooling, retry logic, and monitoring
+Database connection management for the governed preview.
+
+This module provides bounded pooling, health checks, and logging. It does not
+establish production database maturity, migrations, backup, or recovery.
 """
 import os
 from contextlib import contextmanager
@@ -21,9 +23,11 @@ class DatabaseConnection:
     """Database connection manager for the current simulation skeleton."""
     
     def __init__(self):
-        self.database_url = os.getenv('DATABASE_URL')
-        if not self.database_url:
-            raise ValueError("DATABASE_URL environment variable not set")
+        self.database_url = os.getenv("DATABASE_URL")
+        environment = os.getenv("ENVIRONMENT", "development").lower()
+        if not self.database_url and environment == "production":
+            raise ValueError("DATABASE_URL environment variable is required in production")
+        self.database_url = self.database_url or "sqlite:///./uat-preview.db"
         
         engine_kwargs = {
             "echo": False,
@@ -65,8 +69,8 @@ class DatabaseConnection:
         
         logger.info(
             "Database connection initialized",
-            database_url=self.database_url,
-            pool_strategy="static" if self.database_url.startswith("sqlite") else "production",
+            database_url=self.engine.url.render_as_string(hide_password=True),
+            pool_strategy="static" if self.database_url.startswith("sqlite") else "pooled",
         )
     
     def _setup_event_listeners(self):
@@ -96,8 +100,7 @@ class DatabaseConnection:
             if isinstance(exception_context.original_exception, DBAPIError):
                 logger.error("Database error occurred",
                            error=str(exception_context.original_exception),
-                           statement=str(exception_context.statement),
-                           parameters=str(exception_context.parameters))
+                           statement=str(exception_context.statement))
     
     @contextmanager
     def get_session(self) -> Generator[Session, None, None]:
@@ -123,6 +126,9 @@ class DatabaseConnection:
     def create_tables(self):
         """Create all tables in the database"""
         from .models import Base
+        # Import the governed-preview tables before creating metadata.
+        from src.governance import models as _governance_models  # noqa: F401
+
         Base.metadata.create_all(bind=self.engine)
         logger.info("Database tables created successfully")
     
@@ -158,3 +164,13 @@ db = DatabaseConnection()
 
 # Convenience function for getting sessions
 get_db = db.get_session
+
+
+def session_dependency() -> Generator[Session, None, None]:
+    """FastAPI-compatible yielding dependency.
+
+    ``get_db`` remains a context manager for scripts and legacy services.
+    """
+
+    with db.get_session() as session:
+        yield session

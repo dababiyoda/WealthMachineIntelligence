@@ -153,7 +153,7 @@ class PerformanceMetric(Base):
     conversion_rate = Column(Float, default=0.0)
     
     # Operational metrics
-    uptime = Column(Float, default=99.9)  # Percentage
+    uptime = Column(Float, default=0.0)  # Unverified until source-bound measurement exists
     response_time = Column(Float)  # Milliseconds
     error_rate = Column(Float, default=0.0)
     
@@ -169,7 +169,7 @@ class PerformanceMetric(Base):
     )
 
 class RiskAssessment(Base):
-    """AI-driven risk assessments with history tracking"""
+    """Legacy heuristic risk records with history tracking."""
     __tablename__ = 'risk_assessments'
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -211,7 +211,7 @@ class RiskAssessment(Base):
     )
 
 class AIDecision(Base):
-    """Track all AI-driven decisions for audit and learning"""
+    """Track legacy simulation recommendations for audit and learning."""
     __tablename__ = 'ai_decisions'
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))

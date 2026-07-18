@@ -4,16 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#FFFFFF">
-    <title>WealthMachine - Smart Digital Ventures</title>
+    <title>UAT Governed Preview</title>
     <link rel="stylesheet" href="/static/styles.css">
-    
-    <!-- Google Fonts - SF Pro Display alternative -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
 <body>
     <div class="app">
@@ -24,10 +16,17 @@
                     <div class="brand-icon">
                         <span class="material-icons-round">trending_up</span>
                     </div>
-                    <h1 class="brand-name">WealthMachine</h1>
+                    <h1 class="brand-name">UAT Governed Preview</h1>
                 </div>
                 
                 <div class="navbar-actions">
+                    <form id="loginForm" class="login-form" autocomplete="on">
+                        <input id="loginUsername" name="username" type="text" autocomplete="username" placeholder="Operator" required>
+                        <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Password" required>
+                        <button type="submit" class="compact-button">Sign in</button>
+                    </form>
+                    <span id="authStatus" class="auth-status">Sign in to load authoritative local records</span>
+                    <button type="button" class="compact-button hidden" id="logoutButton">Sign out</button>
                     <button class="icon-button" id="themeToggle" aria-label="Toggle theme">
                         <span class="material-icons-round">dark_mode</span>
                     </button>
@@ -35,9 +34,7 @@
                         <span class="material-icons-round">notifications</span>
                         <span class="notification-dot"></span>
                     </button>
-                    <button class="avatar-button">
-                        <img src="https://ui-avatars.com/api/?name=User&background=6366F1&color=fff&bold=true" alt="User avatar">
-                    </button>
+                    <span class="avatar-button" aria-label="Governed operator console">UAT</span>
                 </div>
             </div>
         </nav>
@@ -45,7 +42,7 @@
         <section class="truth-boundary-banner" role="status" aria-live="polite">
             <div>
                 <strong id="operatingMode">Simulation mode — evidence not verified</strong>
-                <span id="capabilityStage">AG0 candidate pending independent review</span>
+                <span id="capabilityStage">Governed preview release candidate</span>
             </div>
             <p>No wealth, success, risk, compliance, or autonomy claim is established by this interface. External action authority: none.</p>
         </section>
@@ -64,6 +61,10 @@
                 <button class="tab-item" data-tab="agents">
                     <span class="tab-icon">🤖</span>
                     <span class="tab-text">AI Agents</span>
+                </button>
+                <button class="tab-item" data-tab="governance">
+                    <span class="tab-icon">🔐</span>
+                    <span class="tab-text">Governance</span>
                 </button>
                 <button class="tab-item" data-tab="opportunity">
                     <span class="tab-icon">🎯</span>
@@ -123,7 +124,7 @@
                                 </div>
                                 <div class="stat-content">
                                     <h3 class="stat-value" id="monthlyRevenue">$0</h3>
-                                    <p class="stat-label">Monthly Revenue</p>
+                                    <p class="stat-label">Recorded Revenue — Unverified</p>
                                 </div>
                             </div>
                             
@@ -137,6 +138,42 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Governance Tab -->
+            <div class="tab-content" id="governance">
+                <section class="container governance-section">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Control and Evidence Plane</h2>
+                            <p class="section-subtitle">Deterministic authorization records; external execution remains human-only</p>
+                        </div>
+                        <div class="status-badge active">Deny by default</div>
+                    </div>
+                    <div class="stats-grid governance-grid">
+                        <article class="stat-card">
+                            <div class="stat-content"><p class="stat-label">Control plane</p><h3 class="governance-value" id="governanceControlStage">Not loaded</h3></div>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-content"><p class="stat-label">Evidence plane</p><h3 class="governance-value" id="governanceEvidenceStage">Not loaded</h3></div>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-content"><p class="stat-label">Recorded actions</p><h3 class="stat-value" id="governanceActions">0</h3></div>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-content"><p class="stat-label">Pending approvals</p><h3 class="stat-value" id="governanceApprovals">0</h3></div>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-content"><p class="stat-label">Active kill switches</p><h3 class="stat-value" id="governanceKills">0</h3></div>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-content"><p class="stat-label">Audit hash chain</p><h3 class="governance-value" id="governanceAudit">Not loaded</h3></div>
+                        </article>
+                    </div>
+                    <div class="recommendation-card governance-notice">
+                        <p><strong>Authority boundary:</strong> this preview records claims, evidence, contracts, grants, budgets, approvals, policy decisions, kill switches, human executions, and independent verification. It has no tool gateway and cannot perform external actions autonomously.</p>
                     </div>
                 </section>
             </div>
@@ -192,7 +229,7 @@
                             <h2 class="section-title">Opportunity Hypotheses</h2>
                             <p class="section-subtitle">Unverified ideas awaiting source-bound problem and buyer evidence</p>
                         </div>
-                        <button class="primary-button" id="runOpportunityAnalysis">
+                        <button class="primary-button" id="runOpportunityAnalysis" type="button" disabled title="Not connected in the governed preview">
                             <span class="material-icons-round">analytics</span>
                             Run Simulation
                         </button>
@@ -329,7 +366,7 @@
                             <h2 class="section-title">Market Intelligence</h2>
                             <p class="section-subtitle">Hypothesis sandbox; no trained or validated forecast is connected</p>
                         </div>
-                        <button class="primary-button" id="refreshMarketData">
+                        <button class="primary-button" id="refreshMarketData" type="button" disabled title="No verified market-data source is connected">
                             <span class="material-icons-round">refresh</span>
                             Refresh Data
                         </button>
@@ -486,7 +523,7 @@
                             <h2 class="section-title">Automation Engine</h2>
                             <p class="section-subtitle">Illustrative rules only; no production tool gateway is connected</p>
                         </div>
-                        <button class="primary-button" id="createAutomation">
+                        <button class="primary-button" id="createAutomation" type="button" disabled title="No production tool gateway is connected">
                             <span class="material-icons-round">add_task</span>
                             Create Rule
                         </button>
@@ -521,7 +558,7 @@
                                     </div>
                                     <div class="rule-controls">
                                         <div class="rule-status active">Draft</div>
-                                        <button class="icon-button">
+                                        <button class="icon-button" type="button" disabled title="Illustrative rule only">
                                             <span class="material-icons-round">edit</span>
                                         </button>
                                     </div>
@@ -534,7 +571,7 @@
                                     </div>
                                     <div class="rule-controls">
                                         <div class="rule-status active">Draft</div>
-                                        <button class="icon-button">
+                                        <button class="icon-button" type="button" disabled title="Illustrative rule only">
                                             <span class="material-icons-round">edit</span>
                                         </button>
                                     </div>
@@ -547,7 +584,7 @@
                                     </div>
                                     <div class="rule-controls">
                                         <div class="rule-status active">Draft</div>
-                                        <button class="icon-button">
+                                        <button class="icon-button" type="button" disabled title="Illustrative rule only">
                                             <span class="material-icons-round">edit</span>
                                         </button>
                                     </div>

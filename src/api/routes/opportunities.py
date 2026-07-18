@@ -13,6 +13,7 @@ while allowing a shared secret in deployment.
 
 from __future__ import annotations
 
+import hmac
 import os
 from typing import Any, Dict
 
@@ -26,8 +27,14 @@ router = APIRouter()
 def _check_token(authorization: str | None) -> None:
     expected = os.getenv("WEALTHMACHINE_INTAKE_TOKEN", "")
     if not expected:
+        if os.getenv("ENVIRONMENT", "development").lower() == "production":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Opportunity intake is disabled until its token is configured",
+            )
         return
-    if authorization != f"Bearer {expected}":
+    supplied = authorization or ""
+    if not hmac.compare_digest(supplied, f"Bearer {expected}"):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid intake token",
@@ -41,7 +48,7 @@ async def _evaluate(payload: Dict[str, Any], authorization: str | None) -> Dict[
     except ValueError as exc:
         # Contract violation in the inbound packet — untrusted input.
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+            status_code=422, detail=str(exc)
         )
 
 
