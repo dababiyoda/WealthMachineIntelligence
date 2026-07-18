@@ -25,7 +25,9 @@ compliance, or a real-world venture failure rate.
 - [ ] Inventory every consequential runtime and administrative side-effect path.
 - [ ] Make gateway mediation and downstream policy unavoidable.
 - [ ] Remove direct consequential credentials and unrestricted egress from agent runtimes.
-- [ ] Persist control state and idempotency transactionally.
+- [x] Persist control state and idempotency transactionally in the local SQLite
+  reference store; production still requires replication, backups, fencing, and
+  downstream reconciliation.
 - [ ] Anchor the Evidence Ledger outside the writer's trust domain.
 - [x] Disable startup schema creation by default and forbid it in production.
 - [ ] Add controlled migrations under a separate reviewed deployment identity.

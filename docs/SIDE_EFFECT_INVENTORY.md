@@ -21,6 +21,7 @@ or network routes.
 | `api/routes/opportunities.py` | Evaluate and retain in-memory assessment objects. | R0/R1 | Explicitly recommendation-only. | Add durable evidence provenance; never convert an assessment directly into an execution grant. |
 | `auth/keycloak.py` | Fetch JWKS for token verification. | R0 external read | Direct network read. | Pin issuer/audience, cache safely, and allowlist egress; no venture capability needed. |
 | `control/evidence.py` | Append control evidence to JSONL. | Trusted control write | Inside control plane. | Move to transactional, independently anchored storage with separate auditor access. |
+| `control/state_store.py` | Persist policy snapshots and gateway action lifecycle in SQLite. | Trusted control write | Integrity-hashed, schema-versioned, transactional local store with fail-closed in-flight recovery. | Move to a replicated production store; add backups, writer fencing, external anchoring, and downstream reconciliation. |
 
 ## Administrative paths
 

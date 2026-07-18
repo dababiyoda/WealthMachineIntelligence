@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import threading
 from dataclasses import replace
-from typing import Any, Callable, Mapping, Optional
+from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional
 
 from .execution_context import activate_authorized_execution
 from .models import (
@@ -19,6 +19,14 @@ from .models import (
     digest,
 )
 from .policy_engine import PolicyEngine
+from .state_store import (
+    StateIntegrityError,
+    deserialize_gateway_result,
+    serialize_gateway_result,
+)
+
+if TYPE_CHECKING:
+    from .state_store import SQLiteControlStateStore
 
 
 Executor = Callable[[ActionIntent], Any]
@@ -27,9 +35,14 @@ Executor = Callable[[ActionIntent], Any]
 class ExecutionGateway:
     """Authorize, execute once, and produce a tamper-evident receipt."""
 
-    def __init__(self, policy_engine: PolicyEngine) -> None:
+    def __init__(
+        self,
+        policy_engine: PolicyEngine,
+        state_store: Optional["SQLiteControlStateStore"] = None,
+    ) -> None:
         self.policy_engine = policy_engine
         self.ledger = policy_engine.ledger
+        self.state_store = state_store or policy_engine.state_store
         self._executors: dict[str, Executor] = {}
         self._fingerprints: dict[str, str] = {}
         self._completed: dict[str, tuple[str, GatewayResult]] = {}
@@ -47,26 +60,37 @@ class ExecutionGateway:
 
         with self._lock:
             fingerprint = intent.fingerprint()
+            if self.state_store is not None:
+                stored = self.state_store.reserve_action(
+                    intent.action_id,
+                    fingerprint,
+                )
+                if stored.fingerprint != fingerprint:
+                    return self._deny_idempotency(
+                        intent,
+                        fingerprint,
+                        "idempotency_key_conflict",
+                    )
+                if stored.lifecycle == "completed":
+                    return self._recover_completed(
+                        intent,
+                        fingerprint,
+                        stored.result_payload,
+                    )
+                if stored.lifecycle == "inflight":
+                    return self._deny_idempotency(
+                        intent,
+                        fingerprint,
+                        "reconciliation_required_for_inflight_action",
+                    )
+
             seen_fingerprint = self._fingerprints.get(intent.action_id)
             if seen_fingerprint is not None and seen_fingerprint != fingerprint:
-                conflict = PolicyDecision(
-                    action_id=intent.action_id,
-                    action_type=intent.action_type,
-                    disposition=PolicyDisposition.DENY,
-                    reason_codes=("idempotency_key_conflict",),
-                    policy_version=self.policy_engine.policy_version,
+                return self._deny_idempotency(
+                    intent,
+                    fingerprint,
+                    "idempotency_key_conflict",
                 )
-                self.ledger.append(
-                    "gateway_denied",
-                    "execution-gateway",
-                    {
-                        "reason": "idempotency_key_conflict",
-                        "intent_fingerprint": fingerprint,
-                    },
-                    cell_id=intent.cell_id,
-                    action_id=intent.action_id,
-                )
-                return GatewayResult(decision=conflict)
 
             previous = self._completed.get(intent.action_id)
             if previous:
@@ -120,6 +144,25 @@ class ExecutionGateway:
                 # after trusted bootstrap installs one.
                 return GatewayResult(decision=denied)
 
+            if self.state_store is not None:
+                claimed = self.state_store.mark_inflight(
+                    intent.action_id,
+                    fingerprint,
+                )
+                if not claimed:
+                    current = self.state_store.load_action(intent.action_id)
+                    if current is not None and current.lifecycle == "completed":
+                        return self._recover_completed(
+                            intent,
+                            fingerprint,
+                            current.result_payload,
+                        )
+                    return self._deny_idempotency(
+                        intent,
+                        fingerprint,
+                        "reconciliation_required_for_inflight_action",
+                    )
+
             try:
                 with activate_authorized_execution(intent, decision):
                     adapter_result = executor(intent)
@@ -159,6 +202,12 @@ class ExecutionGateway:
                     )
                 )
                 result = GatewayResult(decision=decision, receipt=receipt)
+                if self.state_store is not None:
+                    self.state_store.complete_action(
+                        intent.action_id,
+                        fingerprint,
+                        serialize_gateway_result(result),
+                    )
                 self._completed[intent.action_id] = (fingerprint, result)
                 return result
 
@@ -189,8 +238,78 @@ class ExecutionGateway:
                 receipt=receipt,
                 result=adapter_result,
             )
+            if self.state_store is not None:
+                self.state_store.complete_action(
+                    intent.action_id,
+                    fingerprint,
+                    serialize_gateway_result(result),
+                )
             self._completed[intent.action_id] = (fingerprint, result)
             return result
+
+    def _deny_idempotency(
+        self,
+        intent: ActionIntent,
+        fingerprint: str,
+        reason: str,
+    ) -> GatewayResult:
+        definition = self.policy_engine.action_definitions.get(intent.action_type)
+        denied = PolicyDecision(
+            action_id=intent.action_id,
+            action_type=intent.action_type,
+            disposition=PolicyDisposition.DENY,
+            reason_codes=(reason,),
+            policy_version=self.policy_engine.policy_version,
+            risk_tier=definition.risk_tier if definition is not None else None,
+        )
+        self.ledger.append(
+            "gateway_denied",
+            "execution-gateway",
+            {
+                "reason": reason,
+                "intent_fingerprint": fingerprint,
+            },
+            cell_id=intent.cell_id,
+            action_id=intent.action_id,
+        )
+        return GatewayResult(decision=denied)
+
+    def _recover_completed(
+        self,
+        intent: ActionIntent,
+        fingerprint: str,
+        payload: Mapping[str, Any] | None,
+    ) -> GatewayResult:
+        if payload is None:
+            raise StateIntegrityError("completed gateway action has no result")
+        try:
+            recovered = deserialize_gateway_result(payload)
+        except (KeyError, TypeError, ValueError) as exc:
+            raise StateIntegrityError("stored gateway result is malformed") from exc
+        receipt = recovered.receipt
+        if (
+            recovered.decision.action_id != intent.action_id
+            or recovered.decision.action_type != intent.action_type
+            or (receipt is not None and receipt.action_id != intent.action_id)
+            or (
+                receipt is not None
+                and receipt.intent_fingerprint != fingerprint
+            )
+        ):
+            raise StateIntegrityError("stored gateway result does not match action")
+        self._fingerprints[intent.action_id] = fingerprint
+        self._completed[intent.action_id] = (fingerprint, recovered)
+        self.ledger.append(
+            "gateway_replay_returned",
+            "execution-gateway",
+            {
+                "intent_fingerprint": fingerprint,
+                "receipt_status": receipt.status if receipt is not None else None,
+            },
+            cell_id=intent.cell_id,
+            action_id=intent.action_id,
+        )
+        return recovered
 
     @staticmethod
     def _external_reference(result: Any) -> Optional[str]:

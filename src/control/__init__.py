@@ -35,6 +35,7 @@ from .promotion import (
     minimum_zero_failure_trials,
     one_sided_failure_upper_bound,
 )
+from .state_store import SQLiteControlStateStore, StateIntegrityError
 
 __all__ = [
     "ActionDefinition",
@@ -65,6 +66,8 @@ __all__ = [
     "PromotionEvaluator",
     "PromotionEvidence",
     "RiskTier",
+    "SQLiteControlStateStore",
+    "StateIntegrityError",
     "VentureCellCharter",
     "build_default_control_plane",
     "minimum_zero_failure_trials",

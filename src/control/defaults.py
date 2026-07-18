@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 from .evidence import EvidenceLedger
 from .gateway import ExecutionGateway
 from .models import ActionDefinition, AutonomyStage, RiskTier
-from .policy_engine import PolicyEngine
+from .policy_engine import PolicyConfigurationError, PolicyEngine
 from .promotion import PromotionCriteria
+
+if TYPE_CHECKING:
+    from .state_store import SQLiteControlStateStore
 
 
 DEFAULT_ACTIONS = (
@@ -151,23 +154,41 @@ def build_default_control_plane(
     human_authorities: Iterable[str] = (),
     evidence_ledger: EvidenceLedger | None = None,
     policy_version: str = "v1",
+    state_store: "SQLiteControlStateStore" | None = None,
 ) -> tuple[PolicyEngine, ExecutionGateway]:
     engine = PolicyEngine(
         root_authorities={root_actor_id},
         human_authorities=set(human_authorities),
         evidence_ledger=evidence_ledger,
         policy_version=policy_version,
+        state_store=state_store,
     )
     for definition in DEFAULT_ACTIONS:
-        engine.register_action_definition(root_actor_id, definition)
+        existing_definition = engine.action_definitions.get(definition.action_type)
+        if existing_definition is None:
+            engine.register_action_definition(root_actor_id, definition)
+        elif existing_definition != definition:
+            raise PolicyConfigurationError(
+                f"stored action definition conflicts with default: {definition.action_type}"
+            )
         for target_stage, criteria in PROMOTION_LADDER.items():
-            engine.set_promotion_criteria(
-                root_actor_id,
+            existing_criteria = engine.get_promotion_criteria(
                 definition.action_type,
                 target_stage,
-                criteria,
             )
-    return engine, ExecutionGateway(engine)
+            if existing_criteria is None:
+                engine.set_promotion_criteria(
+                    root_actor_id,
+                    definition.action_type,
+                    target_stage,
+                    criteria,
+                )
+            elif existing_criteria != criteria:
+                raise PolicyConfigurationError(
+                    "stored promotion criteria conflict with defaults: "
+                    f"{definition.action_type}/{target_stage.name}"
+                )
+    return engine, ExecutionGateway(engine, state_store=state_store)
 
 
 __all__ = [

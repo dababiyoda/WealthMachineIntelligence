@@ -42,10 +42,17 @@ gateway-mediated. Venture and agent CRUD are explicitly human-admin operations,
 anonymous requests no longer default to admin, demo authentication requires an
 opt-in outside production, and schema auto-creation is forbidden in production.
 
-The implementation is not yet production-enforced. Identities are strings,
-state is primarily in memory, the ledger is not externally anchored, and the
-deployment does not yet prove that direct credentials and network paths are
-absent.
+The current durability slice adds an optional SQLite reference store. It
+reconstructs policy definitions, charters, capability grants, exact approvals,
+promotion criteria, cell status, and spend counters after restart. Gateway
+actions persist a reserved/in-flight/completed lifecycle: completed requests
+return their prior receipt, changed fingerprints fail, and unresolved in-flight
+requests require reconciliation instead of replay.
+
+The implementation is not yet production-enforced. The durable store is local
+and optional, identities are strings, the ledger is not externally anchored,
+and the deployment does not yet prove that direct credentials and network paths
+are absent.
 
 ## GPS lock
 
@@ -69,7 +76,7 @@ absent.
 | Downstream systems can enforce scoped, short-lived credentials. | Python checks alone cannot stop direct calls. | Medium | Build one brokered token flow and attempt direct use from an agent runtime. | Keep cell at A0/A1 and select a different provider/system. |
 | A representative failure taxonomy can be defined. | Trial counts are meaningless without a stable failure definition. | Medium | Label 30 historical/simulated intents with independent reviewers and reconcile disagreement. | Narrow the action until outcomes are objectively classifiable. |
 | Human dual-control can meet operational latency. | R3 work stalls if approvers are unavailable. | Medium | Run approval drills with expiry and backup routing. | Reduce R3 frequency, create safer R2 templates, or remain human-operated. |
-| Hash-chain state can be upgraded to reconstructable durable evidence. | Promotion and incident review require trustworthy history. | High | Persist and reconstruct one full action lifecycle from a transactional store. | Block production canary. |
+| Local control state can be upgraded to production-grade reconstructable evidence. | Promotion and incident review require trustworthy history across hosts and trust domains. | Medium | Run restore, tamper, in-flight reconciliation, and backup drills against the selected shared store; externally anchor ledger heads. | Block production canary. |
 
 ## P — Minimum sufficient stage gates
 
@@ -89,8 +96,10 @@ absent.
 
 **Status:** In progress. Known `KnowledgeGraphConnector` and AI-service writes
 are mediated or proposal-only. Human CRUD is segregated behind explicit admin
-authentication and tamper-evident audit. Transactional control state, durable
-audit/outbox, workload identity, credentials, and deployment egress remain open.
+authentication and tamper-evident audit. Local transactional control state and
+fail-closed restart recovery are implemented. Shared/replicated durability,
+durable admin audit/outbox, workload identity, credentials, and deployment
+egress remain open.
 
 - Inventory every database write, message, payment, contract/signature path,
   cloud mutation, queue, webhook, and external API.
@@ -99,8 +108,9 @@ audit/outbox, workload identity, credentials, and deployment egress remain open.
   runtimes.
 - Enforce network egress and downstream resource policy so only the gateway can
   act.
-- Persist charters, grants, approvals, counters, idempotency, and receipts in a
-  transactional store.
+- Move the tested local policy/idempotency schema to a shared or replicated
+  transactional store; add backup restore, writer fencing, and downstream
+  reconciliation drills.
 - Anchor ledger hashes outside the writer's trust domain.
 - Exercise pause/kill and downstream credential revocation.
 
