@@ -41,16 +41,17 @@ Start with:
 
 1. [`docs/AUTONOMY_ARCHITECTURE_DECISION.md`](docs/AUTONOMY_ARCHITECTURE_DECISION.md)
 2. [`docs/CONSTITUTIONAL_CONTROL_LAYER.md`](docs/CONSTITUTIONAL_CONTROL_LAYER.md)
-3. [`docs/PROGRESSIVE_AUTONOMY_LEVELS.md`](docs/PROGRESSIVE_AUTONOMY_LEVELS.md)
-4. [`docs/VENTURE_CELL_CHARTER_TEMPLATE.md`](docs/VENTURE_CELL_CHARTER_TEMPLATE.md)
-5. [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
-6. [`docs/SIDE_EFFECT_INVENTORY.md`](docs/SIDE_EFFECT_INVENTORY.md)
+3. [`docs/CONTROL_API.md`](docs/CONTROL_API.md)
+4. [`docs/PROGRESSIVE_AUTONOMY_LEVELS.md`](docs/PROGRESSIVE_AUTONOMY_LEVELS.md)
+5. [`docs/VENTURE_CELL_CHARTER_TEMPLATE.md`](docs/VENTURE_CELL_CHARTER_TEMPLATE.md)
+6. [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
+7. [`docs/SIDE_EFFECT_INVENTORY.md`](docs/SIDE_EFFECT_INVENTORY.md)
 
 The current control plane is a tested foundation, not a production compliance
 claim. Production release still requires authenticated workload identities,
-durable transactional state, independently anchored evidence, credential
-brokering, egress enforcement, and a verified inventory of all side-effect
-paths.
+shared/replicated transactional state, independently anchored evidence,
+credential brokering, egress enforcement, and a verified inventory of all
+side-effect paths.
 
 Authentication also fails closed by default: anonymous requests do not become
 admins, demo identities require `ALLOW_DEMO_AUTH=true` outside production, and
@@ -59,6 +60,16 @@ issuer/audience values. JWT verification binds the signature, algorithm,
 expiry, subject, issuer, audience, role, and permission shape. Application-time
 schema creation is disabled unless `AUTO_CREATE_SCHEMA=true` in a non-production
 environment; production migrations must use a separate operator identity.
+
+The versioned API mounts human control operations under `/api/v1/control`.
+Verified JWT subjects must also appear in the independently configured root or
+human authority set and carry the exact `control:read`, `control:root`,
+`control:approve`, or `control:incident` permission. New grants can enter only
+`SIMULATE` or `SHADOW`; executable stages remain reachable only through
+one-stage evidence-gated promotion. The API supports durable cell/grant status,
+creation, pause/resume/termination, revocation, exact-intent approvals, and
+authority-reducing incident reports. See `.env.example` for the explicit
+authority, state, ledger, and TTL settings.
 
 ## Directory Structure
 

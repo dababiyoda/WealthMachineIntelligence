@@ -12,6 +12,7 @@ from src.control import (
     ActionIntent,
     AutonomyStage,
     CapabilityGrant,
+    PromotionEvidence,
     VentureCellCharter,
     build_default_control_plane,
 )
@@ -52,20 +53,37 @@ def _plane(cell_id: str):
 
 
 def _grant(policy, cell_id: str, action_type: str, agent_id: str) -> None:
-    policy.issue_grant(
+    grant = policy.issue_grant(
         ROOT,
         CapabilityGrant(
             grant_id=f"grant:{cell_id}:{action_type}:{agent_id}",
             cell_id=cell_id,
             agent_id=agent_id,
             action_type=action_type,
-            stage=AutonomyStage.SUPERVISED_CANARY,
+            stage=AutonomyStage.SHADOW,
             resource_prefixes=(f"venture:{cell_id}",),
             expires_at=utc_now() + timedelta(hours=1),
             context_fingerprint=CONTEXT,
             allowed_data_classes=frozenset({"internal"}),
         ),
     )
+    promotion = policy.promote_grant(
+        ROOT,
+        grant.grant_id,
+        PromotionEvidence(
+            trials=29,
+            failures=0,
+            observation_days=7,
+            audit_completeness=1.0,
+            rollback_drills=1,
+            policy_violations=0,
+            critical_incidents=0,
+            red_team_critical_findings=0,
+            context_fingerprint=CONTEXT,
+        ),
+        independent_review_id=f"test-review:{grant.grant_id}",
+    )
+    assert promotion.passed
 
 
 def test_direct_connector_mutation_fails_before_state_change() -> None:

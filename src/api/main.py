@@ -11,8 +11,9 @@ import os
 from contextlib import asynccontextmanager
 
 from ..database.connection import db
-from .routes import ventures, agents, analytics, health, opportunities
+from .routes import agents, analytics, control, health, opportunities, ventures
 from .auth import validate_auth_configuration, verify_token
+from .control_runtime import initialize_production_control_plane
 from .middleware import SecurityHeadersMiddleware, LoggingMiddleware
 
 
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting WealthMachine controlled-pilot API")
     validate_auth_configuration()
+    initialize_production_control_plane()
 
     environment = os.getenv("ENVIRONMENT", "development").lower()
     auto_create_schema = os.getenv("AUTO_CREATE_SCHEMA", "false").lower() == "true"
@@ -162,6 +164,7 @@ app.include_router(ventures.router, prefix="/api/v1/ventures", tags=["ventures"]
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
 app.include_router(health.router, prefix="/api/v1/system", tags=["system"])
+app.include_router(control.router, prefix="/api/v1/control", tags=["control"])
 # DALEOBANKS bridge: OpportunityPacket in, VentureAssessment back.
 app.include_router(opportunities.router, prefix="/api", tags=["opportunities"])
 

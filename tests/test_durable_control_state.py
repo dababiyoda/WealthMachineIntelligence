@@ -73,14 +73,14 @@ def _provision(
             kill_conditions=("critical incident", "state integrity failure"),
         ),
     )
-    policy.issue_grant(
+    grant = policy.issue_grant(
         ROOT,
         CapabilityGrant(
             grant_id="durable-grant",
             cell_id=CELL_ID,
             agent_id=AGENT_ID,
             action_type=action_type,
-            stage=stage,
+            stage=min(stage, AutonomyStage.SHADOW),
             resource_prefixes=(f"venture:{CELL_ID}",),
             expires_at=utc_now() + timedelta(days=1),
             context_fingerprint=CONTEXT,
@@ -91,6 +91,35 @@ def _provision(
             max_total_spend_usd=max_total,
         ),
     )
+    proof_by_stage = {
+        AutonomyStage.SUPERVISED_CANARY: (29, 7, 1),
+        AutonomyStage.BOUNDED: (99, 14, 2),
+        AutonomyStage.SCALED_BOUNDED: (299, 30, 3),
+    }
+    while grant.stage < stage:
+        next_stage = AutonomyStage(grant.stage + 1)
+        trials, observation_days, rollback_drills = proof_by_stage[next_stage]
+        evaluation = policy.promote_grant(
+            ROOT,
+            grant.grant_id,
+            PromotionEvidence(
+                trials=trials,
+                failures=0,
+                observation_days=observation_days,
+                audit_completeness=1.0,
+                rollback_drills=rollback_drills,
+                policy_violations=0,
+                critical_incidents=0,
+                red_team_critical_findings=0,
+                context_fingerprint=CONTEXT,
+            ),
+            independent_review_id=(
+                f"test-review:{grant.grant_id}:{next_stage.name}"
+            ),
+        )
+        assert evaluation.passed
+        grant = policy.get_grant(grant.grant_id)
+        assert grant is not None
     return store, policy, gateway
 
 
