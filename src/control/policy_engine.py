@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import math
 import threading
-from dataclasses import replace
-from datetime import datetime
-from decimal import Decimal
 from collections.abc import Mapping
-from typing import Iterable, Optional
+from dataclasses import replace
+from datetime import date, datetime
+from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Iterable, Optional
 
 from .evidence import EvidenceLedger
 from .models import (
@@ -32,6 +33,9 @@ from .promotion import (
     PromotionEvidence,
 )
 
+if TYPE_CHECKING:
+    from .state_store import SQLiteControlStateStore
+
 
 class PolicyConfigurationError(ValueError):
     """Raised when a trusted authority attempts to install invalid policy."""
@@ -51,6 +55,7 @@ class PolicyEngine:
         human_authorities: Iterable[str],
         evidence_ledger: Optional[EvidenceLedger] = None,
         policy_version: str = "v1",
+        state_store: Optional["SQLiteControlStateStore"] = None,
     ) -> None:
         self.root_authorities = frozenset(root_authorities)
         self.human_authorities = frozenset(human_authorities) | self.root_authorities
@@ -58,6 +63,7 @@ class PolicyEngine:
             raise PolicyConfigurationError("at least one root authority is required")
         self.policy_version = policy_version
         self.ledger = evidence_ledger or EvidenceLedger()
+        self.state_store = state_store
         self._action_definitions: dict[str, ActionDefinition] = {}
         self._cells: dict[str, VentureCellCharter] = {}
         self._grants: dict[str, CapabilityGrant] = {}
@@ -71,6 +77,12 @@ class PolicyEngine:
         self._cell_total_spend: dict[str, Decimal] = {}
         self._promotion_evaluator = PromotionEvaluator()
         self._lock = threading.RLock()
+        self._persistence_healthy = True
+        self._evidence_continuity = True
+        if self.state_store is not None:
+            stored_state = self.state_store.load_policy_state()
+            if stored_state is not None:
+                self._restore_state(stored_state)
 
     @property
     def action_definitions(self) -> dict[str, ActionDefinition]:
@@ -81,6 +93,368 @@ class PolicyEngine:
 
     def get_grant(self, grant_id: str) -> Optional[CapabilityGrant]:
         return self._grants.get(grant_id)
+
+    def get_promotion_criteria(
+        self,
+        action_type: str,
+        target_stage: AutonomyStage,
+    ) -> Optional[PromotionCriteria]:
+        return self._promotion_criteria.get((action_type, target_stage))
+
+    def export_state(self) -> Mapping[str, Any]:
+        """Return the complete authorization state in a reconstructable form."""
+
+        with self._lock:
+            ledger_entries = self.ledger.entries
+            ledger_anchor = (
+                {
+                    "sequence": ledger_entries[-1].sequence,
+                    "entry_hash": ledger_entries[-1].entry_hash,
+                }
+                if ledger_entries
+                else {"sequence": 0, "entry_hash": "0" * 64}
+            )
+            return {
+                "schema_version": 1,
+                "policy_version": self.policy_version,
+                "root_authorities": sorted(self.root_authorities),
+                "human_authorities": sorted(self.human_authorities),
+                "ledger_anchor": ledger_anchor,
+                "action_definitions": [
+                    {
+                        "action_type": definition.action_type,
+                        "risk_tier": int(definition.risk_tier),
+                        "minimum_stage": int(definition.minimum_stage),
+                        "required_human_approvals": (
+                            definition.required_human_approvals
+                        ),
+                        "description": definition.description,
+                    }
+                    for definition in sorted(
+                        self._action_definitions.values(),
+                        key=lambda item: item.action_type,
+                    )
+                ],
+                "cells": [
+                    {
+                        "cell_id": cell.cell_id,
+                        "mission": cell.mission,
+                        "owner_id": cell.owner_id,
+                        "allowed_geographies": sorted(cell.allowed_geographies),
+                        "allowed_data_classes": sorted(cell.allowed_data_classes),
+                        "prohibited_actions": sorted(cell.prohibited_actions),
+                        "max_daily_spend_usd": str(cell.max_daily_spend_usd),
+                        "max_total_spend_usd": str(cell.max_total_spend_usd),
+                        "kill_conditions": list(cell.kill_conditions),
+                        "policy_version": cell.policy_version,
+                        "status": cell.status.value,
+                        "created_at": cell.created_at.isoformat(),
+                    }
+                    for cell in sorted(
+                        self._cells.values(), key=lambda item: item.cell_id
+                    )
+                ],
+                "grants": [
+                    {
+                        "grant_id": grant.grant_id,
+                        "cell_id": grant.cell_id,
+                        "agent_id": grant.agent_id,
+                        "action_type": grant.action_type,
+                        "stage": int(grant.stage),
+                        "resource_prefixes": list(grant.resource_prefixes),
+                        "expires_at": grant.expires_at.isoformat(),
+                        "context_fingerprint": grant.context_fingerprint,
+                        "allowed_geographies": sorted(grant.allowed_geographies),
+                        "allowed_data_classes": sorted(grant.allowed_data_classes),
+                        "parameter_constraints": {
+                            path: list(values)
+                            for path, values in sorted(
+                                grant.parameter_constraints.items()
+                            )
+                        },
+                        "max_per_action_usd": str(grant.max_per_action_usd),
+                        "max_daily_spend_usd": str(grant.max_daily_spend_usd),
+                        "max_total_spend_usd": str(grant.max_total_spend_usd),
+                        "delegation_depth": grant.delegation_depth,
+                        "parent_grant_id": grant.parent_grant_id,
+                        "created_by": grant.created_by,
+                        "issued_at": grant.issued_at.isoformat(),
+                        "active": grant.active,
+                    }
+                    for grant in sorted(
+                        self._grants.values(), key=lambda item: item.grant_id
+                    )
+                ],
+                "approvals": [
+                    {
+                        "approval_id": approval.approval_id,
+                        "action_fingerprint": approval.action_fingerprint,
+                        "approver_id": approval.approver_id,
+                        "policy_version": approval.policy_version,
+                        "expires_at": approval.expires_at.isoformat(),
+                        "approved_at": approval.approved_at.isoformat(),
+                    }
+                    for approval in sorted(
+                        self._approvals.values(),
+                        key=lambda item: item.approval_id,
+                    )
+                ],
+                "promotion_criteria": [
+                    {
+                        "action_type": action_type,
+                        "target_stage": int(target_stage),
+                        "minimum_trials": criteria.minimum_trials,
+                        "minimum_observation_days": (
+                            criteria.minimum_observation_days
+                        ),
+                        "maximum_failure_upper_bound": (
+                            criteria.maximum_failure_upper_bound
+                        ),
+                        "minimum_audit_completeness": (
+                            criteria.minimum_audit_completeness
+                        ),
+                        "minimum_rollback_drills": (
+                            criteria.minimum_rollback_drills
+                        ),
+                        "require_red_team": criteria.require_red_team,
+                        "maximum_policy_violations": (
+                            criteria.maximum_policy_violations
+                        ),
+                        "maximum_critical_incidents": (
+                            criteria.maximum_critical_incidents
+                        ),
+                        "maximum_red_team_critical_findings": (
+                            criteria.maximum_red_team_critical_findings
+                        ),
+                    }
+                    for (action_type, target_stage), criteria in sorted(
+                        self._promotion_criteria.items(),
+                        key=lambda item: (item[0][0], int(item[0][1])),
+                    )
+                ],
+                "spend": {
+                    "grant_daily": [
+                        {
+                            "grant_id": grant_id,
+                            "day": day,
+                            "amount_usd": str(amount),
+                        }
+                        for (grant_id, day), amount in sorted(
+                            self._grant_daily_spend.items()
+                        )
+                    ],
+                    "grant_total": [
+                        {"grant_id": grant_id, "amount_usd": str(amount)}
+                        for grant_id, amount in sorted(
+                            self._grant_total_spend.items()
+                        )
+                    ],
+                    "cell_daily": [
+                        {
+                            "cell_id": cell_id,
+                            "day": day,
+                            "amount_usd": str(amount),
+                        }
+                        for (cell_id, day), amount in sorted(
+                            self._cell_daily_spend.items()
+                        )
+                    ],
+                    "cell_total": [
+                        {"cell_id": cell_id, "amount_usd": str(amount)}
+                        for cell_id, amount in sorted(
+                            self._cell_total_spend.items()
+                        )
+                    ],
+                },
+            }
+
+    def _restore_state(self, payload: Mapping[str, Any]) -> None:
+        """Reconstruct policy state only when identity and schema still match."""
+
+        if payload.get("schema_version") != 1:
+            raise PolicyConfigurationError("unsupported policy snapshot schema")
+        if payload.get("policy_version") != self.policy_version:
+            raise PolicyConfigurationError("stored policy version does not match runtime")
+        if frozenset(payload.get("root_authorities", ())) != self.root_authorities:
+            raise PolicyConfigurationError("stored root authorities do not match runtime")
+        if frozenset(payload.get("human_authorities", ())) != self.human_authorities:
+            raise PolicyConfigurationError("stored human authorities do not match runtime")
+
+        ledger_anchor = payload.get("ledger_anchor")
+        if not isinstance(ledger_anchor, Mapping):
+            raise PolicyConfigurationError("policy snapshot lacks a ledger anchor")
+        try:
+            anchor_sequence = int(ledger_anchor["sequence"])
+            anchor_hash = str(ledger_anchor["entry_hash"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise PolicyConfigurationError("invalid policy ledger anchor") from exc
+        self._evidence_continuity = self._ledger_contains_anchor(
+            anchor_sequence,
+            anchor_hash,
+        )
+
+        try:
+            definitions = {
+                item["action_type"]: ActionDefinition(
+                    action_type=item["action_type"],
+                    risk_tier=RiskTier(int(item["risk_tier"])),
+                    minimum_stage=AutonomyStage(int(item["minimum_stage"])),
+                    required_human_approvals=int(
+                        item.get("required_human_approvals", 0)
+                    ),
+                    description=item.get("description", ""),
+                )
+                for item in payload.get("action_definitions", ())
+            }
+            cells = {
+                item["cell_id"]: VentureCellCharter(
+                    cell_id=item["cell_id"],
+                    mission=item["mission"],
+                    owner_id=item["owner_id"],
+                    allowed_geographies=frozenset(
+                        item.get("allowed_geographies", ())
+                    ),
+                    allowed_data_classes=frozenset(
+                        item.get("allowed_data_classes", ())
+                    ),
+                    prohibited_actions=frozenset(
+                        item.get("prohibited_actions", ())
+                    ),
+                    max_daily_spend_usd=Decimal(item["max_daily_spend_usd"]),
+                    max_total_spend_usd=Decimal(item["max_total_spend_usd"]),
+                    kill_conditions=tuple(item.get("kill_conditions", ())),
+                    policy_version=item["policy_version"],
+                    status=CellStatus(item["status"]),
+                    created_at=self._parse_snapshot_datetime(item["created_at"]),
+                )
+                for item in payload.get("cells", ())
+            }
+            grants = {
+                item["grant_id"]: CapabilityGrant(
+                    grant_id=item["grant_id"],
+                    cell_id=item["cell_id"],
+                    agent_id=item["agent_id"],
+                    action_type=item["action_type"],
+                    stage=AutonomyStage(int(item["stage"])),
+                    resource_prefixes=tuple(item["resource_prefixes"]),
+                    expires_at=self._parse_snapshot_datetime(item["expires_at"]),
+                    context_fingerprint=item["context_fingerprint"],
+                    allowed_geographies=frozenset(
+                        item.get("allowed_geographies", ())
+                    ),
+                    allowed_data_classes=frozenset(
+                        item.get("allowed_data_classes", ())
+                    ),
+                    parameter_constraints={
+                        path: tuple(values)
+                        for path, values in item.get(
+                            "parameter_constraints", {}
+                        ).items()
+                    },
+                    max_per_action_usd=Decimal(item["max_per_action_usd"]),
+                    max_daily_spend_usd=Decimal(item["max_daily_spend_usd"]),
+                    max_total_spend_usd=Decimal(item["max_total_spend_usd"]),
+                    delegation_depth=int(item.get("delegation_depth", 0)),
+                    parent_grant_id=item.get("parent_grant_id"),
+                    created_by=item.get("created_by", ""),
+                    issued_at=self._parse_snapshot_datetime(item["issued_at"]),
+                    active=bool(item.get("active", True)),
+                )
+                for item in payload.get("grants", ())
+            }
+            approvals = {
+                item["approval_id"]: ApprovalRecord(
+                    approval_id=item["approval_id"],
+                    action_fingerprint=item["action_fingerprint"],
+                    approver_id=item["approver_id"],
+                    policy_version=item["policy_version"],
+                    expires_at=self._parse_snapshot_datetime(item["expires_at"]),
+                    approved_at=self._parse_snapshot_datetime(item["approved_at"]),
+                )
+                for item in payload.get("approvals", ())
+            }
+            criteria = {
+                (item["action_type"], AutonomyStage(int(item["target_stage"]))): (
+                    PromotionCriteria(
+                        minimum_trials=int(item["minimum_trials"]),
+                        minimum_observation_days=int(
+                            item["minimum_observation_days"]
+                        ),
+                        maximum_failure_upper_bound=float(
+                            item["maximum_failure_upper_bound"]
+                        ),
+                        minimum_audit_completeness=float(
+                            item.get("minimum_audit_completeness", 1.0)
+                        ),
+                        minimum_rollback_drills=int(
+                            item.get("minimum_rollback_drills", 1)
+                        ),
+                        require_red_team=bool(item.get("require_red_team", True)),
+                        maximum_policy_violations=int(
+                            item.get("maximum_policy_violations", 0)
+                        ),
+                        maximum_critical_incidents=int(
+                            item.get("maximum_critical_incidents", 0)
+                        ),
+                        maximum_red_team_critical_findings=int(
+                            item.get("maximum_red_team_critical_findings", 0)
+                        ),
+                    )
+                )
+                for item in payload.get("promotion_criteria", ())
+            }
+            spend = payload.get("spend", {})
+            grant_daily = {
+                (item["grant_id"], item["day"]): Decimal(item["amount_usd"])
+                for item in spend.get("grant_daily", ())
+            }
+            grant_total = {
+                item["grant_id"]: Decimal(item["amount_usd"])
+                for item in spend.get("grant_total", ())
+            }
+            cell_daily = {
+                (item["cell_id"], item["day"]): Decimal(item["amount_usd"])
+                for item in spend.get("cell_daily", ())
+            }
+            cell_total = {
+                item["cell_id"]: Decimal(item["amount_usd"])
+                for item in spend.get("cell_total", ())
+            }
+        except (KeyError, TypeError, ValueError) as exc:
+            raise PolicyConfigurationError("invalid durable policy snapshot") from exc
+
+        self._reject_duplicate_snapshot_ids(
+            payload,
+            definitions,
+            cells,
+            grants,
+            approvals,
+            criteria,
+            grant_daily,
+            grant_total,
+            cell_daily,
+            cell_total,
+        )
+        self._validate_restored_state(
+            definitions,
+            cells,
+            grants,
+            approvals,
+            criteria,
+            grant_daily,
+            grant_total,
+            cell_daily,
+            cell_total,
+        )
+        self._action_definitions = definitions
+        self._cells = cells
+        self._grants = grants
+        self._approvals = approvals
+        self._promotion_criteria = criteria
+        self._grant_daily_spend = grant_daily
+        self._grant_total_spend = grant_total
+        self._cell_daily_spend = cell_daily
+        self._cell_total_spend = cell_total
 
     def register_action_definition(
         self,
@@ -107,6 +481,7 @@ class PolicyEngine:
                     "policy_version": self.policy_version,
                 },
             )
+            self._persist_state()
 
     def set_promotion_criteria(
         self,
@@ -132,6 +507,7 @@ class PolicyEngine:
                     "policy_version": self.policy_version,
                 },
             )
+            self._persist_state()
 
     def create_cell(self, actor_id: str, charter: VentureCellCharter) -> None:
         self._require_root(actor_id)
@@ -161,6 +537,7 @@ class PolicyEngine:
                 },
                 cell_id=charter.cell_id,
             )
+            self._persist_state()
 
     def pause_cell(self, actor_id: str, cell_id: str, reason: str) -> None:
         self._require_human(actor_id)
@@ -227,6 +604,7 @@ class PolicyEngine:
                 {"grant_id": grant_id, "reason": reason},
                 cell_id=grant.cell_id,
             )
+            self._persist_state()
 
     def record_approval(self, approval: ApprovalRecord) -> None:
         self._require_human(approval.approver_id)
@@ -250,11 +628,19 @@ class PolicyEngine:
                     "policy_version": approval.policy_version,
                 },
             )
+            self._persist_state()
 
     def evaluate(self, intent: ActionIntent) -> PolicyDecision:
         """Evaluate an intent against installed policy; unknowns fail closed."""
 
         with self._lock:
+            if not self._persistence_healthy:
+                return self._decision(
+                    intent,
+                    PolicyDisposition.DENY,
+                    ("control_state_persistence_unavailable",),
+                    self._action_definitions.get(intent.action_type),
+                )
             definition = self._action_definitions.get(intent.action_type)
             if definition is None:
                 return self._decision(intent, PolicyDisposition.DENY, ("unknown_action",))
@@ -427,6 +813,7 @@ class PolicyEngine:
             self._cell_total_spend[intent.cell_id] = (
                 self._cell_total_spend.get(intent.cell_id, Decimal("0")) + amount
             )
+            self._persist_state()
 
     def promote_grant(
         self,
@@ -439,6 +826,10 @@ class PolicyEngine:
 
         self._require_root(actor_id)
         with self._lock:
+            if not self._evidence_continuity:
+                raise AuthorizationError(
+                    "durable evidence ledger continuity is required for promotion"
+                )
             grant = self._require_grant(grant_id)
             if actor_id == grant.agent_id:
                 raise AuthorizationError("agents cannot approve their own promotion")
@@ -477,6 +868,7 @@ class PolicyEngine:
             )
             if evaluation.passed:
                 self._grants[grant_id] = replace(grant, stage=target_stage)
+                self._persist_state()
             return evaluation
 
     def regress_grant(
@@ -535,6 +927,225 @@ class PolicyEngine:
                             AutonomyStage(grant.stage - 1),
                             f"automatic regression after {incident.incident_id}",
                         )
+            self._persist_state()
+
+    @staticmethod
+    def _parse_snapshot_datetime(value: str) -> datetime:
+        parsed = datetime.fromisoformat(value)
+        if parsed.tzinfo is None or parsed.utcoffset() is None:
+            raise ValueError("snapshot timestamps must be timezone-aware")
+        return parsed
+
+    def _ledger_contains_anchor(self, sequence: int, entry_hash: str) -> bool:
+        if sequence < 0 or not self.ledger.verify_chain():
+            return False
+        if sequence == 0:
+            return entry_hash == "0" * 64
+        entries = self.ledger.entries
+        if len(entries) < sequence:
+            return False
+        anchored = entries[sequence - 1]
+        return anchored.sequence == sequence and anchored.entry_hash == entry_hash
+
+    @staticmethod
+    def _reject_duplicate_snapshot_ids(
+        payload: Mapping[str, Any],
+        definitions: Mapping[str, ActionDefinition],
+        cells: Mapping[str, VentureCellCharter],
+        grants: Mapping[str, CapabilityGrant],
+        approvals: Mapping[str, ApprovalRecord],
+        criteria: Mapping[tuple[str, AutonomyStage], PromotionCriteria],
+        grant_daily: Mapping[tuple[str, str], Decimal],
+        grant_total: Mapping[str, Decimal],
+        cell_daily: Mapping[tuple[str, str], Decimal],
+        cell_total: Mapping[str, Decimal],
+    ) -> None:
+        sections = (
+            ("action_definitions", definitions),
+            ("cells", cells),
+            ("grants", grants),
+            ("approvals", approvals),
+        )
+        for section_name, decoded in sections:
+            encoded = payload.get(section_name, ())
+            if not isinstance(encoded, list) or len(encoded) != len(decoded):
+                raise PolicyConfigurationError(
+                    f"duplicate or malformed records in {section_name}"
+                )
+        promotion_records = payload.get("promotion_criteria", ())
+        if (
+            not isinstance(promotion_records, list)
+            or len(promotion_records) != len(criteria)
+        ):
+            raise PolicyConfigurationError(
+                "duplicate or malformed records in promotion_criteria"
+            )
+        spend = payload.get("spend")
+        if not isinstance(spend, Mapping):
+            raise PolicyConfigurationError("malformed spend snapshot")
+        spend_sections = (
+            ("grant_daily", grant_daily),
+            ("grant_total", grant_total),
+            ("cell_daily", cell_daily),
+            ("cell_total", cell_total),
+        )
+        for section_name, decoded in spend_sections:
+            encoded = spend.get(section_name, ())
+            if not isinstance(encoded, list) or len(encoded) != len(decoded):
+                raise PolicyConfigurationError(
+                    f"duplicate or malformed records in spend.{section_name}"
+                )
+
+    def _validate_restored_state(
+        self,
+        definitions: Mapping[str, ActionDefinition],
+        cells: Mapping[str, VentureCellCharter],
+        grants: Mapping[str, CapabilityGrant],
+        approvals: Mapping[str, ApprovalRecord],
+        criteria: Mapping[tuple[str, AutonomyStage], PromotionCriteria],
+        grant_daily: Mapping[tuple[str, str], Decimal],
+        grant_total: Mapping[str, Decimal],
+        cell_daily: Mapping[tuple[str, str], Decimal],
+        cell_total: Mapping[str, Decimal],
+    ) -> None:
+        for action_type, definition in definitions.items():
+            if not action_type or action_type != definition.action_type:
+                raise PolicyConfigurationError("invalid restored action definition")
+            if (
+                definition.risk_tier is RiskTier.MATERIAL
+                and definition.required_human_approvals < 2
+            ):
+                raise PolicyConfigurationError(
+                    "restored material action lacks dual control"
+                )
+            if (
+                definition.risk_tier is RiskTier.CONSTITUTIONAL
+                and definition.required_human_approvals
+            ):
+                raise PolicyConfigurationError(
+                    "restored constitutional action is approval-routed"
+                )
+
+        for cell_id, cell in cells.items():
+            if (
+                not cell_id
+                or cell_id != cell.cell_id
+                or not cell.mission
+                or not cell.owner_id
+                or cell.policy_version != self.policy_version
+            ):
+                raise PolicyConfigurationError("invalid restored cell charter")
+            self._validate_money(cell.max_daily_spend_usd)
+            self._validate_money(cell.max_total_spend_usd)
+            if cell.max_daily_spend_usd > cell.max_total_spend_usd:
+                raise PolicyConfigurationError("restored cell budget is inconsistent")
+
+        for grant_id, grant in grants.items():
+            cell = cells.get(grant.cell_id)
+            definition = definitions.get(grant.action_type)
+            if (
+                not grant_id
+                or grant_id != grant.grant_id
+                or cell is None
+                or definition is None
+                or definition.risk_tier is RiskTier.CONSTITUTIONAL
+                or not grant.agent_id
+                or not grant.resource_prefixes
+                or any(not prefix for prefix in grant.resource_prefixes)
+                or not grant.context_fingerprint
+            ):
+                raise PolicyConfigurationError("invalid restored capability grant")
+            if grant.expires_at.tzinfo is None or grant.expires_at.utcoffset() is None:
+                raise PolicyConfigurationError("restored grant expiry is timezone-naive")
+            if grant.delegation_depth < 0 or grant.delegation_depth > 2:
+                raise PolicyConfigurationError("restored delegation depth is invalid")
+            if (
+                definition.risk_tier >= RiskTier.MATERIAL
+                and grant.delegation_depth
+            ):
+                raise PolicyConfigurationError(
+                    "restored material authority is delegable"
+                )
+            if not grant.allowed_geographies.issubset(cell.allowed_geographies):
+                raise PolicyConfigurationError("restored grant geography is too broad")
+            if not grant.allowed_data_classes.issubset(cell.allowed_data_classes):
+                raise PolicyConfigurationError("restored grant data scope is too broad")
+            for amount in (
+                grant.max_per_action_usd,
+                grant.max_daily_spend_usd,
+                grant.max_total_spend_usd,
+            ):
+                self._validate_money(amount)
+            if (
+                grant.max_per_action_usd > grant.max_daily_spend_usd
+                or grant.max_daily_spend_usd > grant.max_total_spend_usd
+                or grant.max_daily_spend_usd > cell.max_daily_spend_usd
+                or grant.max_total_spend_usd > cell.max_total_spend_usd
+            ):
+                raise PolicyConfigurationError("restored grant budget is inconsistent")
+            if grant.parent_grant_id is not None and grant.parent_grant_id not in grants:
+                raise PolicyConfigurationError("restored parent grant is missing")
+            for path, allowed_values in grant.parameter_constraints.items():
+                if not path or not allowed_values:
+                    raise PolicyConfigurationError(
+                        "restored parameter constraint is empty"
+                    )
+                for allowed_value in allowed_values:
+                    self._validate_parameter_value(allowed_value)
+
+        for approval_id, approval in approvals.items():
+            if (
+                not approval_id
+                or approval_id != approval.approval_id
+                or not approval.action_fingerprint
+                or approval.approver_id not in self.human_authorities
+                or approval.policy_version != self.policy_version
+            ):
+                raise PolicyConfigurationError("invalid restored approval")
+
+        for (action_type, target_stage), item in criteria.items():
+            if action_type not in definitions or target_stage is AutonomyStage.SIMULATE:
+                raise PolicyConfigurationError("invalid restored promotion criteria")
+            if (
+                item.minimum_trials < 1
+                or item.minimum_observation_days < 0
+                or not 0 < item.maximum_failure_upper_bound <= 1
+                or not 0 <= item.minimum_audit_completeness <= 1
+                or item.minimum_rollback_drills < 0
+                or item.maximum_policy_violations < 0
+                or item.maximum_critical_incidents < 0
+                or item.maximum_red_team_critical_findings < 0
+            ):
+                raise PolicyConfigurationError("restored promotion criteria are invalid")
+
+        for (grant_id, day), amount in grant_daily.items():
+            if grant_id not in grants:
+                raise PolicyConfigurationError("restored grant spend has no grant")
+            date.fromisoformat(day)
+            self._validate_money(amount)
+        for grant_id, amount in grant_total.items():
+            if grant_id not in grants:
+                raise PolicyConfigurationError("restored grant total has no grant")
+            self._validate_money(amount)
+        for (cell_id, day), amount in cell_daily.items():
+            if cell_id not in cells:
+                raise PolicyConfigurationError("restored cell spend has no cell")
+            date.fromisoformat(day)
+            self._validate_money(amount)
+        for cell_id, amount in cell_total.items():
+            if cell_id not in cells:
+                raise PolicyConfigurationError("restored cell total has no cell")
+            self._validate_money(amount)
+
+    def _persist_state(self) -> None:
+        if self.state_store is None:
+            return
+        try:
+            self.state_store.save_policy_state(self.export_state())
+        except Exception:
+            self._persistence_healthy = False
+            raise
+        self._persistence_healthy = True
 
     def _require_root(self, actor_id: str) -> None:
         if actor_id not in self.root_authorities:
@@ -548,6 +1159,34 @@ class PolicyEngine:
     def _validate_money(amount: Decimal) -> None:
         if amount < 0 or not amount.is_finite():
             raise PolicyConfigurationError("budget values must be finite and non-negative")
+
+    @staticmethod
+    def _validate_parameter_value(value: Any) -> None:
+        """Limit persisted constraints to deterministic JSON value types."""
+
+        if value is None or isinstance(value, (str, bool, int)):
+            return
+        if isinstance(value, float):
+            if not math.isfinite(value):
+                raise PolicyConfigurationError(
+                    "parameter constraint numbers must be finite"
+                )
+            return
+        if isinstance(value, list):
+            for item in value:
+                PolicyEngine._validate_parameter_value(item)
+            return
+        if isinstance(value, Mapping):
+            if any(not isinstance(key, str) for key in value):
+                raise PolicyConfigurationError(
+                    "parameter constraint object keys must be strings"
+                )
+            for item in value.values():
+                PolicyEngine._validate_parameter_value(item)
+            return
+        raise PolicyConfigurationError(
+            "parameter constraints must use deterministic JSON value types"
+        )
 
     @staticmethod
     def _is_expired(expires_at: datetime) -> bool:
@@ -575,6 +1214,7 @@ class PolicyEngine:
                 {"reason": reason},
                 cell_id=cell_id,
             )
+            self._persist_state()
 
     def _validate_grant(self, grant: CapabilityGrant) -> None:
         if grant.grant_id in self._grants:
@@ -598,6 +1238,8 @@ class PolicyEngine:
                 raise PolicyConfigurationError(
                     "parameter constraints require a path and allowed values"
                 )
+            for allowed_value in allowed_values:
+                self._validate_parameter_value(allowed_value)
         if self._is_expired(grant.expires_at):
             raise PolicyConfigurationError("grant expiry must be in the future")
         if grant.delegation_depth < 0 or grant.delegation_depth > 2:
@@ -705,6 +1347,7 @@ class PolicyEngine:
             },
             cell_id=grant.cell_id,
         )
+        self._persist_state()
 
     def _require_grant(self, grant_id: str) -> CapabilityGrant:
         grant = self._grants.get(grant_id)
@@ -829,8 +1472,8 @@ class PolicyEngine:
                 "policy_version": self.policy_version,
             },
             cell_id=intent.cell_id,
-            action_id=intent.action_id,
-        )
+                action_id=intent.action_id,
+            )
         return decision
 
     def _record_promotion_decision(
@@ -884,6 +1527,7 @@ class PolicyEngine:
             },
             cell_id=grant.cell_id,
         )
+        self._persist_state()
         return regressed
 
 

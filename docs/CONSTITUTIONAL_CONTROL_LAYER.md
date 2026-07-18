@@ -18,6 +18,7 @@ This implementation is a foundation, not a claim of production certification.
 | Capability grant | Lease action authority to an agent for resources, parameters, context, time, and budget. | `CapabilityGrant` |
 | Policy decision point | Return allow, shadow, review, or deny with reason codes. | `src/control/policy_engine.py` |
 | Execution gateway | Enforce idempotency, invoke trusted adapters only after allow, and produce receipts. | `src/control/gateway.py` |
+| Durable control state | Transactionally persist policy snapshots and the reserved/in-flight/completed action lifecycle for restart recovery. | `src/control/state_store.py` |
 | Authorized execution context | Bind the allowed intent's action and resource to the adapter call stack; reject ordinary direct or confused-deputy mutation calls. | `src/control/execution_context.py` |
 | Graph adapters | Convert loop, risk, and monitor persistence requests into intents and dispatch validated payloads only inside the gateway. | `src/control/graph_adapter.py` |
 | Evidence Ledger | Append hash-chained intents, policy decisions, approvals, grants, incidents, promotions, regressions, and receipts. | `src/control/evidence.py` |
@@ -30,14 +31,17 @@ For every consequential action, the gateway:
 
 1. receives an immutable `ActionIntent`;
 2. records a digest of the payload rather than raw sensitive content;
-3. rejects reuse of an action ID with a different fingerprint;
-4. asks the policy engine to evaluate the intent;
-5. performs no side effect for shadow, review, or deny;
-6. fails closed if no trusted executor is registered;
-7. binds the allowed action and resource to a short-lived execution context;
-8. invokes the adapter once after allow and clears that context afterward;
-9. records spend only after successful execution; and
-10. stores a result digest and external reference in an execution receipt.
+3. durably reserves the action ID and rejects reuse with another fingerprint;
+4. returns the prior receipt when the same completed action is retried;
+5. asks the policy engine to evaluate a new or still-reserved intent;
+6. performs no side effect for shadow, review, or deny;
+7. fails closed if no trusted executor is registered;
+8. atomically marks the action in flight before invoking an adapter;
+9. binds the allowed action and resource to a short-lived execution context;
+10. invokes the adapter after allow and clears that context afterward;
+11. records spend only after successful execution; and
+12. durably completes the action with a result digest, external reference, and
+    execution receipt.
 
 The policy engine checks, in order:
 
@@ -54,6 +58,46 @@ The policy engine checks, in order:
 
 Unknown action, missing state, stale context, and adapter absence never default
 to allow.
+
+## Restart recovery and transaction boundary
+
+`SQLiteControlStateStore` is the capital-light reference implementation for a
+single control-plane process. It stores a versioned, integrity-hashed
+snapshot of action definitions, charters, grants, approvals, promotion rules,
+cell/grant spend counters, and status. It separately stores each gateway action
+as `reserved`, `inflight`, or `completed`.
+
+On restart:
+
+- a completed action returns its original decision and receipt without invoking
+  the adapter again;
+- a reserved action may be reevaluated after an approval, promotion, or trusted
+  adapter bootstrap;
+- an in-flight action is denied with
+  `reconciliation_required_for_inflight_action`; it is never blindly replayed;
+- a changed action fingerprint is denied; and
+- a snapshot or action-record hash mismatch raises an integrity error before
+  authority is reconstructed.
+
+Each policy snapshot also records an Evidence Ledger sequence/hash anchor.
+Authority-reducing controls and bounded execution can recover without the old
+ledger file, but capability promotion fails closed until the anchored chain is
+reconstructed and verified. Configure a durable `EvidenceLedger` path alongside
+the state store if promotions must remain available after restart.
+
+The store uses SQLite WAL mode, full synchronous writes, and immediate
+transactions. This gives local restart durability, not a distributed exactly-
+once guarantee. The transaction cannot atomically commit both an arbitrary
+downstream side effect and the local receipt. An in-flight record therefore
+represents an uncertain outcome that an operator must reconcile with the
+downstream system. Production still needs a shared/replicated store, fencing or
+single-writer leadership, transactional outbox/inbox patterns where available,
+backups, and explicit reconciliation procedures.
+
+The hashes detect corruption and unsynchronized edits; they are not keyed and
+do not stop an attacker who can rewrite both a record and its hash. Protect the
+database with operating-system access controls and add independent/WORM
+anchoring in production.
 
 ## Approval binding
 
@@ -162,6 +206,8 @@ from decimal import Decimal
 from src.control import (
     AutonomyStage,
     CapabilityGrant,
+    EvidenceLedger,
+    SQLiteControlStateStore,
     VentureCellCharter,
     build_default_control_plane,
 )
@@ -170,6 +216,8 @@ from src.control.models import utc_now
 policy, gateway = build_default_control_plane(
     root_actor_id="operator-1",
     human_authorities={"reviewer-1", "reviewer-2"},
+    evidence_ledger=EvidenceLedger("var/control/evidence.jsonl"),
+    state_store=SQLiteControlStateStore("var/control/control.db"),
 )
 policy.create_cell(
     "operator-1",
@@ -209,7 +257,8 @@ Do not label the system doctrine-enforced in production until:
 
 - every consequential adapter is inventoried and gateway-mediated;
 - agent runtimes lack direct consequential credentials and egress;
-- policy, grants, approvals, spend counters, and idempotency are transactional;
+- policy, grants, approvals, spend counters, and idempotency use a production
+  shared/replicated transactional store with tested restore and reconciliation;
 - identities are cryptographically authenticated, not caller-supplied strings;
 - the ledger is independently anchored and reconstructable;
 - pause/kill is tested against real dependencies;

@@ -197,7 +197,8 @@ An assessment is evidence for a venture decision, not an execution grant. Any
 resulting side effect must independently pass the Constitutional Control Plane.
 
 ## Future Development
-- Persist control state and idempotency transactionally
+- Promote the tested local SQLite control-state/idempotency store to a
+  shared/replicated production store with backups and reconciliation
 - Broker short-lived, resource-scoped adapter credentials
 - Enforce cell-specific workload identity and network egress
 - Anchor Evidence Ledger hashes outside the writer trust domain
