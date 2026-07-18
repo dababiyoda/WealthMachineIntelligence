@@ -130,6 +130,25 @@ def test_capability_record_denies_external_autonomy() -> None:
     assert capability["acceptance_status"]["AG3_to_AG7"] == "not_implemented"
 
 
+def test_live_chatgpt_site_has_a_repository_enforced_truth_boundary() -> None:
+    capability = load_json("spec/uat/v1/current-capability.json")
+    site = capability["operator_surfaces"]["chatgpt_site"]
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    site_doc = (ROOT / "docs/CHATGPT_SITE.md").read_text(encoding="utf-8")
+
+    assert site["url"].startswith("https://")
+    assert site["url"] in readme
+    assert site["url"] in site_doc
+    assert site["integration_status"] == (
+        "published_truthful_frontend_not_connected_to_production_control_plane"
+    )
+    assert "External side effect: Not executed." in site_doc
+    assert any(
+        "does not read or mutate" in limitation
+        for limitation in capability["limitations"]
+    )
+
+
 def test_governance_routes_expose_records_not_external_execution() -> None:
     paths = {
         path

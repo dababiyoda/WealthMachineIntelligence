@@ -58,3 +58,22 @@ is invalid:
 
 The preview does not yet claim tested database point-in-time recovery. Back up
 the database before every deployment and test restoration before relying on it.
+
+## ChatGPT website
+
+The institutional website is published at
+[`UAT Venture Command`](https://uat-venture-command.investigatin-9078.chatgpt.site).
+
+It is a separate ChatGPT Sites deployment with two surfaces:
+
+- `/` is a public explanation of the UAT doctrine, architecture, lifecycle,
+  roles, repository status, and capability boundary;
+- `/command` uses platform-managed ChatGPT sign-in and provides an interactive
+  deterministic policy lab.
+
+The website is intentionally not configured with API credentials, financial
+accounts, production secrets, or access to the FastAPI governance database.
+Its action lab calculates and explains a bounded risk floor but cannot execute
+the proposed action. Treat it as an institutional communication and operator
+training surface until the API integration gates in `docs/CHATGPT_SITE.md`
+have cleared.
