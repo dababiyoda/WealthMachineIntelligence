@@ -18,6 +18,8 @@ This implementation is a foundation, not a claim of production certification.
 | Capability grant | Lease action authority to an agent for resources, parameters, context, time, and budget. | `CapabilityGrant` |
 | Policy decision point | Return allow, shadow, review, or deny with reason codes. | `src/control/policy_engine.py` |
 | Execution gateway | Enforce idempotency, invoke trusted adapters only after allow, and produce receipts. | `src/control/gateway.py` |
+| Authorized execution context | Bind the allowed intent's action and resource to the adapter call stack; reject ordinary direct or confused-deputy mutation calls. | `src/control/execution_context.py` |
+| Graph adapters | Convert loop, risk, and monitor persistence requests into intents and dispatch validated payloads only inside the gateway. | `src/control/graph_adapter.py` |
 | Evidence Ledger | Append hash-chained intents, policy decisions, approvals, grants, incidents, promotions, regressions, and receipts. | `src/control/evidence.py` |
 | Assumption Register | Version critical assumptions and require external/human evidence plus independent verification for terminal conclusions. | `src/control/assumptions.py` |
 | Promotion evaluator | Apply exact statistical assurance gates independent of commercial metrics. | `src/control/promotion.py` |
@@ -32,9 +34,10 @@ For every consequential action, the gateway:
 4. asks the policy engine to evaluate the intent;
 5. performs no side effect for shadow, review, or deny;
 6. fails closed if no trusted executor is registered;
-7. invokes the adapter once after allow;
-8. records spend only after successful execution; and
-9. stores a result digest and external reference in an execution receipt.
+7. binds the allowed action and resource to a short-lived execution context;
+8. invokes the adapter once after allow and clears that context afterward;
+9. records spend only after successful execution; and
+10. stores a result digest and external reference in an execution receipt.
 
 The policy engine checks, in order:
 
@@ -128,6 +131,12 @@ R3 material authority and all R4 authority are non-delegable.
 longer mutates venture status or notifies roles by default. With a configured
 gateway, a matching rule creates an `ActionIntent`; only a valid cell grant can
 reach the existing connector adapter.
+
+The Income Streams Loop, risk manager, and demo market monitor follow the same
+rule for graph persistence. Without a gateway they return explicit proposals
+and perform no connector mutation. With a gateway, their registered persistence
+actions require separate capability grants. This closes ordinary in-process
+bypass routes but does not replace production process/credential isolation.
 
 Example bootstrap:
 

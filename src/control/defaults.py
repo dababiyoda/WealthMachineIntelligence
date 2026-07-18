@@ -37,6 +37,42 @@ DEFAULT_ACTIONS = (
         description="Route an internal compliance review.",
     ),
     ActionDefinition(
+        "persist_venture_opportunities",
+        RiskTier.REVERSIBLE_INTERNAL,
+        AutonomyStage.SUPERVISED_CANARY,
+        description="Persist internally generated opportunity hypotheses.",
+    ),
+    ActionDefinition(
+        "persist_venture_metrics",
+        RiskTier.REVERSIBLE_INTERNAL,
+        AutonomyStage.SUPERVISED_CANARY,
+        description="Persist internal venture metrics with explicit provenance.",
+    ),
+    ActionDefinition(
+        "persist_sentiment",
+        RiskTier.REVERSIBLE_INTERNAL,
+        AutonomyStage.SUPERVISED_CANARY,
+        description="Persist a sentiment-analysis artifact as internal evidence.",
+    ),
+    ActionDefinition(
+        "persist_predictions",
+        RiskTier.REVERSIBLE_INTERNAL,
+        AutonomyStage.SUPERVISED_CANARY,
+        description="Persist an uncalibrated model-prediction artifact.",
+    ),
+    ActionDefinition(
+        "persist_forecast",
+        RiskTier.REVERSIBLE_INTERNAL,
+        AutonomyStage.SUPERVISED_CANARY,
+        description="Persist a forecast artifact without granting execution authority.",
+    ),
+    ActionDefinition(
+        "persist_risk_assessment",
+        RiskTier.REVERSIBLE_INTERNAL,
+        AutonomyStage.SUPERVISED_CANARY,
+        description="Persist a risk-screening artifact and mirrored internal state.",
+    ),
+    ActionDefinition(
         "send_preapproved_message",
         RiskTier.BOUNDED_EXTERNAL,
         AutonomyStage.BOUNDED,

@@ -11,10 +11,11 @@ forecast data, recording risk assessments, and retrieving competitor
 information.  The connector acts as a central gateway for the rule
 engine and AI agents, encapsulating both graph and database operations.
 
-The implementation deliberately logs actions for auditing and
-debugging purposes.  In a production environment this layer could be
-extended to emit events to message queues or external monitoring
-services.
+The implementation deliberately logs actions for auditing and debugging.
+Mutation methods reject calls unless they run inside an allowed
+``ExecutionGateway`` adapter context matching the action and resource. This is
+single-process defense in depth; production still requires isolated workload
+identity, credentials, and egress policy.
 """
 
 from __future__ import annotations
@@ -22,7 +23,8 @@ from __future__ import annotations
 import logging
 from typing import Dict, Any, List, Optional
 
-from .knowledge_graph import knowledge_graph, Node, Edge
+from ..control.execution_context import require_authorized_execution
+from .knowledge_graph import Node, knowledge_graph
 
 try:
     # Try to import database models and session manager.  These imports
@@ -45,10 +47,10 @@ logger = logging.getLogger(__name__)
 class KnowledgeGraphConnector:
     """Facade for synchronising the knowledge graph and the database.
 
-    All public methods perform their work in both the graph and the
-    database (when available).  If no database connection is
-    configured the operations will still be reflected in the in‑memory
-    graph, allowing the rule engine to function in isolation.
+    Authorized mutation methods perform their work in both the graph and the
+    database (when available). If no database connection is configured, allowed
+    operations are still reflected in the in-memory graph. Read methods remain
+    side-effect free.
     """
 
     def update_venture_status(self, venture_id: str, new_status: str) -> None:
@@ -61,6 +63,10 @@ class KnowledgeGraphConnector:
         new_status: str
             New status (e.g. ``'On Hold'`` or ``'Needs Review'``).
         """
+        require_authorized_execution(
+            action_types={"update_venture_status"},
+            resource=f"venture:{venture_id}",
+        )
         logger.info("Updating venture status", extra={"venture_id": venture_id, "new_status": new_status})
 
         # Update database record if available
@@ -88,6 +94,10 @@ class KnowledgeGraphConnector:
 
         Both the database and the knowledge graph will be updated.
         """
+        require_authorized_execution(
+            action_types={"persist_venture_metrics"},
+            resource=f"venture:{venture_id}",
+        )
         logger.info("Updating venture metrics", extra={"venture_id": venture_id, "metrics": metrics})
 
         # Persist metrics to the database where possible
@@ -118,6 +128,10 @@ class KnowledgeGraphConnector:
         the ``sentiment_analysis`` column.  It is also attached to the
         knowledge graph node for quick lookups.
         """
+        require_authorized_execution(
+            action_types={"persist_sentiment"},
+            resource=f"venture:{venture_id}",
+        )
         logger.info("Storing sentiment", extra={"venture_id": venture_id, "sentiment": sentiment_data})
 
         if db and MarketAnalysis:
@@ -155,6 +169,10 @@ class KnowledgeGraphConnector:
         Predictions are saved into the ``lstm_prediction`` column of
         ``MarketAnalysis`` and attached to the knowledge graph.
         """
+        require_authorized_execution(
+            action_types={"persist_predictions"},
+            resource=f"venture:{venture_id}",
+        )
         logger.info("Storing predictions", extra={"venture_id": venture_id, "predictions": prediction_data})
 
         if db and MarketAnalysis:
@@ -191,6 +209,10 @@ class KnowledgeGraphConnector:
         there is no dedicated column defined.  In a full
         implementation this method would write to a dedicated table.
         """
+        require_authorized_execution(
+            action_types={"persist_forecast"},
+            resource=f"venture:{venture_id}",
+        )
         logger.info("Storing forecast", extra={"venture_id": venture_id, "forecast": forecast_data})
         node = knowledge_graph.get_node(venture_id)
         if node:
@@ -207,6 +229,10 @@ class KnowledgeGraphConnector:
         venture.  Additionally, the latest risk information is stored on
         the venture node.
         """
+        require_authorized_execution(
+            action_types={"persist_risk_assessment"},
+            resource=f"venture:{venture_id}",
+        )
         logger.info("Storing risk assessment", extra={"venture_id": venture_id, "risk_data": risk_data})
 
         if db and RiskAssessment:
@@ -272,6 +298,10 @@ class KnowledgeGraphConnector:
         the node.  Each entry in the list should include fields such as
         ``description``, ``expected_value`` and ``confidence``.
         """
+        require_authorized_execution(
+            action_types={"persist_venture_opportunities"},
+            resource=f"venture:{venture_id}",
+        )
         logger.info("Updating opportunities", extra={"venture_id": venture_id, "opportunities": opportunities})
         node = knowledge_graph.get_node(venture_id)
         if node:
@@ -289,6 +319,14 @@ class KnowledgeGraphConnector:
         logged.  This abstraction decouples the rule engine from
         specific messaging implementations (email, Slack, etc.).
         """
+        require_authorized_execution(
+            action_types={
+                "update_venture_status",
+                "trigger_review",
+                "optimize_funnel",
+                "compliance_review",
+            },
+        )
         try:
             from ..utils.notifications import notify_role as real_notify
             real_notify(role, message)

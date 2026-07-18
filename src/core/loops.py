@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Mapping, Optional
 
+from ..control.graph_adapter import GraphIntentClient
 from .knowledge_graph_connector import KnowledgeGraphConnector
 from .performance import PerformanceTracker
 from ..agents.specialized import (
@@ -46,6 +47,7 @@ class VentureCycleResult:
     marketing: AgentOutput
     partnerships: AgentOutput
     risk: Dict[str, Any]
+    control_outcomes: List[Dict[str, Any]]
     decision_outcomes: List[Dict[str, Any]]
     go_no_go: str
 
@@ -61,6 +63,7 @@ class VentureCycleResult:
             "marketing": self.marketing.data,
             "partnerships": self.partnerships.data,
             "risk": self.risk,
+            "control_outcomes": self.control_outcomes,
             "decision_outcomes": self.decision_outcomes,
             "go_no_go": self.go_no_go,
         }
@@ -82,6 +85,11 @@ class IncomeStreamsLoop:
         self.risk_manager = risk_manager
         self.performance_tracker = performance_tracker
         self.connector = connector or KnowledgeGraphConnector()
+        self.graph_intents = GraphIntentClient(
+            decision_engine.gateway,
+            agent_id="income-streams-loop",
+            context_fingerprint=decision_engine.context_fingerprint,
+        )
 
     async def execute_cycle(self, venture_id: str, payload: Dict[str, Any]) -> VentureCycleResult:
         """Run a full venture evaluation cycle."""
@@ -98,7 +106,19 @@ class IncomeStreamsLoop:
         opportunity = await opportunity_agent.handle_task({
             "technology_signals": payload.get("technology_signals", []),
         })
-        self.connector.update_opportunities(venture_id, opportunity.data.get("opportunities", []))
+        control_outcomes = [
+            self.graph_intents.submit(
+                "persist_venture_opportunities",
+                venture_id,
+                {
+                    "opportunities": opportunity.data.get("opportunities", []),
+                    "provenance": {
+                        "producer": opportunity_agent.agent_id,
+                        "source_type": "agent_hypothesis",
+                    },
+                },
+            )
+        ]
 
         market = await market_agent.handle_task({
             "market_data": payload.get("market_data", {}),
@@ -147,11 +167,23 @@ class IncomeStreamsLoop:
             "risk_buffer": financial.data["risk_buffer"],
         }
 
-        self.connector.update_venture_metrics(venture_id, {
-            "opportunity_score": metrics["opportunity_score"],
-            "market_alignment": market.data["market_alignment"],
-            "expected_roi": metrics["expected_roi"],
-        })
+        control_outcomes.append(
+            self.graph_intents.submit(
+                "persist_venture_metrics",
+                venture_id,
+                {
+                    "metrics": {
+                        "opportunity_score": metrics["opportunity_score"],
+                        "market_alignment": market.data["market_alignment"],
+                        "expected_roi": metrics["expected_roi"],
+                    },
+                    "provenance": {
+                        "producer": "income-streams-loop",
+                        "source_type": "derived_internal_metric",
+                    },
+                },
+            )
+        )
 
         risk = await self.risk_manager.assess(venture_id, metrics)
         decision_outcomes = self.decision_engine.evaluate(
@@ -178,6 +210,7 @@ class IncomeStreamsLoop:
             marketing=marketing,
             partnerships=partnerships,
             risk=risk,
+            control_outcomes=control_outcomes,
             decision_outcomes=decision_outcomes,
             go_no_go=go_no_go,
         )
@@ -235,4 +268,3 @@ __all__ = [
     "VentureCycleResult",
     "TeamCycleResult",
 ]
-
