@@ -14,15 +14,29 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
+from ..control.gateway import ExecutionGateway
+from ..control.graph_adapter import GraphIntentClient
 from ..core.knowledge_graph_connector import KnowledgeGraphConnector
 
 
 class RiskManager:
     """Facade that blends deterministic risk scoring with stored assessments."""
 
-    def __init__(self, risk_service: Optional[Any] = None, connector: Optional[KnowledgeGraphConnector] = None):
+    def __init__(
+        self,
+        risk_service: Optional[Any] = None,
+        connector: Optional[KnowledgeGraphConnector] = None,
+        gateway: Optional[ExecutionGateway] = None,
+        context_fingerprint: str = "",
+        agent_id: str = "risk-manager",
+    ):
         self.risk_service = risk_service
         self.connector = connector or KnowledgeGraphConnector()
+        self.graph_intents = GraphIntentClient(
+            gateway,
+            agent_id=agent_id,
+            context_fingerprint=context_fingerprint,
+        )
 
     async def assess(self, venture_id: str, metrics: Dict[str, Any]) -> Dict[str, Any]:
         """Return a risk profile and persist it through the connector."""
@@ -36,7 +50,24 @@ class RiskManager:
         else:
             assessment = self._heuristic_assessment(metrics)
 
-        self.connector.store_risk_assessment(venture_id, assessment)
+        assessment["persistence"] = self.graph_intents.submit(
+            "persist_risk_assessment",
+            venture_id,
+            {
+                "assessment": dict(assessment),
+                "provenance": {
+                    "producer": self.graph_intents.agent_id,
+                    "source_type": (
+                        "optional_risk_service"
+                        if self.risk_service is not None
+                        else "deterministic_heuristic"
+                    ),
+                    "probability_calibrated": bool(
+                        assessment.get("probability_calibrated", False)
+                    ),
+                },
+            },
+        )
         return assessment
 
     def _heuristic_assessment(self, metrics: Dict[str, Any]) -> Dict[str, Any]:

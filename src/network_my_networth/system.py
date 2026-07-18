@@ -89,7 +89,11 @@ class NetworkWealthEngine:
                 context_fingerprint=control_context_fingerprint,
             )
 
-        self.risk_manager = RiskManager(connector=self.connector)
+        self.risk_manager = RiskManager(
+            connector=self.connector,
+            gateway=gateway,
+            context_fingerprint=control_context_fingerprint,
+        )
         self.orchestrator = WealthMachineOrchestrator(
             decision_engine=self.decision_engine,
             risk_manager=self.risk_manager,

@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
+from ..control.graph_adapter import KnowledgeGraphActionAdapter
 from ..agents.specialized import (
     BusinessModelInnovatorAgent,
     EmergingTechAgent,
@@ -47,7 +48,19 @@ class WealthMachineOrchestrator:
         self._bootstrap_goals()
 
         self.decision_engine = decision_engine or DecisionEngine([])
-        self.risk_manager = risk_manager or RiskManager()
+        self.graph_adapter = (
+            KnowledgeGraphActionAdapter(
+                self.decision_engine.gateway,
+                self.decision_engine.connector,
+            )
+            if self.decision_engine.gateway
+            else None
+        )
+        self.risk_manager = risk_manager or RiskManager(
+            connector=self.decision_engine.connector,
+            gateway=self.decision_engine.gateway,
+            context_fingerprint=self.decision_engine.context_fingerprint,
+        )
         self.phase_manager = phase_manager or PhaseManager()
 
         self.income_loop = IncomeStreamsLoop(
@@ -98,4 +111,3 @@ class WealthMachineOrchestrator:
 
 
 __all__ = ["WealthMachineOrchestrator"]
-

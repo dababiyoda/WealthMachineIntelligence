@@ -6,6 +6,7 @@ import threading
 from dataclasses import replace
 from typing import Any, Callable, Mapping, Optional
 
+from .execution_context import activate_authorized_execution
 from .models import (
     ActionIntent,
     ExecutionReceipt,
@@ -120,7 +121,8 @@ class ExecutionGateway:
                 return GatewayResult(decision=denied)
 
             try:
-                adapter_result = executor(intent)
+                with activate_authorized_execution(intent, decision):
+                    adapter_result = executor(intent)
             except Exception as exc:  # pragma: no cover - adapter-specific failures
                 receipt = ExecutionReceipt(
                     action_id=intent.action_id,

@@ -31,6 +31,11 @@ The branch containing this roadmap establishes the first software slice:
 - proposal-only behavior for the existing `DecisionEngine` unless a gateway is
   configured.
 
+The first enforcement follow-up also routes the known loop, risk-manager, and
+demo-monitor graph writes through registered intents. Connector mutations now
+require an active allowed gateway context matching the action type and exact
+venture resource; direct and confused-deputy calls fail closed in tests.
+
 The implementation is not yet production-enforced. Identities are strings,
 state is primarily in memory, the ledger is not externally anchored, and the
 deployment does not yet prove that direct credentials and network paths are
@@ -45,7 +50,7 @@ absent.
 | Active gate | The complete side-effect and credential inventory is not yet known. |
 | Gate-crossing evidence | Signed inventory showing 100% of consequential adapters, credentials, queues, webhooks, and egress paths are mediated or explicitly disabled. |
 | Active single bottleneck metric | **Verified mediated side-effect coverage** = mediated consequential paths / inventoried consequential paths. |
-| Baseline | Four current rule-engine action adapters are proposal-only or gateway-capable; the production denominator is unknown. |
+| Baseline | Ten current rule/graph action types are gateway-mediated in code; at least five direct runtime mutation families plus the deployment denominator remain unresolved. |
 | Target | 100% coverage, with a bypass test for every inventoried path. |
 | Resource budget before review | One bounded integration sprint; no external customer side effects until the inventory and enforcement gate passes. |
 | Review cadence | Daily during adapter migration; formal gate review before shadow and before canary. |
@@ -75,6 +80,10 @@ absent.
 ### Node 2 — Unavoidable production enforcement
 
 **Estimated range:** 2–4 weeks, dependent on infrastructure access.
+
+**Status:** In progress. Known `KnowledgeGraphConnector` callers in the loop,
+risk manager, and demo monitor are mediated or proposal-only. The remaining
+direct SQL/API families and deployment identity/egress controls are open.
 
 - Inventory every database write, message, payment, contract/signature path,
   cloud mutation, queue, webhook, and external API.

@@ -35,6 +35,11 @@ def test_income_stream_cycle_generates_cohesive_plan() -> None:
     assert venture["opportunity"]["opportunity_score"] >= 0.6
     assert venture["financial"]["expected_roi"] >= payload["financial"]["minimum_roi"]
     assert venture["risk"]["risk_level"] in {"Ultra Low", "Low", "Moderate"}
+    assert all(
+        outcome["execution_status"] == "proposed"
+        for outcome in venture["control_outcomes"]
+    )
+    assert venture["risk"]["persistence"]["execution_status"] == "proposed"
 
     team = report["team"]
     assert team["insights"], "Team loop should generate collaboration insights"

@@ -19,8 +19,10 @@ from __future__ import annotations
 import asyncio
 import random
 import logging
-from typing import Dict, List
+from typing import Dict, List, Optional
 
+from ..control.gateway import ExecutionGateway
+from ..control.graph_adapter import GraphIntentClient, KnowledgeGraphActionAdapter
 from ..core.knowledge_graph_connector import KnowledgeGraphConnector
 from .decision_engine import DecisionEngine
 
@@ -37,9 +39,29 @@ logger = logging.getLogger(__name__)
 class MarketMonitor:
     """Background service that evaluates ventures on a schedule."""
 
-    def __init__(self, rules_path: str, interval_seconds: int = 60) -> None:
+    def __init__(
+        self,
+        rules_path: str,
+        interval_seconds: int = 60,
+        gateway: Optional[ExecutionGateway] = None,
+        context_fingerprint: str = "",
+    ) -> None:
         self.connector = KnowledgeGraphConnector()
-        self.engine = DecisionEngine.from_json_file(rules_path, connector=self.connector)
+        self.graph_adapter = (
+            KnowledgeGraphActionAdapter(gateway, self.connector) if gateway else None
+        )
+        self.graph_intents = GraphIntentClient(
+            gateway,
+            agent_id="market-monitor",
+            context_fingerprint=context_fingerprint,
+        )
+        self.engine = DecisionEngine.from_json_file(
+            rules_path,
+            connector=self.connector,
+            gateway=gateway,
+            agent_id="market-monitor-decision-engine",
+            context_fingerprint=context_fingerprint,
+        )
         self.interval_seconds = interval_seconds
 
     async def _collect_metrics(self, venture_id: str, venture_type: str) -> Dict[str, float]:
@@ -86,11 +108,28 @@ class MarketMonitor:
         ventures = await self._list_ventures()
         for venture in ventures:
             metrics = await self._collect_metrics(venture['id'], venture['type'])
-            # Persist collected metrics to the knowledge graph
-            self.connector.update_venture_metrics(venture['id'], metrics)
+            persistence = self.graph_intents.submit(
+                "persist_venture_metrics",
+                venture["id"],
+                {
+                    "metrics": metrics,
+                    "provenance": {
+                        "producer": "market-monitor",
+                        "source_type": "randomized_demo_simulation",
+                        "production_evidence": False,
+                    },
+                },
+            )
             outcomes = self.engine.evaluate(venture['id'], venture['type'], metrics)
-            if outcomes:
-                logger.info("Actions executed", extra={"venture_id": venture['id'], "outcomes": outcomes})
+            if outcomes or persistence:
+                logger.info(
+                    "Monitor proposals evaluated",
+                    extra={
+                        "venture_id": venture["id"],
+                        "persistence": persistence,
+                        "outcomes": outcomes,
+                    },
+                )
 
     async def start(self) -> None:
         """Continuously run monitoring cycles with a fixed interval."""

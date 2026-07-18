@@ -9,10 +9,10 @@ or network routes.
 
 | Caller | Effect | Nominal tier | Current enforcement | Required next move |
 | --- | --- | ---: | --- | --- |
-| `services/decision_engine.py` | Update venture status; route review, funnel, and compliance notifications. | R1 | **Gateway-capable. Proposal-only by default.** | Ensure production construction always supplies a cell-scoped gateway and that the connector identity is gateway-only. |
-| `core/loops.py` | Persist derived opportunity, market-alignment, and ROI metrics. | R1 | Direct connector call. | Register `persist_venture_metrics`; distinguish evidence append from mutable operational state. |
-| `services/risk_management.py` | Persist heuristic risk assessment. | R1 | Direct connector call. | Register `persist_risk_assessment`; label provenance/model/context and prevent heuristic scores from granting authority. |
-| `services/market_monitor.py` | Persist randomized/demo metrics on a schedule. | R1 | Direct connector call; rule actions are proposal-only. | Disable in production or run in a demo cell; route writes through a shadow-only evidence adapter. |
+| `services/decision_engine.py` | Update venture status; route review, funnel, and compliance notifications. | R1 | **Gateway-only in code; proposal-only by default.** Connector calls require an active allowed intent for the exact action/resource. | Give the connector a gateway-only deployment identity and test downstream credential bypass. |
+| `core/loops.py` | Persist derived opportunity, market-alignment, and ROI metrics. | R1 | **Gateway-mediated; proposal-only without a gateway.** Uses `persist_venture_opportunities` and `persist_venture_metrics`. | Reconcile receipts with durable downstream state and independently classify provenance. |
+| `services/risk_management.py` | Persist heuristic risk assessment. | R1 | **Gateway-mediated; proposal-only without a gateway.** Heuristic provenance and uncalibrated status are retained. | Split append-only assessment evidence from mutable venture state in the durable schema. |
+| `services/market_monitor.py` | Persist randomized/demo metrics on a schedule. | R1 | **Gateway-mediated; proposal-only by default.** Payload is marked `randomized_demo_simulation` and not production evidence. | Keep disabled in production or isolate in a demo cell with shadow-stage grants. |
 | `services/ai_agents.py:MarketIntelligenceService` | Insert market-analysis database records. | R1 | Direct database transaction. | Route through evidence persistence with provenance; remove production claims from simulated model outputs. |
 | `services/ai_agents.py:RiskAssessmentService` | Insert risk assessment and mutate venture risk fields. | R1/R2 if used for capital decisions | Direct database transaction. | Split append-only assessment from venture-state mutation; require policy for the latter. |
 | `services/ai_agents.py:_get_agent_id` | Create persistent agent identity record. | R2 | Direct database transaction. | Move identity provisioning to root-human control; do not let an agent mint its own persistent authority. |
@@ -36,21 +36,24 @@ agent identity from reaching them:
 
 ## Common choke point
 
-`KnowledgeGraphConnector` already centralizes several graph/database mutations.
-It is the fastest next integration wedge, but it is not itself a policy
-boundary: callers can invoke it directly. The production design should expose
-its mutation methods only as trusted gateway adapters and give the connector a
-workload identity unavailable to agent processes.
+`KnowledgeGraphConnector` centralizes several graph/database mutations. Its
+mutation methods now require a short-lived authorization context installed only
+while `ExecutionGateway` invokes an allowed adapter. The context binds action
+type and exact venture resource; direct calls and confused-deputy calls fail
+before mutation. This is useful in-process defense in depth, not a cryptographic
+security boundary. Production must still place the connector behind a workload
+identity, credential broker, and network policy unavailable to agent processes.
 
 ## Coverage accounting
 
-The four current rule-engine actions are mediated in code. The complete
-production denominator is still unknown because deployment configuration and
-external connectors are not represented by this static scan. Therefore the
-honest baseline is:
+Ten current action types are mediated in code: four rule actions and six
+knowledge-graph persistence actions. The complete production denominator is
+still unknown because direct SQL paths, deployment configuration, and external
+connectors are not fully mediated or represented by this static scan. Therefore
+the honest baseline is:
 
-- **Code-mediated:** four rule action types;
-- **Known direct runtime mutation families:** at least eight in the table above;
+- **Code-mediated:** ten registered action types, with connector bypass tests;
+- **Known direct runtime mutation families:** at least five in the table above;
 - **Deployment credential/egress coverage:** unverified; and
 - **Verified mediated side-effect coverage:** not yet reportable as a percentage.
 
