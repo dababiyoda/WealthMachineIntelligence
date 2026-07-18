@@ -1,0 +1,59 @@
+{
+  "record_version": "2026-07-18.2",
+  "canonical_release_path": [
+    "main.py",
+    "src.api.main",
+    "src.governance"
+  ],
+  "tracked_files_audited": 210,
+  "tracked_python_cache_files": 43,
+  "overall_classification": "governed_preview_with_durable_owner_beta_site",
+  "components": {
+    "constitution_and_schemas": "implemented_draft_pending_independent_review",
+    "governance_record_api": "implemented_preview_no_external_execution",
+    "legacy_agents_and_loops": "simulation_reference",
+    "ai_integration_runtime": "planned_not_implemented",
+    "enhanced_nested_prototype": "incomplete_superseded",
+    "chatgpt_site": "deployed_owner_only_durable_product_state",
+    "commercial_multi_tenant_saas": "blocked_not_implemented",
+    "venture_pods": "planned_not_implemented"
+  },
+  "daleobanks": {
+    "classification": "separate_github_service",
+    "repository": "dababiyoda/DALEOBANKS",
+    "audited_commit": "1bd7da1ca72e4665509bdabf4269896dea76e2bf",
+    "hardening_candidate": "authenticated_fail_closed_candidate_verified_pending_merge_and_deployment",
+    "opportunity_contract": "schema_1_0_compatible",
+    "runtime_connection": "not_configured",
+    "execution_authority": "none",
+    "human_approval_required": true,
+    "production_activation_blockers": [
+      "approved_runtime_endpoint_and_owner",
+      "scoped_service_credentials",
+      "durable_idempotency_and_reconciliation",
+      "replay_rate_limit_retry_and_schema_drift_controls",
+      "independent_final_state_verification",
+      "incident_recovery_and_contract_rollback"
+    ]
+  },
+  "library_sources": {
+    "/DALEOBANKS": {
+      "purpose": "supplementary_owner_material_for_sibling_service",
+      "status": "unresolved_library_read_surface_unavailable"
+    },
+    "/LIVE PLAYER": {
+      "purpose": "ai_agent_context_source",
+      "status": "unresolved_library_read_surface_unavailable",
+      "authority": "none",
+      "ingestion_policy": "quarantine_hash_classify_scan_scope_human_activate"
+    }
+  },
+  "prohibited_promotions": [
+    "context_to_authority",
+    "compatibility_contract_to_live_connection",
+    "activation_intent_to_active_entitlement",
+    "simulation_to_verified_outcome",
+    "heuristic_score_to_probability",
+    "owner_only_site_to_public_commercial_launch"
+  ]
+}

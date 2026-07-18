@@ -8,10 +8,11 @@ deterministic, deny-by-default governance and evidence workflow.
 [`UAT Venture Command`](https://uat-venture-command.investigatin-9078.chatgpt.site)
 
 The landing route explains the doctrine, architecture, lifecycle, roles, and
-current readiness boundary. Its `/command` route uses ChatGPT-managed sign-in
-and provides a deterministic governed-action lab. That lab never executes an
-external action and is not connected to production venture or financial data.
-See [`docs/CHATGPT_SITE.md`](docs/CHATGPT_SITE.md) for the integration boundary.
+current readiness boundary. Signed-in owner routes provide D1-backed Egregore,
+membership, activation-intent, and audit records plus a deterministic
+governed-action lab. They never charge, obtain provider credentials, call the
+FastAPI control plane, load LIVE PLAYER context, or execute an external action.
+See [`docs/CHATGPT_SITE.md`](docs/CHATGPT_SITE.md) for the exact boundary.
 
 It is ready to review and deploy as a **governed preview**. It is not ready to
 operate businesses autonomously.
@@ -37,6 +38,9 @@ runtime. Developers who need to inspect that legacy path may install
 
 The machine-readable truth boundary is
 [`spec/uat/v1/current-capability.json`](spec/uat/v1/current-capability.json).
+The complete claim-to-code inventory is
+[`docs/REPOSITORY_TRUTH_AUDIT.md`](docs/REPOSITORY_TRUTH_AUDIT.md), backed by
+[`spec/uat/v1/repository-truth-audit.json`](spec/uat/v1/repository-truth-audit.json).
 
 ## Architecture contract
 
@@ -118,7 +122,9 @@ must use the governance workflow.
 
 ## DALEOBANKS compatibility bridge
 
-The existing `OpportunityPacket` intake contract remains available at:
+DALEOBANKS is a separate sibling repository, `dababiyoda/DALEOBANKS`. Its
+schema-1.0 `OpportunityPacket` sender is compatible with the receiving contract
+available here at:
 
 - `POST /api/opportunities/intake`
 - `POST /api/ventures/evaluate`
@@ -126,7 +132,15 @@ The existing `OpportunityPacket` intake contract remains available at:
 
 In production, the bridge fails closed until
 `WEALTHMACHINE_INTAKE_TOKEN` is configured. Its output is a recommendation that
-always requires human approval; it does not create or launch a venture.
+always requires human approval; it does not create or launch a venture. No
+runtime URL, service credential, durable delivery reconciliation, or live
+execution is configured by this repository.
+
+LIVE PLAYER is a separate AI-agent context source selected from ChatGPT
+Library. It is not a connector or permission grant. Its contents remain
+unresolved and un-ingested until the authorized Library source can be
+materialized, classified, injection-screened, versioned, scoped, and explicitly
+activated by a human.
 
 ## Verify
 
