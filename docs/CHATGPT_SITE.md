@@ -8,7 +8,9 @@ The published website is
 It makes the UAT doctrine reviewable without overstating the current system.
 The landing experience explains the institution, its evidence-gated venture
 lifecycle, twelve parent roles, operating guarantee, and current readiness
-boundary. The command room is protected by ChatGPT-managed sign-in.
+boundary. The command room, Egregore workspace, pricing-intent surface, and
+system-readiness view are protected by ChatGPT-managed sign-in where product
+state is involved.
 
 The current access policy is `custom` and allows the owner only. This is a live
 production deployment, but it is not public internet access. The current
@@ -24,6 +26,16 @@ The website provides:
 - explicit disclosure that external autonomy is `none`;
 - direct traceability to the governed-preview GitHub release;
 - a ChatGPT-authenticated command overview;
+- D1-backed accounts, Egregores, memberships, subscription activation intents,
+  integration activation intents, agent-context activation intents, and
+  append-only mutation audit events;
+- server-derived account ownership checks for authenticated owner workflows;
+- a pricing page that labels the proposed `$99/month` plan as unapproved and
+  unavailable for checkout;
+- a connection center that records provider requests without storing secrets
+  or claiming a live OAuth connection;
+- separate DALEOBANKS sibling-service and LIVE PLAYER agent-context surfaces,
+  neither of which is represented as connected or authorized;
 - the current AG1/AG2 capability boundary and active bottleneck;
 - an evidence register and portfolio hold state;
 - a deterministic governed-action lab;
@@ -37,20 +49,32 @@ It always displays and enforces this presentation-layer result:
 
 > External side effect: Not executed.
 
-## Separation from the control plane
+DALEOBANKS is represented as a separate GitHub service with a verified
+schema-1.0 compatibility boundary. It is not represented as a live Site
+connector. LIVE PLAYER is represented separately as an unresolved AI-agent
+context source. Context cannot grant tools, credentials, permissions, or
+execution authority.
 
-The website is not the authoritative UAT runtime. It does not:
+## Separation from the control plane and external services
+
+The website is authoritative only for its bounded owner-beta product records.
+It is not the authoritative UAT governance or execution runtime. It does not:
 
 - connect to the FastAPI database;
-- create identities, grants, approvals, claims, evidence, or audit records;
+- create FastAPI governance identities, grants, approvals, claims, evidence,
+  executions, or outcomes;
 - receive production credentials or secrets;
 - invoke external tools;
 - spend, publish, deploy, contract, hire, or launch a venture;
 - establish demand, compliance, security, or venture success.
 
+It also does not charge a payment method, process a payment webhook, obtain an
+OAuth token, call the DALEOBANKS runtime, or ingest LIVE PLAYER content.
+
 The authoritative preview implementation remains in `src/governance/` and its
-API surface under `/api/v1/governance`. The website communicates that model and
-provides a safe operator-training interaction.
+API surface under `/api/v1/governance`. The website communicates that model,
+preserves bounded owner product state, and provides a safe operator-training
+interaction.
 
 ## Gates before a live API connection
 
@@ -81,14 +105,18 @@ website polish.
 
 ## Release verification
 
-The ChatGPT Sites release was built through its locked production pipeline and
-verified as a deployed production URL on 2026-07-18. Its automated rendered
-HTML checks confirm:
+The ChatGPT Sites owner-beta release was built through its locked production
+pipeline and verified as a deployed production URL on 2026-07-18. Automated
+rendered HTML and D1-compatible workflow checks confirm:
 
 - the institutional doctrine and truth boundary render;
 - an anonymous command-room request redirects to ChatGPT sign-in;
 - an authenticated request renders the command room;
-- the command room exposes the `external autonomy: none` boundary.
+- the command room exposes the `external autonomy: none` boundary;
+- six authenticated owner workflows are implemented without external side
+  effects: account provisioning, Egregore creation, owned-Egregore retrieval,
+  plan activation request, integration activation request, and agent-context
+  activation request.
 
 This verifies the website artifact. It does not clear any UAT production
 acceptance gate by itself.

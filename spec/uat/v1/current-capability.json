@@ -1,6 +1,6 @@
 {
   "spec_version": "1.0.0-draft",
-  "record_version": "2026-07-18.4",
+  "record_version": "2026-07-18.6",
   "as_of": "2026-07-18",
   "declared_stage": "governed_preview_release_candidate",
   "acceptance_status": {
@@ -20,10 +20,10 @@
     "chatgpt_site": {
       "url": "https://uat-venture-command.investigatin-9078.chatgpt.site",
       "landing_route": "Institutional doctrine, architecture, lifecycle, and readiness disclosure",
-      "authenticated_route": "ChatGPT-sign-in command room with a deterministic no-execution action lab",
+      "authenticated_route": "ChatGPT-sign-in command room with durable owner Egregore state and a deterministic no-execution action lab",
       "access_mode": "custom_owner_only",
       "public_access_status": "not_available_in_current_workspace_policy",
-      "integration_status": "published_truthful_frontend_not_connected_to_production_control_plane"
+      "integration_status": "owner_beta_product_state_only_not_connected_to_production_control_plane_or_external_services"
     }
   },
   "implemented_control_scope": [
@@ -45,7 +45,8 @@
     "Deny missing identity, contract, capability, evidence, budget, approval, rollback, and kill-switch requirements",
     "Reconstruct an action from evidence through policy, approval, human execution, and independent verification",
     "Validate the normative UAT artifacts and governed preview through repository tests",
-    "Publish an owner-access institutional website and ChatGPT-authenticated deterministic action lab that performs no external side effect"
+    "Publish an owner-access institutional website with D1-backed account, Egregore, membership, subscription-intent, integration-intent, agent-context-intent, and audit records",
+    "Keep the website action lab, activation intents, DALEOBANKS service boundary, and LIVE PLAYER context boundary fail-closed with no external side effect"
   ],
   "limitations": [
     "AG0 still requires independent review; the complete AG1 and AG2 acceptance gates have not cleared",
@@ -54,7 +55,9 @@
     "The in-process rate limiter and local preview identities are not distributed enterprise controls",
     "The operator console stores its preview bearer token in browser session storage; it is not an enterprise session architecture",
     "The deterministic action-risk taxonomy is bounded and is not a complete production action registry",
-    "The ChatGPT website is a separately deployed presentation and simulation surface; it does not read or mutate the FastAPI governance database and is not a production control-plane client",
+    "The ChatGPT website is a separately deployed owner-beta product surface; its D1 state is not the FastAPI governance database and it is not a production control-plane client",
+    "The DALEOBANKS schema-1.0 compatibility contract is implemented across two repositories, but no production endpoint, scoped credential, durable reconciliation, or live execution is configured",
+    "LIVE PLAYER is designated as an AI-agent context source, but its selected Library contents remain unresolved and have not been ingested, verified, or granted authority",
     "Immediate reauthorization governs system records but cannot prevent a human from acting outside the system",
     "No isolated agent runtime, tool gateway, secrets broker, egress control, Venture Pod, or worker factory exists",
     "No venture has been proven through paid, repeatable operation by this repository",

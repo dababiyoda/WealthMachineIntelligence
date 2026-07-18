@@ -64,19 +64,25 @@ the database before every deployment and test restoration before relying on it.
 The institutional website is published at
 [`UAT Venture Command`](https://uat-venture-command.investigatin-9078.chatgpt.site).
 
-It is a separate ChatGPT Sites deployment with two surfaces:
+It is a separate ChatGPT Sites deployment with an institutional landing route
+and signed-in owner product routes:
 
-- `/` is the institutional explanation of the UAT doctrine, architecture, lifecycle,
-  roles, repository status, and capability boundary;
+- `/` explains the UAT doctrine, architecture, lifecycle, roles, repository
+  status, and capability boundary;
 - `/command` uses platform-managed ChatGPT sign-in and provides an interactive
-  deterministic policy lab.
+  deterministic policy lab;
+- `/egregore` stores bounded owner Egregore, activation-intent, sibling-service,
+  agent-context, and audit state;
+- `/pricing` and `/system` disclose the unapproved subscription and production
+  activation gates without claiming checkout, entitlement, or live integration.
 
 The website is intentionally not configured with API credentials, financial
 accounts, production secrets, or access to the FastAPI governance database.
 Its action lab calculates and explains a bounded risk floor but cannot execute
-the proposed action. Treat it as an institutional communication and operator
-training surface until the API integration gates in `docs/CHATGPT_SITE.md`
-have cleared.
+the proposed action. DALEOBANKS remains a separate sibling service, and LIVE
+PLAYER remains unresolved agent context with authority `none`. Treat the Site
+as an owner-beta product and operator-training surface until the API integration
+gates in `docs/CHATGPT_SITE.md` have cleared.
 
 The current Sites access policy is `custom` with the owner as the only allowed
 user. The deployment is live but is not a public-internet launch. The current

@@ -140,7 +140,7 @@ def test_live_chatgpt_site_has_a_repository_enforced_truth_boundary() -> None:
     assert site["url"] in readme
     assert site["url"] in site_doc
     assert site["integration_status"] == (
-        "published_truthful_frontend_not_connected_to_production_control_plane"
+        "owner_beta_product_state_only_not_connected_to_production_control_plane_or_external_services"
     )
     assert site["access_mode"] == "custom_owner_only"
     assert site["public_access_status"] == (
@@ -149,7 +149,7 @@ def test_live_chatgpt_site_has_a_repository_enforced_truth_boundary() -> None:
     assert "External side effect: Not executed." in site_doc
     assert "not public internet access" in site_doc
     assert any(
-        "does not read or mutate" in limitation
+        "not a production control-plane client" in limitation
         for limitation in capability["limitations"]
     )
 

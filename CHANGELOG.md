@@ -22,10 +22,12 @@
   tags, provenance, and an SBOM.
 - Added a locked dependency graph and CI vulnerability audit; removed the
   vulnerable JOSE dependency from the preview token path.
-- Published the UAT Venture Command ChatGPT website with an owner-access institutional
-  surface, ChatGPT-managed command-room sign-in, and a deterministic
-  no-execution action lab. The website remains isolated from production data
-  and external tools.
+- Published the UAT Venture Command ChatGPT website with an owner-access
+  institutional surface, D1-backed Egregore and activation-intent records,
+  ChatGPT-managed sign-in, and a deterministic no-execution action lab.
+- Represented DALEOBANKS as a separate schema-1.0-compatible sibling service
+  and LIVE PLAYER as unresolved agent context with authority `none`; neither is
+  connected to production execution.
 
 This release does not enable autonomous external actions or claim that AG1,
 AG2, production, security, or enterprise assurance gates have cleared.

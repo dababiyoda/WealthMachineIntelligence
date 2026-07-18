@@ -1,0 +1,85 @@
+{
+  "record_version": "2026-07-18.3",
+  "scope": "chatgpt_site_multi_tenant_subscription_and_connector_readiness",
+  "current_node": "N1_durable_owner_beta",
+  "authority_ceiling": "record_owned_workspace_and_activation_intents_only",
+  "external_side_effects": "none",
+  "access": {
+    "current_mode": "custom_owner_only",
+    "public_mode_available": false,
+    "commercial_multi_user_ready": false
+  },
+  "billing": {
+    "provider": "unselected",
+    "price": "unapproved",
+    "checkout": "not_configured",
+    "webhook_entitlement": "not_implemented",
+    "charges_authorized": false
+  },
+  "connectors": {
+    "chatgpt_identity": "implemented_by_host",
+    "github": "repository_traceability_only_not_user_oauth",
+    "daleobanks": {
+      "classification": "separate_github_service",
+      "repository": "dababiyoda/DALEOBANKS",
+      "schema": "opportunity_packet_1_0_compatible",
+      "protocol": {
+        "intake_endpoint": "/api/opportunities/intake",
+        "request_type": "OpportunityPacket",
+        "response_type": "VentureAssessment",
+        "requires_human_approval": true
+      },
+      "hardening_status": "verified_candidate_not_merged_or_deployed",
+      "runtime": "not_configured",
+      "execution": "not_authorized"
+    },
+    "external_oauth": "not_implemented",
+    "production_tokens_stored": false
+  },
+  "agent_contexts": {
+    "live_player": {
+      "classification": "ai_agent_context_source_not_connector",
+      "library_path": "/LIVE PLAYER",
+      "source_status": "unresolved_library_read_surface_unavailable",
+      "ingestion_status": "not_ingested",
+      "authority": "none"
+    }
+  },
+  "node_1_required_workflows": [
+    "provision_account",
+    "create_owned_egregore",
+    "retrieve_owned_egregore",
+    "request_plan_activation",
+    "request_connector_activation",
+    "request_agent_context_activation"
+  ],
+  "commercial_activation_gates": [
+    "customer_appropriate_access_mode",
+    "two_identity_tenant_isolation_evidence",
+    "approved_legal_entity_price_terms_refund_and_support_owners",
+    "signed_payment_webhook_and_entitlement_reconciliation",
+    "provider_registered_oauth_clients_and_minimum_scopes",
+    "daleobanks_sandbox_contract_and_reconciliation",
+    "paid_minimum_value_event_and_retention_evidence",
+    "independent_security_privacy_legal_and_recovery_review"
+  ],
+  "status_vocabulary": [
+    "not_configured",
+    "requested",
+    "configured",
+    "verified",
+    "active",
+    "suspended",
+    "revoked"
+  ],
+  "prohibited_claims": [
+    "a connection request is a live provider connection",
+    "a subscription intent is a completed payment",
+    "the owner-only site is a public commercial launch",
+    "the website operates the FastAPI control plane",
+    "daleobanks production execution is connected",
+    "live player context is loaded, verified, or authorized",
+    "agent context grants tool, spending, policy, or execution authority",
+    "customer tenant isolation is proven before a two-identity test"
+  ]
+}
