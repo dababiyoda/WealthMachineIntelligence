@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import sqlite3
+from dataclasses import dataclass
 from dataclasses import replace
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -145,6 +146,50 @@ def test_completed_action_returns_same_receipt_after_restart(tmp_path: Path) -> 
     assert restored_policy.get_grant("durable-grant") == first_policy.get_grant(
         "durable-grant"
     )
+
+
+def test_rich_adapter_result_has_same_canonical_shape_after_restart(
+    tmp_path: Path,
+) -> None:
+    @dataclass(frozen=True)
+    class AdapterDetail:
+        label: str
+        count: int
+
+    path = tmp_path / "control.db"
+    _, _, gateway = _provision(path)
+    observed_at = datetime(2026, 7, 18, 12, 30, tzinfo=timezone.utc)
+    gateway.register_executor(
+        "update_venture_status",
+        lambda intent: {
+            "amount": Decimal("12.50"),
+            "observed_at": observed_at,
+            "steps": ("validated", 2),
+            "detail": AdapterDetail("pilot", 3),
+            7: "non-string-key",
+        },
+    )
+    intent = _intent("canonical-result-replay")
+
+    first = gateway.submit(intent)
+    assert first.result == {
+        "7": "non-string-key",
+        "amount": "12.50",
+        "detail": {"count": 3, "label": "pilot"},
+        "observed_at": observed_at.isoformat(),
+        "steps": ["validated", 2],
+    }
+
+    _, _, restored_gateway = _build(path)
+    calls: list[str] = []
+    restored_gateway.register_executor(
+        "update_venture_status",
+        lambda submitted: calls.append(submitted.action_id),
+    )
+    replay = restored_gateway.submit(intent)
+
+    assert replay == first
+    assert calls == []
 
 
 def test_spend_counters_survive_restart_and_stop_splitting(tmp_path: Path) -> None:

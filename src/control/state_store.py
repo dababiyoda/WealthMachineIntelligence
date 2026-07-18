@@ -432,8 +432,19 @@ def serialize_gateway_result(result: GatewayResult) -> Mapping[str, Any]:
             if receipt is not None
             else None
         ),
-        "result": json.loads(canonical_json(result.result)),
+        "result": normalize_gateway_result_value(result.result),
     }
+
+
+def normalize_gateway_result_value(value: Any) -> Any:
+    """Return the canonical JSON representation exposed by the gateway.
+
+    Trusted adapters may use richer Python values internally. The gateway API
+    intentionally returns a process-independent JSON value on the first call
+    and every replay so callers never observe restart-dependent result types.
+    """
+
+    return json.loads(canonical_json(value))
 
 
 def deserialize_gateway_result(payload: Mapping[str, Any]) -> GatewayResult:
@@ -480,5 +491,6 @@ __all__ = [
     "StateIntegrityError",
     "StoredAction",
     "deserialize_gateway_result",
+    "normalize_gateway_result_value",
     "serialize_gateway_result",
 ]

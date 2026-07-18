@@ -22,6 +22,7 @@ from .policy_engine import PolicyEngine
 from .state_store import (
     StateIntegrityError,
     deserialize_gateway_result,
+    normalize_gateway_result_value,
     serialize_gateway_result,
 )
 
@@ -165,7 +166,10 @@ class ExecutionGateway:
 
             try:
                 with activate_authorized_execution(intent, decision):
-                    adapter_result = executor(intent)
+                    raw_adapter_result = executor(intent)
+                adapter_result = normalize_gateway_result_value(
+                    raw_adapter_result
+                )
             except Exception as exc:  # pragma: no cover - adapter-specific failures
                 receipt = ExecutionReceipt(
                     action_id=intent.action_id,
