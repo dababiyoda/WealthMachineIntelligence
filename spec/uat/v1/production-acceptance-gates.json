@@ -1,0 +1,79 @@
+{
+  "spec_version": "1.0.0-draft",
+  "current_declared_stage": "pre_AG0_simulation_skeleton",
+  "production_claim_rule": "The system may not describe itself as autonomous, enterprise-grade, secure, compliant, calibrated, or production-ready until the specifically relevant gate evidence exists and is independently reviewable.",
+  "gates": [
+    {
+      "id": "AG0",
+      "name": "epistemic_credibility",
+      "objective": "Remove unsupported certainty and make every consequential claim traceable or explicitly hypothetical.",
+      "required_artifacts": ["claim inventory", "evidence classes", "terminology migration", "simulation labeling", "unsupported-claim removal"],
+      "exit_evidence": ["dashboard and API claims trace to evidence or carry a simulation/hypothesis label", "heuristic scores are not called probabilities", "current capabilities and limitations are explicit"],
+      "required_evaluations": ["EVAL-EVID-001", "EVAL-BIZ-001"],
+      "hold_rule": "No new external autonomy or production claim while AG0 is open."
+    },
+    {
+      "id": "AG1",
+      "name": "durable_control_plane",
+      "objective": "Enforce identity, contracts, capabilities, approvals, budgets, separation of duties, audit, and kill switches outside the models.",
+      "required_artifacts": ["policy service", "agent registry", "approval service", "budget service", "audit service", "incident control", "authority matrix"],
+      "exit_evidence": ["unauthorized actions cannot bypass action class, budget, approval, or tool boundaries", "R3 and R4 actions require designated human records", "kill switches operate without model cooperation"],
+      "required_evaluations": ["EVAL-POLICY-001", "EVAL-AUTH-001", "EVAL-IAM-001", "EVAL-BUDGET-001", "EVAL-GOV-001", "EVAL-KILL-001"],
+      "hold_rule": "Agents remain analysis or sandbox only until AG1 clears."
+    },
+    {
+      "id": "AG2",
+      "name": "evidence_and_decision_ledger",
+      "objective": "Persist claims, assumptions, evidence, contradictions, experiments, decisions, approvals, and outcomes with provenance.",
+      "required_artifacts": ["authoritative relational model", "evidence object storage", "append-only decision events", "retention and classification policies", "reconstruction API"],
+      "exit_evidence": ["a venture decision reconstructs from raw signal to authorization and verified outcome", "cross-venture reuse preserves scope and confidentiality", "stale and contradictory evidence is visible"],
+      "required_evaluations": ["EVAL-MEM-001", "EVAL-EVID-001", "EVAL-AUDIT-001", "EVAL-TENANT-001"],
+      "hold_rule": "No gate advancement may depend on ephemeral memory."
+    },
+    {
+      "id": "AG3",
+      "name": "hardened_agent_runtime",
+      "objective": "Contain untrusted content, tools, secrets, models, egress, spawning, and side effects.",
+      "required_artifacts": ["isolated runtime", "tool gateway", "secrets broker", "egress policy", "model gateway", "worker quotas", "versioned evaluation harness"],
+      "exit_evidence": ["defined prompt, memory, tool, privilege, data, and model attacks are denied or contained", "no ambient production credential enters a model context", "model and prompt rollback is proven"],
+      "required_evaluations": ["EVAL-PROMPT-001", "EVAL-EGRESS-001", "EVAL-SPAWN-001", "EVAL-TOOL-001", "EVAL-MODEL-001", "EVAL-SUPPLY-001"],
+      "hold_rule": "External action remains human-executed until the relevant runtime control is proven."
+    },
+    {
+      "id": "AG4",
+      "name": "first_complete_venture_pod",
+      "objective": "Take one opportunity through paid, repeatable operation with isolated agents and bounded human supervision.",
+      "required_artifacts": ["signed venture charter", "pod contracts", "venture namespace", "approved tools", "budget", "SLOs", "support and incident runbooks", "retirement plan"],
+      "exit_evidence": ["one customer-visible recurring workflow creates measured business value", "external actions and payments reconcile", "isolation, budget, escalation, and shutdown controls work under incident conditions"],
+      "required_evaluations": ["EVAL-TENANT-001", "EVAL-IDEMP-001", "EVAL-BIZ-001", "EVAL-METRIC-001", "EVAL-RECOVERY-001"],
+      "hold_rule": "Do not create concurrent production Venture Pods before AG4 clears."
+    },
+    {
+      "id": "AG5",
+      "name": "controlled_recursive_specialization",
+      "objective": "Prove that child agents and shared assets make a second venture reach evidence faster or cheaper without authority or data leakage.",
+      "required_artifacts": ["worker factory", "spawn policy", "reusable asset registry", "safe cross-venture abstraction process", "comparative baseline"],
+      "exit_evidence": ["second venture improves time-to-proof or cost-to-proof against a defined comparator", "worker quotas and expiry hold", "no private payload crosses ventures"],
+      "required_evaluations": ["EVAL-SPAWN-001", "EVAL-TENANT-001", "EVAL-MEM-001", "EVAL-BUDGET-001"],
+      "hold_rule": "Recursive specialization remains sandboxed when its measured benefit or containment is unproven."
+    },
+    {
+      "id": "AG6",
+      "name": "portfolio_allocation",
+      "objective": "Reallocate capital and attention through precommitted evidence, risk, cash, concentration, and shared-asset rules.",
+      "required_artifacts": ["portfolio exposure model", "allocation policy", "concentration limits", "real-options tranches", "counterfactual comparator", "appeal and override process"],
+      "exit_evidence": ["repeated allocation decisions follow policy", "weak ventures lose capital despite sunk cost", "allocation is compared against equal or intuition-driven baselines", "mission and stakeholder guardrails remain satisfied"],
+      "required_evaluations": ["EVAL-METRIC-001", "EVAL-GOV-001", "EVAL-DEPENDENCY-001", "EVAL-BUDGET-001"],
+      "hold_rule": "Allocation outputs remain recommendations until calibration and governance evidence clear."
+    },
+    {
+      "id": "AG7",
+      "name": "enterprise_assurance",
+      "objective": "Establish independently reproducible security, reliability, privacy, legal, model-risk, vendor-risk, and recovery evidence.",
+      "required_artifacts": ["independent penetration test", "threat-model review", "access certification", "incident exercise", "disaster-recovery exercise", "vendor review", "model-risk review", "data-retention review", "legal assessment", "control exceptions register"],
+      "exit_evidence": ["independent reviewers reproduce control design, tests, findings, exceptions, and remediation state", "critical findings are closed or explicitly accepted by authorized owners with expiry", "production SLOs and recovery objectives are measured under failure"],
+      "required_evaluations": ["EVAL-AUDIT-001", "EVAL-SUPPLY-001", "EVAL-KILL-001", "EVAL-MODEL-001", "EVAL-RECOVERY-001", "EVAL-DEPENDENCY-001"],
+      "hold_rule": "No broad enterprise-grade or high-autonomy claim before AG7 evidence is current."
+    }
+  ]
+}

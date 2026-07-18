@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://networkmynetworth.example/spec/uat/v1/evidence-record.schema.json",
+  "title": "UAT Evidence Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidence_id",
+    "claim_id",
+    "venture_id",
+    "evidence_grade",
+    "evidence_type",
+    "source",
+    "observed_at",
+    "recorded_at",
+    "recorded_by",
+    "scope",
+    "verification_status",
+    "integrity",
+    "classification",
+    "review_at"
+  ],
+  "properties": {
+    "evidence_id": {"type": "string", "minLength": 1},
+    "claim_id": {"type": "string", "minLength": 1},
+    "venture_id": {"type": "string", "minLength": 1},
+    "evidence_grade": {
+      "enum": ["E0_assertion", "E1_source_supported", "E2_direct_observation", "E3_counterparty_commitment", "E4_paid_outcome", "E5_repeatable_outcome"]
+    },
+    "evidence_type": {
+      "enum": ["document", "dataset", "interview", "workflow_observation", "commitment", "payment", "telemetry", "experiment", "legal_review", "security_test", "operational_result", "other"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locator", "publisher_or_counterparty", "retrieved_at"],
+      "properties": {
+        "locator": {"type": "string", "minLength": 1},
+        "publisher_or_counterparty": {"type": "string", "minLength": 1},
+        "retrieved_at": {"type": "string", "format": "date-time"},
+        "authoritative_for": {"type": "array", "items": {"type": "string"}},
+        "terms_or_consent_ref": {"type": ["string", "null"]}
+      }
+    },
+    "observed_at": {"type": "string", "format": "date-time"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "recorded_by": {"type": "string", "minLength": 1},
+    "scope": {"type": "string", "minLength": 1},
+    "content_ref": {"type": ["string", "null"]},
+    "summary": {"type": ["string", "null"]},
+    "verification_status": {"enum": ["unverified", "verified", "disputed", "superseded", "invalid"]},
+    "verified_by": {"type": ["string", "null"]},
+    "contradicts_evidence_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "custody_log_ref"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+        "signature_ref": {"type": ["string", "null"]},
+        "custody_log_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "classification": {"enum": ["public", "internal", "confidential", "restricted", "regulated"]},
+    "retention_policy_id": {"type": ["string", "null"]},
+    "review_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": ["string", "null"], "format": "date-time"}
+  }
+}
