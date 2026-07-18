@@ -25,6 +25,12 @@ must also use a representative test design and severity-weighted failure
 definition. Correlated trials, repeated easy cases, or missing audit data do not
 count as independent assurance.
 
+The implementation enforces the starting boundary in the policy engine: a new
+root grant can be issued only at A0 or A1. A request for A2–A4 is rejected even
+from a configured root, so no HTTP route, script, or alternate trusted caller
+can use grant creation to skip the evidence ladder. Each later transition uses
+the one-stage promotion method and is recorded in the Evidence Ledger.
+
 ## Two independent evidence lanes
 
 | Lane | Question | Strong evidence | What it can unlock |
@@ -109,6 +115,11 @@ Promotion requires all of the following:
 4. an intact Evidence Ledger chain;
 5. objective criteria passing; and
 6. an independent root-human approver and review identifier.
+
+Human API operations use the intersection of two independent sources: signed
+JWT claims and a separately configured authority allowlist. A token cannot
+self-declare root authority, and request payloads cannot choose the actor of an
+approval or incident.
 
 Regression is deliberately easier:
 

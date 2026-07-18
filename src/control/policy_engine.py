@@ -88,6 +88,41 @@ class PolicyEngine:
     def action_definitions(self) -> dict[str, ActionDefinition]:
         return dict(self._action_definitions)
 
+    @property
+    def persistence_healthy(self) -> bool:
+        """Return whether the last durable policy-state write succeeded."""
+
+        return self._persistence_healthy
+
+    @property
+    def evidence_continuity(self) -> bool:
+        """Return whether the configured ledger contains the stored anchor."""
+
+        return self._evidence_continuity
+
+    def list_cells(self) -> tuple[VentureCellCharter, ...]:
+        """Return a stable snapshot of configured Venture Cells."""
+
+        with self._lock:
+            return tuple(
+                sorted(self._cells.values(), key=lambda item: item.cell_id)
+            )
+
+    def list_grants(
+        self,
+        *,
+        cell_id: str | None = None,
+    ) -> tuple[CapabilityGrant, ...]:
+        """Return a stable snapshot of grants, optionally scoped to one cell."""
+
+        with self._lock:
+            grants = self._grants.values()
+            if cell_id is not None:
+                grants = (
+                    grant for grant in grants if grant.cell_id == cell_id
+                )
+            return tuple(sorted(grants, key=lambda item: item.grant_id))
+
     def get_cell(self, cell_id: str) -> Optional[VentureCellCharter]:
         return self._cells.get(cell_id)
 
@@ -553,6 +588,11 @@ class PolicyEngine:
 
     def issue_grant(self, actor_id: str, grant: CapabilityGrant) -> CapabilityGrant:
         self._require_root(actor_id)
+        if grant.stage > AutonomyStage.SHADOW:
+            raise AuthorizationError(
+                "new root grants must start in SIMULATE or SHADOW; "
+                "executable stages require evidence-gated promotion"
+            )
         with self._lock:
             self._validate_grant(grant)
             if grant.parent_grant_id is not None:

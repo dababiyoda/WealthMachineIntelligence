@@ -19,6 +19,8 @@ This implementation is a foundation, not a claim of production certification.
 | Policy decision point | Return allow, shadow, review, or deny with reason codes. | `src/control/policy_engine.py` |
 | Execution gateway | Enforce idempotency, invoke trusted adapters only after allow, and produce receipts. | `src/control/gateway.py` |
 | Durable control state | Transactionally persist policy snapshots and the reserved/in-flight/completed action lifecycle for restart recovery. | `src/control/state_store.py` |
+| Authenticated control runtime | Reconstruct one durable policy/gateway instance from an explicit root/human authority map. | `src/api/control_runtime.py` |
+| Human control API | Expose root creation/resume/revoke and human pause/approval/incident operations without accepting caller-supplied authority. | `src/api/routes/control.py` |
 | Authorized execution context | Bind the allowed intent's action and resource to the adapter call stack; reject ordinary direct or confused-deputy mutation calls. | `src/control/execution_context.py` |
 | Graph adapters | Convert loop, risk, and monitor persistence requests into intents and dispatch validated payloads only inside the gateway. | `src/control/graph_adapter.py` |
 | Evidence Ledger | Append hash-chained intents, policy decisions, approvals, grants, incidents, promotions, regressions, and receipts. | `src/control/evidence.py` |
@@ -58,6 +60,11 @@ The policy engine checks, in order:
 
 Unknown action, missing state, stale context, and adapter absence never default
 to allow.
+
+A newly issued root grant may start only in `SIMULATE` or `SHADOW`, where it
+cannot execute a side effect. The policy engine itself rejects direct issuance
+at an executable stage, so HTTP validation cannot be bypassed by another trusted
+caller. Advancement remains exactly one stage per recorded promotion decision.
 
 ## Restart recovery and transaction boundary
 
@@ -149,6 +156,21 @@ tamper-evident rather than independently anchored, so production still requires
 a workforce identity provider with account lifecycle and signing-key rotation,
 plus a durable audit/outbox design. The HS256 verifier is a controlled-pilot
 reference, not a substitute for that identity system.
+
+The control API adds an independent authority intersection. A signed role or
+permission is not sufficient by itself: the verified JWT subject must also
+match `CONTROL_ROOT_AUTHORITY_ID` or one of
+`CONTROL_HUMAN_AUTHORITY_IDS`. Root operations require `control:root`; human
+approval/pause operations require `control:approve`; portfolio reads require
+`control:read`; and incident reports require `control:incident`. Request bodies
+cannot select the actor for an approval or incident. Approval identity, policy
+version, issue time, and bounded expiry are assigned by the server.
+
+Production startup requires explicit durable paths and at least two distinct
+human subjects so the default R3 dual-control rule is operationally possible.
+The included SQLite/JSONL runtime remains a single-process controlled-pilot
+reference; this identity mapping does not make it a replicated production
+control service.
 
 ## Evidence Ledger guarantees and limits
 
@@ -242,7 +264,9 @@ policy.issue_grant(
         cell_id="venture-42",
         agent_id="decision-engine",
         action_type="update_venture_status",
-        stage=AutonomyStage.SUPERVISED_CANARY,
+        # New grants cannot execute. Promote one stage at a time only after
+        # same-context assurance evidence passes the configured criteria.
+        stage=AutonomyStage.SHADOW,
         resource_prefixes=("venture:venture-42",),
         parameter_constraints={
             "parameters.new_status": ("Needs Review", "On Hold"),

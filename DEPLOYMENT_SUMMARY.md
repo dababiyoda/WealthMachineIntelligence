@@ -17,7 +17,11 @@ compliance, or a real-world venture failure rate.
 - metrics/logging foundations;
 - proposal-only rule execution by default; and
 - control-plane primitives for scoped grants, policy decisions, approvals,
-  budgets, evidence, incidents, and execution receipts.
+  budgets, evidence, incidents, and execution receipts;
+- a signed-subject plus configured-authority control API for local controlled
+  pilots; and
+- restart-safe cell, grant, approval, pause, and incident state in the SQLite
+  reference runtime.
 
 ## Release blockers
 
@@ -25,6 +29,10 @@ compliance, or a real-world venture failure rate.
   audience, role, and permission shape; forbid demo auth in production.
 - [ ] Replace the local shared-secret reference with a production workforce IdP,
   user lifecycle/revocation, signing-key rotation, and end-to-end deployment tests.
+- [x] Prevent API principals from self-declaring root/human control authority;
+  bind approvals/incidents to the verified subject and enforce bounded TTLs.
+- [x] Reject brand-new grants above A1 in the policy engine; require one-stage
+  evidence-gated promotion for all executable authority.
 - [ ] Inventory every consequential runtime and administrative side-effect path.
 - [ ] Make gateway mediation and downstream policy unavoidable.
 - [ ] Remove direct consequential credentials and unrestricted egress from agent runtimes.
@@ -58,6 +66,7 @@ External side effects require the additional capability-stage evidence in
 ## Operational references
 
 - `docs/CONSTITUTIONAL_CONTROL_LAYER.md`
+- `docs/CONTROL_API.md`
 - `docs/VENTURE_CELL_CHARTER_TEMPLATE.md`
 - `docs/IMPLEMENTATION_ROADMAP.md`
 - `docs/SIDE_EFFECT_INVENTORY.md`

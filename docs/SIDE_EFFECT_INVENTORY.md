@@ -18,6 +18,7 @@ or network routes.
 | Retired: `services/ai_agents.py:_get_agent_id` | Previously created a persistent agent record during risk analysis. | R2 | **Removed.** Analysis cannot mint a persistent identity or authority record. | Provision workload and database identities through the human/root administration process. |
 | `api/routes/ventures.py` | Create, update, discontinue, and launch venture records. | Human administrative plane | **Signed admin JWT required; anonymous and ordinary users fail closed.** Signature, expiry, issuer, audience, role, and permission shape are checked. Each mutation writes a hash-chained intent/outcome audit pair. | Replace the shared-secret reference with a workforce IdP and account revocation; make audit/outcome transactional and use field-specific dual control where material. |
 | `api/routes/agents.py` | Activate/deactivate persistent agent records. | Human administrative plane | **Signed admin JWT required with hash-chained audit.** `is_active` does not create a capability grant. | Add workforce identity lifecycle/key rotation and a durable transactional audit/outbox. |
+| `api/routes/control.py` | Create/pause/resume/terminate cells; issue/revoke grants; record approvals/incidents. | Constitutional human control plane | **Verified subject plus independently configured authority and exact control permission.** New grants are A0/A1 only; actor identity and TTLs are server-bound; every policy mutation enters the durable control snapshot and Evidence Ledger. | Move the runtime to a replicated store, workforce identity, and independently anchored evidence before production. |
 | `api/routes/opportunities.py` | Evaluate and retain in-memory assessment objects. | R0/R1 | Explicitly recommendation-only. | Add durable evidence provenance; never convert an assessment directly into an execution grant. |
 | `auth/keycloak.py` | Fetch JWKS for token verification. | R0 external read | Direct network read. | Pin issuer/audience, cache safely, and allowlist egress; no venture capability needed. |
 | `control/evidence.py` | Append control evidence to JSONL. | Trusted control write | Inside control plane. | Move to transactional, independently anchored storage with separate auditor access. |
@@ -34,6 +35,7 @@ agent identity from reaching them:
 | `database/connection.py:create_tables` | Create schema. | Migration identity. |
 | `database/connection.py:drop_tables` | Destructive schema removal. | Requires explicit `ALLOW_SCHEMA_DROP=true` plus a constant-time confirmation token; keep callable only by an offline break-glass identity. Dual-human workflow remains a deployment requirement. |
 | `api/main.py` startup | Schema creation is disabled by default and forbidden in production. | Add controlled, reviewed migration tooling under a separate identity. |
+| `api/control_runtime.py` startup | Reconstruct the root/human authority map, policy snapshot, action lifecycle, and ledger. | Production requires explicit paths and at least two distinct configured human subjects; shared-store migration remains open. |
 
 ## Common choke point
 

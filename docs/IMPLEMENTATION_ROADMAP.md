@@ -51,10 +51,18 @@ actions persist a reserved/in-flight/completed lifecycle: completed requests
 return their prior receipt, changed fingerprints fail, and unresolved in-flight
 requests require reconciliation instead of replay.
 
+The authenticated control API reconstructs that runtime from explicit durable
+paths and an authority map whose identifiers must match verified JWT subjects.
+Root, human approval, read, and incident permissions are separate. Creation,
+resume, termination, and revocation remain root-only; pause and approval require
+a configured human; incident reports can reduce but not increase authority.
+New grants are restricted to A0/A1 in the policy engine itself.
+
 The implementation is not yet production-enforced. The durable store is local
-and optional, identities are strings, the ledger is not externally anchored,
-and the deployment does not yet prove that direct credentials and network paths
-are absent.
+and optional, human API identities use a shared-secret controlled-pilot
+verifier, agent/workload identities are not yet cryptographically bound, the
+ledger is not externally anchored, and the deployment does not yet prove that
+direct credentials and network paths are absent.
 
 ## GPS lock
 
@@ -98,9 +106,10 @@ are absent.
 
 **Status:** In progress. Known `KnowledgeGraphConnector` and AI-service writes
 are mediated or proposal-only. Human CRUD is segregated behind explicit admin
-authentication and tamper-evident audit. Local transactional control state and
-fail-closed restart recovery are implemented. Shared/replicated durability,
-durable admin audit/outbox, workload identity, credentials, and deployment
+authentication and tamper-evident audit. Human control operations intersect
+signed permissions with a separate authority allowlist, and local transactional
+state now reconstructs behind that API. Shared/replicated durability, durable
+admin audit/outbox, workforce/workload identity, credentials, and deployment
 egress remain open.
 
 - Inventory every database write, message, payment, contract/signature path,

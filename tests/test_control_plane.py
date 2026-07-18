@@ -91,6 +91,47 @@ def _grant(
     )
 
 
+def _issue_grant(policy, grant: CapabilityGrant) -> CapabilityGrant:
+    """Install a grant through the same one-stage evidence ladder as production."""
+
+    target_stage = grant.stage
+    initial_stage = min(target_stage, AutonomyStage.SHADOW)
+    installed = policy.issue_grant(
+        ROOT,
+        replace(grant, stage=initial_stage),
+    )
+    proof_by_stage = {
+        AutonomyStage.SUPERVISED_CANARY: (29, 7, 1),
+        AutonomyStage.BOUNDED: (99, 14, 2),
+        AutonomyStage.SCALED_BOUNDED: (299, 30, 3),
+    }
+    while installed.stage < target_stage:
+        next_stage = AutonomyStage(installed.stage + 1)
+        trials, observation_days, rollback_drills = proof_by_stage[next_stage]
+        evaluation = policy.promote_grant(
+            ROOT,
+            installed.grant_id,
+            PromotionEvidence(
+                trials=trials,
+                failures=0,
+                observation_days=observation_days,
+                audit_completeness=1.0,
+                rollback_drills=rollback_drills,
+                policy_violations=0,
+                critical_incidents=0,
+                red_team_critical_findings=0,
+                context_fingerprint=installed.context_fingerprint,
+            ),
+            independent_review_id=(
+                f"test-review:{installed.grant_id}:{next_stage.name}"
+            ),
+        )
+        assert evaluation.passed
+        installed = policy.get_grant(installed.grant_id)
+        assert installed is not None
+    return installed
+
+
 def _intent(
     *,
     action_id: str,
@@ -191,7 +232,7 @@ def test_assumption_register_rejects_internal_confidence_as_proof() -> None:
 
 def test_shadow_grant_never_invokes_executor() -> None:
     policy, gateway = _plane()
-    policy.issue_grant(ROOT, _grant(stage=AutonomyStage.SHADOW))
+    _issue_grant(policy, _grant(stage=AutonomyStage.SHADOW))
     calls = []
     gateway.register_executor("update_venture_status", calls.append)
 
@@ -202,9 +243,21 @@ def test_shadow_grant_never_invokes_executor() -> None:
     assert calls == []
 
 
+def test_new_grant_cannot_skip_the_evidence_ladder() -> None:
+    policy, _ = _plane()
+
+    with pytest.raises(AuthorizationError, match="evidence-gated promotion"):
+        policy.issue_grant(
+            ROOT,
+            _grant(stage=AutonomyStage.BOUNDED),
+        )
+
+    assert policy.get_grant("grant-1") is None
+
+
 def test_authorized_action_executes_once_and_returns_same_receipt() -> None:
     policy, gateway = _plane()
-    policy.issue_grant(ROOT, _grant())
+    _issue_grant(policy, _grant())
     calls = []
     gateway.register_executor(
         "update_venture_status",
@@ -224,8 +277,8 @@ def test_authorized_action_executes_once_and_returns_same_receipt() -> None:
 
 def test_aggregate_budget_stops_transaction_splitting() -> None:
     policy, gateway = _plane()
-    policy.issue_grant(
-        ROOT,
+    _issue_grant(
+        policy,
         replace(
             _grant(
                 action_type="spend_within_envelope",
@@ -259,7 +312,7 @@ def test_aggregate_budget_stops_transaction_splitting() -> None:
 
 def test_changed_context_forces_capability_back_to_shadow() -> None:
     policy, gateway = _plane()
-    policy.issue_grant(ROOT, _grant())
+    _issue_grant(policy, _grant())
     gateway.register_executor("update_venture_status", lambda intent: {"id": "should-not-run"})
 
     result = gateway.submit(_intent(action_id="context-change", context="model-v2"))
@@ -270,8 +323,8 @@ def test_changed_context_forces_capability_back_to_shadow() -> None:
 
 def test_material_action_needs_two_distinct_bound_human_approvals() -> None:
     policy, gateway = _plane()
-    policy.issue_grant(
-        ROOT,
+    _issue_grant(
+        policy,
         _grant(
             action_type="finance.transfer",
             stage=AutonomyStage.BOUNDED,
@@ -319,8 +372,8 @@ def test_constitutional_action_is_denied_even_without_a_grant() -> None:
 
 def test_child_grant_must_be_a_strict_subset() -> None:
     policy, _ = _plane()
-    parent = policy.issue_grant(
-        ROOT,
+    parent = _issue_grant(
+        policy,
         _grant(
             grant_id="parent",
             agent_id="parent-agent",
@@ -354,7 +407,7 @@ def test_child_grant_must_be_a_strict_subset() -> None:
 
 def test_promotion_uses_assurance_evidence_and_moves_one_stage() -> None:
     policy, _ = _plane()
-    policy.issue_grant(ROOT, _grant(stage=AutonomyStage.SHADOW))
+    _issue_grant(policy, _grant(stage=AutonomyStage.SHADOW))
     evidence = PromotionEvidence(
         trials=29,
         failures=0,
@@ -376,7 +429,7 @@ def test_promotion_uses_assurance_evidence_and_moves_one_stage() -> None:
 
 def test_major_incident_regresses_and_critical_incident_pauses_cell() -> None:
     policy, _ = _plane()
-    policy.issue_grant(ROOT, _grant(stage=AutonomyStage.BOUNDED))
+    _issue_grant(policy, _grant(stage=AutonomyStage.BOUNDED))
     policy.report_incident(
         Incident(
             incident_id="incident-major",
@@ -404,8 +457,8 @@ def test_major_incident_regresses_and_critical_incident_pauses_cell() -> None:
 
 def test_parameter_constraints_are_enforced_before_adapter_execution() -> None:
     policy, gateway = _plane()
-    policy.issue_grant(
-        ROOT,
+    _issue_grant(
+        policy,
         replace(
             _grant(),
             parameter_constraints={"parameters.new_status": ("Needs Review",)},
@@ -427,8 +480,8 @@ def test_parameter_constraints_are_enforced_before_adapter_execution() -> None:
 def test_decision_engine_executes_only_through_a_matching_capability() -> None:
     cell_id = "venture-controlled"
     policy, gateway = _plane(cell_id)
-    policy.issue_grant(
-        ROOT,
+    _issue_grant(
+        policy,
         replace(
             _grant(
                 cell_id=cell_id,
