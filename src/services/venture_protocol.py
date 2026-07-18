@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 
 ALLOWED_SIGNAL_TYPES = frozenset({
     "social_complaint",

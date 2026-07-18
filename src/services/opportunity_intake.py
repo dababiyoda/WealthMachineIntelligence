@@ -91,6 +91,7 @@ class OpportunityIntakeService:
         )
         self._assessments: Dict[str, Dict[str, Any]] = {}
         self._by_packet: Dict[str, str] = {}
+        self._by_idempotency: Dict[str, str] = {}
 
     # ------------------------------------------------------------------ #
     # Evaluation
@@ -123,6 +124,15 @@ class OpportunityIntakeService:
             assessment["opportunity_score"], assessment["risk_level"],
         )
         return assessment
+
+    def get_idempotent(self, idempotency_key: str) -> Optional[Dict[str, Any]]:
+        """A repeated request with a known idempotency key returns the
+        original assessment — the engine never runs twice for one intent."""
+        assessment_id = self._by_idempotency.get(idempotency_key)
+        return self._assessments.get(assessment_id) if assessment_id else None
+
+    def remember_idempotent(self, idempotency_key: str, assessment: Dict[str, Any]) -> None:
+        self._by_idempotency[idempotency_key] = assessment["id"]
 
     def get_assessment(self, assessment_id: str) -> Optional[Dict[str, Any]]:
         found = self._assessments.get(assessment_id)
