@@ -27,8 +27,10 @@ compliance, or a real-world venture failure rate.
 - [ ] Remove direct consequential credentials and unrestricted egress from agent runtimes.
 - [ ] Persist control state and idempotency transactionally.
 - [ ] Anchor the Evidence Ledger outside the writer's trust domain.
-- [ ] Replace startup schema creation with controlled migrations.
-- [ ] Protect destructive database administration with break-glass dual control.
+- [x] Disable startup schema creation by default and forbid it in production.
+- [ ] Add controlled migrations under a separate reviewed deployment identity.
+- [x] Remove the unlocked schema-drop default; require explicit break-glass configuration and token.
+- [ ] Enforce dual-human schema administration through the deployment identity layer.
 - [ ] Validate models on representative data and calibrate any probability claims.
 - [ ] Run dependency, secret, SAST, DAST, and infrastructure security reviews.
 - [ ] Test backup, restore, reconciliation, incident response, pause, and kill paths.

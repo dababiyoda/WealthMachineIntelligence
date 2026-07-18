@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
+from contextlib import contextmanager
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -18,6 +19,7 @@ from src.control.execution_context import UnmediatedSideEffectError
 from src.control.graph_adapter import GraphIntentClient, KnowledgeGraphActionAdapter
 from src.control.models import utc_now
 from src.core.knowledge_graph import knowledge_graph
+import src.core.knowledge_graph_connector as connector_module
 from src.core.knowledge_graph_connector import KnowledgeGraphConnector
 from src.services.risk_management import RiskManager
 
@@ -187,3 +189,84 @@ def test_graph_client_and_risk_manager_are_proposal_only_without_gateway() -> No
     assert proposal["execution_status"] == "proposed"
     assert risk["persistence"]["execution_status"] == "proposed"
     assert knowledge_graph.get_node(cell_id) is None
+
+
+def test_risk_persistence_cannot_mint_its_own_agent_identity() -> None:
+    cell_id = "graph-risk-no-identity"
+    agent_id = "risk-assessment-service"
+    policy, gateway = _plane(cell_id)
+    _grant(policy, cell_id, "persist_risk_assessment", agent_id)
+    KnowledgeGraphActionAdapter(gateway, KnowledgeGraphConnector())
+    client = GraphIntentClient(
+        gateway,
+        agent_id=agent_id,
+        context_fingerprint=CONTEXT,
+    )
+
+    result = client.submit(
+        "persist_risk_assessment",
+        cell_id,
+        {
+            "assessment": {
+                "agent_id": None,
+                "risk_score": 0.2,
+                "failure_probability": 0.004,
+            }
+        },
+    )
+
+    assert result["policy_disposition"] == "allow"
+    assert result["execution_status"] == "failed"
+    assert knowledge_graph.get_node(cell_id) is None
+
+
+def test_market_analysis_without_timestamp_persists_non_null_time(
+    monkeypatch,
+) -> None:
+    cell_id = "graph-market-default-timestamp"
+    agent_id = "market-writer"
+    captured: list[object] = []
+
+    class FakeMarketAnalysis:
+        def __init__(self, **values):
+            for key, value in values.items():
+                setattr(self, key, value)
+
+    class FakeSession:
+        def add(self, value) -> None:
+            captured.append(value)
+
+    class FakeDatabase:
+        @contextmanager
+        def get_session(self):
+            yield FakeSession()
+
+    monkeypatch.setattr(connector_module, "db", FakeDatabase())
+    monkeypatch.setattr(connector_module, "MarketAnalysis", FakeMarketAnalysis)
+
+    policy, gateway = _plane(cell_id)
+    _grant(policy, cell_id, "persist_market_analysis", agent_id)
+    KnowledgeGraphActionAdapter(gateway, KnowledgeGraphConnector())
+    client = GraphIntentClient(
+        gateway,
+        agent_id=agent_id,
+        context_fingerprint=CONTEXT,
+    )
+
+    result = client.submit(
+        "persist_market_analysis",
+        cell_id,
+        {
+            "analysis": {
+                "market_size": 1_000_000,
+                "competition_level": "medium",
+                "opportunity_score": 0.6,
+            }
+        },
+    )
+
+    assert result["execution_status"] == "executed"
+    assert len(captured) == 1
+    analyzed_at = captured[0].analyzed_at
+    assert isinstance(analyzed_at, datetime)
+    assert analyzed_at.tzinfo is not None

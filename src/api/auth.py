@@ -4,7 +4,7 @@ JWT token handling and user management
 """
 import os
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 
 try:  # pragma: no cover - dependency may be unavailable in tests
@@ -25,6 +25,27 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+def demo_auth_enabled() -> bool:
+    """Return whether local demo identities were explicitly enabled."""
+
+    return (
+        os.getenv("ENVIRONMENT", "development").lower() != "production"
+        and os.getenv("ALLOW_DEMO_AUTH", "false").lower() == "true"
+    )
+
+
+def validate_auth_configuration() -> None:
+    """Fail production startup when authentication uses unsafe defaults."""
+
+    if os.getenv("ENVIRONMENT", "development").lower() != "production":
+        return
+    unsafe_secrets = {"", "change-me", "your-secret-key-change-in-production"}
+    if SECRET_KEY in unsafe_secrets or len(SECRET_KEY) < 32:
+        raise RuntimeError("JWT_SECRET_KEY must be a non-default 32+ character secret")
+    if os.getenv("ALLOW_DEMO_AUTH", "false").lower() == "true":
+        raise RuntimeError("demo authentication cannot be enabled in production")
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash."""
@@ -54,9 +75,9 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     to_encode = data.copy()
     
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -102,6 +123,8 @@ DEMO_USERS = {
 
 def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     """Authenticate a user with username/password"""
+    if not demo_auth_enabled():
+        return None
     user = DEMO_USERS.get(username)
     if not user:
         return None
@@ -121,13 +144,10 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Dic
     """Retrieve the current user based on the access token."""
 
     if not token:
-        # Default to admin for development/test scenarios
-        return {
-            "user_id": DEMO_USERS["admin"]["user_id"],
-            "username": DEMO_USERS["admin"]["username"],
-            "role": DEMO_USERS["admin"]["role"],
-            "permissions": DEMO_USERS["admin"]["permissions"],
-        }
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication credentials required",
+        )
 
     payload = verify_token(token)
     if not payload:
@@ -149,3 +169,17 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Dic
         "role": user["role"],
         "permissions": user["permissions"],
     }
+
+
+async def require_admin_user(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+) -> Dict[str, Any]:
+    """Require an authenticated human administrative identity."""
+
+    permissions = set(current_user.get("permissions", []))
+    if current_user.get("role") != "admin" or "admin" not in permissions:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Human administrator authority required",
+        )
+    return current_user

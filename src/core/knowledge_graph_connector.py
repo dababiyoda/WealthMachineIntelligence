@@ -21,6 +21,7 @@ identity, credentials, and egress policy.
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
 from ..control.execution_context import require_authorized_execution
@@ -162,6 +163,55 @@ class KnowledgeGraphConnector:
             node.update({"sentiment_analysis": sentiment_data})
         else:
             knowledge_graph.add_node(Node(venture_id, "DigitalVenture", {"sentiment_analysis": sentiment_data}))
+
+    def store_market_analysis(
+        self,
+        venture_id: str,
+        analysis_data: Dict[str, Any],
+    ) -> None:
+        """Persist a complete market-analysis artifact through the gateway."""
+
+        require_authorized_execution(
+            action_types={"persist_market_analysis"},
+            resource=f"venture:{venture_id}",
+        )
+        logger.info(
+            "Storing market analysis",
+            extra={"venture_id": venture_id, "analysis_mode": analysis_data.get("analysis_mode")},
+        )
+
+        if db and MarketAnalysis:
+            try:
+                with db.get_session() as session:
+                    session.add(
+                        MarketAnalysis(
+                            venture_id=venture_id,
+                            market_size=analysis_data.get("market_size", 0.0),
+                            growth_rate=analysis_data.get("growth_rate"),
+                            competition_level=analysis_data.get("competition_level", "unknown"),
+                            opportunity_score=analysis_data.get("opportunity_score", 0.0),
+                            timing_score=analysis_data.get("timing_score"),
+                            key_trends=analysis_data.get("key_trends", []),
+                            customer_segments=analysis_data.get("customer_segments", []),
+                            competitive_advantages=analysis_data.get("competitive_advantages", []),
+                            lstm_prediction=analysis_data.get("prediction", {}),
+                            sentiment_analysis=analysis_data.get("sentiment", {}),
+                            analyzed_at=(
+                                analysis_data.get("analyzed_at")
+                                or datetime.now(timezone.utc)
+                            ),
+                        )
+                    )
+            except Exception as exc:  # pragma: no cover
+                logger.warning("Skipping market analysis DB persistence", exc_info=exc)
+
+        node = knowledge_graph.get_node(venture_id)
+        if node:
+            node.update({"market_analysis": analysis_data})
+        else:
+            knowledge_graph.add_node(
+                Node(venture_id, "DigitalVenture", {"market_analysis": analysis_data})
+            )
 
     def store_predictions(self, venture_id: str, prediction_data: Dict[str, Any]) -> None:
         """Persist AI model predictions for a venture.

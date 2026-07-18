@@ -9,17 +9,15 @@ background workers.
 import asyncio
 import random
 from typing import Dict, List, Optional, Any
-from datetime import datetime
-from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
+from ..control.gateway import ExecutionGateway
+from ..control.graph_adapter import GraphIntentClient
 from ..database.connection import get_db
 from ..database.models import (
     DigitalVenture,
-    AIAgent,
-    RiskAssessment,
-    MarketAnalysis,
     AgentType,
     RiskLevel,
     VentureStatus,
@@ -29,10 +27,20 @@ from ..database.models import (
 class MarketIntelligenceService:
     """Synthetic market-analysis prototype requiring external validation."""
     
-    def __init__(self):
+    def __init__(
+        self,
+        gateway: Optional[ExecutionGateway] = None,
+        context_fingerprint: str = "",
+        agent_id: str = "market-intelligence-service",
+    ):
         self.agent_type = AgentType.MARKET_INTELLIGENCE
         self.model_version = "1.0.0"
         self.confidence_threshold = 0.7
+        self.graph_intents = GraphIntentClient(
+            gateway,
+            agent_id=agent_id,
+            context_fingerprint=context_fingerprint,
+        )
         
     async def analyze_market_opportunity(self, venture_id: str, market_data: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze market opportunity using AI models"""
@@ -63,21 +71,31 @@ class MarketIntelligenceService:
                 'execution_authority': False,
             }
             
-            # Store analysis in database
-            with get_db() as session:
-                analysis = MarketAnalysis(
-                    venture_id=venture_id,
-                    market_size=market_size,
-                    opportunity_score=opportunity_score,
-                    key_trends=insights['key_trends'],
-                    lstm_prediction={
-                        'trend_score': trend_score,
-                        'analysis_mode': 'synthetic_demo',
+            insights["persistence"] = self.graph_intents.submit(
+                "persist_market_analysis",
+                venture_id,
+                {
+                    "analysis": {
+                        "market_size": market_size,
+                        "growth_rate": market_data.get("growth_rate"),
+                        "competition_level": competition_level,
+                        "opportunity_score": opportunity_score,
+                        "key_trends": insights["key_trends"],
+                        "prediction": {
+                            "trend_score": trend_score,
+                            "analysis_mode": "synthetic_demo",
+                        },
+                        "analysis_mode": "synthetic_demo",
+                        "production_evidence": False,
+                        "analyzed_at": datetime.now(timezone.utc),
                     },
-                    analyzed_at=datetime.utcnow()
-                )
-                session.add(analysis)
-                session.commit()
+                    "provenance": {
+                        "producer": self.graph_intents.agent_id,
+                        "source_type": "randomized_demo_simulation",
+                        "production_evidence": False,
+                    },
+                },
+            )
             
             logger.info("Market opportunity analyzed",
                        venture_id=venture_id,
@@ -129,10 +147,22 @@ class MarketIntelligenceService:
 class RiskAssessmentService:
     """Uncalibrated heuristic risk service for development use."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        gateway: Optional[ExecutionGateway] = None,
+        context_fingerprint: str = "",
+        agent_id: str = "risk-assessment-service",
+        persistent_agent_id: Optional[str] = None,
+    ):
         self.agent_type = AgentType.RISK_ASSESSMENT
         self.model_version = "1.0.0"
         self.legacy_score_threshold = 0.0001
+        self.persistent_agent_id = persistent_agent_id
+        self.graph_intents = GraphIntentClient(
+            gateway,
+            agent_id=agent_id,
+            context_fingerprint=context_fingerprint,
+        )
         # Pre-compute weights without requiring a numerical runtime dependency.
         self._weight_vector = (0.35, 0.25, 0.3, 0.1)
         
@@ -166,61 +196,71 @@ class RiskAssessmentService:
                     risk_score, failure_probability
                 )
                 
-                # Store assessment
-                assessment = RiskAssessment(
-                    venture_id=venture_id,
-                    agent_id=self._get_agent_id(session),
-                    risk_score=risk_score,
-                    failure_probability=failure_probability,
-                    market_risk=market_risk,
-                    operational_risk=operational_risk,
-                    financial_risk=financial_risk,
-                    technical_risk=technical_risk,
-                    risk_level=risk_level,
-                    recommendations=recommendations,
-                    model_version=self.model_version,
-                    confidence_level=0.85,
-                    assessed_at=datetime.utcnow()
-                )
-                session.add(assessment)
-                
-                # Update venture risk metrics
-                venture.risk_score = risk_score
-                venture.failure_probability = failure_probability
-                venture.risk_level = risk_level
-                
-                session.commit()
-                
-                logger.info("Risk assessment completed",
-                           venture_id=venture_id,
-                           risk_score=risk_score,
-                           failure_probability=failure_probability,
-                           meets_internal_threshold=(
-                               failure_probability <= self.legacy_score_threshold
-                           ),
-                           probability_calibrated=False)
-                
-                return {
-                    'risk_score': risk_score,
-                    'failure_probability': failure_probability,
-                    'risk_level': risk_level.value,
-                    'risk_factors': {
-                        'market': market_risk,
-                        'operational': operational_risk,
-                        'financial': financial_risk,
-                        'technical': technical_risk
-                    },
-                    'recommendations': recommendations,
-                    'meets_internal_threshold': (
-                        failure_probability <= self.legacy_score_threshold
+                assessment = {
+                    "agent_id": self.persistent_agent_id,
+                    "risk_score": risk_score,
+                    "failure_probability": failure_probability,
+                    "market_risk": market_risk,
+                    "operational_risk": operational_risk,
+                    "financial_risk": financial_risk,
+                    "technical_risk": technical_risk,
+                    "risk_level": risk_level,
+                    "recommendations": recommendations,
+                    "model_version": self.model_version,
+                    "confidence_level": 0.85,
+                    "assessed_at": datetime.now(timezone.utc),
+                    "probability_calibrated": False,
+                    "score_semantics": (
+                        "heuristic proxy; not an empirical venture failure probability"
                     ),
-                    'probability_calibrated': False,
-                    'score_semantics': (
-                        'heuristic proxy stored in a legacy probability field; '
-                        'not an empirical venture failure probability'
-                    ),
-                    'execution_authority': False,
                 }
+
+            persistence = self.graph_intents.submit(
+                "persist_risk_assessment",
+                venture_id,
+                {
+                    "assessment": assessment,
+                    "provenance": {
+                        "producer": self.graph_intents.agent_id,
+                        "source_type": "uncalibrated_heuristic",
+                        "production_evidence": False,
+                    },
+                },
+            )
+
+            logger.info(
+                "Risk assessment completed",
+                venture_id=venture_id,
+                risk_score=risk_score,
+                failure_probability=failure_probability,
+                meets_internal_threshold=(
+                    failure_probability <= self.legacy_score_threshold
+                ),
+                probability_calibrated=False,
+            )
+
+            return {
+                "risk_score": risk_score,
+                "failure_probability": failure_probability,
+                "risk_level": risk_level.value,
+                "risk_factors": {
+                    "market": market_risk,
+                    "operational": operational_risk,
+                    "financial": financial_risk,
+                    "technical": technical_risk,
+                },
+                "recommendations": recommendations,
+                "meets_internal_threshold": (
+                    failure_probability <= self.legacy_score_threshold
+                ),
+                "probability_calibrated": False,
+                "score_semantics": (
+                    "heuristic proxy stored in a legacy probability field; "
+                    "not an empirical venture failure probability"
+                ),
+                "execution_authority": False,
+                "persistence": persistence,
+            }
                 
         except SQLAlchemyError as e:
             logger.error("Risk assessment failed", venture_id=venture_id, error=str(e))
@@ -336,31 +376,24 @@ class RiskAssessmentService:
         
         return recommendations
     
-    def _get_agent_id(self, session: Session) -> str:
-        """Get or create risk assessment agent"""
-        agent = session.query(AIAgent).filter(
-            AIAgent.agent_type == self.agent_type
-        ).first()
-        
-        if not agent:
-            agent = AIAgent(
-                agent_type=self.agent_type,
-                name="Risk Assessment Agent",
-                version=self.model_version,
-                model_type="Heuristic prototype (uncalibrated)",
-                is_active=True
-            )
-            session.add(agent)
-            session.commit()
-        
-        return agent.id
-
 class DecisionOrchestrator:
     """Orchestrate recommendation-only venture analysis."""
     
-    def __init__(self):
-        self.market_service = MarketIntelligenceService()
-        self.risk_service = RiskAssessmentService()
+    def __init__(
+        self,
+        gateway: Optional[ExecutionGateway] = None,
+        context_fingerprint: str = "",
+        persistent_risk_agent_id: Optional[str] = None,
+    ):
+        self.market_service = MarketIntelligenceService(
+            gateway=gateway,
+            context_fingerprint=context_fingerprint,
+        )
+        self.risk_service = RiskAssessmentService(
+            gateway=gateway,
+            context_fingerprint=context_fingerprint,
+            persistent_agent_id=persistent_risk_agent_id,
+        )
     
     async def evaluate_venture_opportunity(self, venture_id: str, 
                                          market_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

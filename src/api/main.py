@@ -1,23 +1,38 @@
-"""
-Enterprise FastAPI application for WealthMachine
-Production-ready API with authentication, monitoring, and comprehensive endpoints
-"""
+"""FastAPI prototype for doctrine-governed WealthMachine workflows."""
 from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import JSONResponse
-import time
 from src.logging_config import configure_logging, logger
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import Counter, Histogram, generate_latest
 from prometheus_client import start_http_server
 import os
 from contextlib import asynccontextmanager
 
 from ..database.connection import db
 from .routes import ventures, agents, analytics, health, opportunities
-from .auth import verify_token
+from .auth import validate_auth_configuration, verify_token
 from .middleware import SecurityHeadersMiddleware, LoggingMiddleware
+
+
+def _configured_trusted_hosts(environment: str) -> list[str]:
+    hosts = [
+        host.strip()
+        for host in os.getenv("ALLOWED_HOSTS", "").split(",")
+        if host.strip()
+    ]
+    if environment == "production":
+        if not hosts:
+            raise RuntimeError(
+                "ALLOWED_HOSTS must name at least one explicit host in production"
+            )
+        if "*" in hosts:
+            raise RuntimeError(
+                "ALLOWED_HOSTS cannot contain '*' in production"
+            )
+        return hosts
+    return hosts or ["*"]
 
 # Configure structured logging
 configure_logging()
@@ -30,15 +45,22 @@ REQUEST_DURATION = Histogram('wealthmachine_request_duration_seconds', 'Request 
 async def lifespan(app: FastAPI):
     """Application lifespan management"""
     # Startup
-    logger.info("Starting WealthMachine Enterprise API")
-    
-    # Initialize database
-    try:
-        db.create_tables()
-        logger.info("Database tables initialized")
-    except Exception as e:
-        logger.error("Failed to initialize database", error=str(e))
-        raise
+    logger.info("Starting WealthMachine controlled-pilot API")
+    validate_auth_configuration()
+
+    environment = os.getenv("ENVIRONMENT", "development").lower()
+    auto_create_schema = os.getenv("AUTO_CREATE_SCHEMA", "false").lower() == "true"
+    if environment == "production" and auto_create_schema:
+        raise RuntimeError("AUTO_CREATE_SCHEMA must be disabled in production")
+    if auto_create_schema:
+        try:
+            db.create_tables()
+            logger.info("Development database tables initialized")
+        except Exception as e:
+            logger.error("Failed to initialize development database", error=str(e))
+            raise
+    else:
+        logger.info("Automatic schema creation disabled; migrations are operator-managed")
     
     # Start Prometheus metrics server
     metrics_port = int(os.getenv('METRICS_PORT', '9090'))
@@ -51,8 +73,8 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down WealthMachine Enterprise API")
 
 app = FastAPI(
-    title="WealthMachine Enterprise API",
-    description="AI-driven digital business opportunity identification and scaling system",
+    title="WealthMachine Controlled-Pilot API",
+    description="Evidence-gated venture analysis and policy-mediated execution prototype",
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/docs" if os.getenv("ENVIRONMENT") != "production" else None,
@@ -60,15 +82,27 @@ app = FastAPI(
 )
 
 # Security middleware
+environment = os.getenv("ENVIRONMENT", "development").lower()
+is_production = environment == "production"
+allowed_hosts = _configured_trusted_hosts(environment)
 app.add_middleware(
-    TrustedHostMiddleware, 
-    allowed_hosts=["*"] if os.getenv("ENVIRONMENT") != "production" else ["localhost", "*.replit.app"]
+    TrustedHostMiddleware,
+    allowed_hosts=allowed_hosts,
 )
 
+allowed_origins = (
+    [
+        origin.strip()
+        for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
+    if is_production
+    else ["*"]
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if os.getenv("ENVIRONMENT") != "production" else ["https://*.replit.app"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
@@ -135,9 +169,9 @@ app.include_router(opportunities.router, prefix="/api", tags=["opportunities"])
 async def root():
     """API root endpoint"""
     return {
-        "name": "WealthMachine Enterprise API",
+        "name": "WealthMachine Controlled-Pilot API",
         "version": "1.0.0",
-        "description": "AI-driven digital business opportunity identification and scaling system",
+        "description": "Evidence-gated venture analysis and policy-mediated execution prototype",
         "docs": "/docs",
         "health": "/health",
         "metrics": "/metrics"
