@@ -1,33 +1,72 @@
 {
   "spec_version": "1.0.0-draft",
-  "record_version": "2026-07-18.1",
+  "record_version": "2026-07-18.4",
   "as_of": "2026-07-18",
-  "declared_stage": "AG0_candidate_pending_independent_review",
-  "operating_mode": "simulation",
+  "declared_stage": "governed_preview_release_candidate",
+  "acceptance_status": {
+    "AG0": "implementation_complete_pending_independent_review",
+    "AG1": "bounded_vertical_slice_candidate",
+    "AG2": "bounded_vertical_slice_candidate",
+    "AG3_to_AG7": "not_implemented"
+  },
+  "operating_mode": "governed_preview",
   "runtime_enforced": false,
   "authorized_external_autonomy": "none",
-  "authority": "recommendation_only",
-  "data_status": "unverified_local_records_or_fixtures",
+  "authority": "policy_gated_recording_and_human_execution_only",
+  "data_status": "authoritative_governance_records_plus_unverified_legacy_fixtures",
   "risk_output_semantics": "uncalibrated_heuristic_index",
+  "operator_surfaces": {
+    "repository_preview": "FastAPI operator console and governance-record API",
+    "chatgpt_site": {
+      "url": "https://uat-venture-command.investigatin-9078.chatgpt.site",
+      "landing_route": "Institutional doctrine, architecture, lifecycle, and readiness disclosure",
+      "authenticated_route": "ChatGPT-sign-in command room with a deterministic no-execution action lab",
+      "access_mode": "custom_owner_only",
+      "public_access_status": "not_available_in_current_workspace_policy",
+      "integration_status": "published_truthful_frontend_not_connected_to_production_control_plane"
+    }
+  },
+  "implemented_control_scope": [
+    "Persistent identities, agent contracts, capability grants, and venture budgets",
+    "Deny-by-default R0-R4 action evaluation outside language models",
+    "Deterministic minimum risk floors and action-window validation",
+    "Independent human approval and dual-control checks for R3 and R4",
+    "Immediate policy re-evaluation before human execution records are accepted",
+    "R4 human-execution-only enforcement",
+    "Portfolio, venture, identity, and action-type kill switches",
+    "Claims, evidence, verification, execution, and outcome records with reconstruction",
+    "Append-only application API with a SHA-256 audit hash chain",
+    "One canonical authenticated web application and operator console"
+  ],
   "demonstrated_capabilities": [
-    "Run deterministic, local opportunity and portfolio simulations",
+    "Run deterministic local opportunity and portfolio simulations",
     "Accept the versioned DALEOBANKS OpportunityPacket compatibility contract",
-    "Render local database records and explicitly labeled offline fixtures",
-    "Validate the normative UAT artifacts through repository tests"
+    "Record bounded governance and evidence workflows in a relational database",
+    "Deny missing identity, contract, capability, evidence, budget, approval, rollback, and kill-switch requirements",
+    "Reconstruct an action from evidence through policy, approval, human execution, and independent verification",
+    "Validate the normative UAT artifacts and governed preview through repository tests",
+    "Publish an owner-access institutional website and ChatGPT-authenticated deterministic action lab that performs no external side effect"
   ],
   "limitations": [
+    "AG0 still requires independent review; the complete AG1 and AG2 acceptance gates have not cleared",
+    "The audit hash chain is application-enforced and has not yet been anchored to an independent immutable store",
+    "Database schema creation is suitable for the preview; versioned production migrations and recovery exercises remain open",
+    "The in-process rate limiter and local preview identities are not distributed enterprise controls",
+    "The operator console stores its preview bearer token in browser session storage; it is not an enterprise session architecture",
+    "The deterministic action-risk taxonomy is bounded and is not a complete production action registry",
+    "The ChatGPT website is a separately deployed presentation and simulation surface; it does not read or mutate the FastAPI governance database and is not a production control-plane client",
+    "Immediate reauthorization governs system records but cannot prevent a human from acting outside the system",
+    "No isolated agent runtime, tool gateway, secrets broker, egress control, Venture Pod, or worker factory exists",
     "No venture has been proven through paid, repeatable operation by this repository",
     "No model or heuristic is calibrated to predict venture failure probability",
-    "Financial, market, compliance, agent-performance, and risk values may be seed data or operator inputs and are not independently audited",
-    "Authentication is suitable only for local demonstration and is not an enterprise identity control plane",
-    "Agent contracts, evidence gates, budgets, approvals, isolation, audit, and kill switches are specified but not yet enforced as a complete runtime",
-    "No output authorizes spending, contracting, publication, production deployment, hiring, legal representation, or another irreversible action"
+    "Legacy financial, market, compliance, agent-performance, and risk values may be fixtures or operator inputs and are not independently audited",
+    "No output authorizes autonomous spending, contracting, publication, deployment, hiring, legal representation, or another external action"
   ],
   "prohibited_claims": [
     "guaranteed wealth or venture success",
     "empirical failure probability derived from a heuristic score",
     "legal or regulatory compliance without qualified review and evidence",
-    "production-grade, secure, autonomous, or enterprise-ready operation before the relevant acceptance gate clears"
+    "complete AG1, AG2, secure, autonomous, production-grade, or enterprise-ready operation before the relevant acceptance gate clears"
   ],
   "permitted_cycle_outcomes": [
     "progress",

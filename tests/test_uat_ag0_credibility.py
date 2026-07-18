@@ -31,11 +31,11 @@ def load(path: Path) -> dict:
 def test_current_capability_record_is_complete_and_fail_closed() -> None:
     record = current_capability_record()
 
-    assert record["declared_stage"] == "AG0_candidate_pending_independent_review"
-    assert record["operating_mode"] == "simulation"
+    assert record["declared_stage"] == "governed_preview_release_candidate"
+    assert record["operating_mode"] == "governed_preview"
     assert record["runtime_enforced"] is False
     assert record["authorized_external_autonomy"] == "none"
-    assert record["authority"] == "recommendation_only"
+    assert record["authority"] == "policy_gated_recording_and_human_execution_only"
     assert record["review_required"] is True
     assert record["limitations"]
     assert record["prohibited_claims"]
@@ -172,7 +172,7 @@ def test_runtime_descriptions_match_current_capability_record() -> None:
         for path in ("main.py", "src/api/main.py", "pyproject.toml")
     ).lower()
 
-    assert "uat simulation api" in runtime_descriptions
+    assert "uat governed preview" in runtime_descriptions
     assert "production-ready" not in runtime_descriptions
     assert "enterprise-grade ai-driven" not in runtime_descriptions
 
@@ -185,11 +185,14 @@ def test_legacy_documents_cannot_be_mistaken_for_current_assurance() -> None:
     assert "rejected as deployment evidence" in deployment
     assert "superseded and non-normative" in analysis
     assert "simulation and architecture skeleton" in replit
+    assert "P(failure)" not in analysis
+    assert "ultra-low failure" not in analysis.lower()
+    assert "governed-preview release candidate" in analysis
 
 
 def test_current_capability_record_denies_external_authority() -> None:
     capability = load(SPEC / "current-capability.json")
 
     assert capability["authorized_external_autonomy"] == "none"
-    assert capability["authority"] == "recommendation_only"
+    assert capability["authority"] == "policy_gated_recording_and_human_execution_only"
     assert any("No output authorizes" in limitation for limitation in capability["limitations"])

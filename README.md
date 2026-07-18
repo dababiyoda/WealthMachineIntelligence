@@ -1,178 +1,157 @@
-# WealthMachineOntology_DigitalAI
+# UAT Governed Preview
 
-## Purpose
-A unified ontological backbone for digital business ventures that emphasizes AI integration and multi-agent orchestration. This framework provides a structured approach to identifying, launching, and scaling digital business opportunities through AI-driven processes and human expertise.
+The repository now publishes one coherent preview of the Universally Adaptive
+Team operating model: an evidence-labeled venture simulation wrapped in a
+deterministic, deny-by-default governance and evidence workflow.
 
-## Normative enterprise specification
+**Live institutional website:**
+[`UAT Venture Command`](https://uat-venture-command.investigatin-9078.chatgpt.site)
 
-The governing target architecture is [UAT Enterprise System Specification](docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md). Its machine-readable contracts begin at [`spec/uat/v1/system-manifest.json`](spec/uat/v1/system-manifest.json).
+The landing route explains the doctrine, architecture, lifecycle, roles, and
+current readiness boundary. Its `/command` route uses ChatGPT-managed sign-in
+and provides a deterministic governed-action lab. That lab never executes an
+external action and is not connected to production venture or financial data.
+See [`docs/CHATGPT_SITE.md`](docs/CHATGPT_SITE.md) for the integration boundary.
 
-The current application is a simulation and architectural skeleton. It is not a production autonomous venture operator, and its heuristic scores are not validated probabilities. Runtime authority must not expand until the applicable acceptance gates in the specification are implemented and independently verified.
+It is ready to review and deploy as a **governed preview**. It is not ready to
+operate businesses autonomously.
 
-The machine-readable current truth boundary is
+## Current truth boundary
+
+The preview can persist identities, contracts, capability grants, budgets,
+claims, evidence, approvals, policy decisions, kill switches, human execution
+records, outcome verification, and a hash-chained audit history. It can
+reconstruct one proposed action from evidence through its final recorded state.
+
+It cannot autonomously spend, publish, deploy, contract, hire, transfer money,
+or launch a venture. External autonomy is `none`. R4 actions remain
+human-execution-only even after all approval records exist.
+
+The older venture engine remains a simulation and architectural skeleton.
+Its market, financial, agent-performance, and heuristic-risk values are not
+independently verified outcomes.
+
+Historical numerical simulation modules are quarantined from the release
+runtime. Developers who need to inspect that legacy path may install
+`.[legacy-simulation]`; it does not add production authority or calibration.
+
+The machine-readable truth boundary is
 [`spec/uat/v1/current-capability.json`](spec/uat/v1/current-capability.json).
-AG0 remediation and claim coverage are recorded in
-[`spec/uat/v1/ag0-claim-inventory.json`](spec/uat/v1/ag0-claim-inventory.json).
-The implementation is an AG0 candidate pending independent review; external
-autonomy remains unauthorized.
 
-## Core Principles
+## Architecture contract
 
-### Digital-First Approach
-- Systematic identification of low-risk, high-reward digital opportunities
-- Focus on scalable digital business models (SaaS, e-commerce, subscription services)
-- Integration of automation at every level of operations
+- Normative design: [`docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md`](docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md)
+- Venture lifecycle: [`spec/uat/v1/venture-lifecycle.json`](spec/uat/v1/venture-lifecycle.json)
+- Agent charters: [`spec/uat/v1/agent-charters.json`](spec/uat/v1/agent-charters.json)
+- Approval matrix: [`spec/uat/v1/approval-matrix.json`](spec/uat/v1/approval-matrix.json)
+- Threat model: [`spec/uat/v1/threat-model.json`](spec/uat/v1/threat-model.json)
+- Preview control claims: [`spec/uat/v1/governed-preview-controls.json`](spec/uat/v1/governed-preview-controls.json)
+- Release checklist: [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md)
 
-### AI-Driven Synergy
-- Multi-agent architecture for automated decision-making
-- Data-driven validation of business opportunities
-- Continuous learning and optimization through AI feedback loops
+## Run locally
 
-### Iterative Growth Strategy
-- Phased approach to business development
-- Risk-managed expansion through data analytics
-- Automated market validation and testing
-
-## Directory Structure
-
-### /ontology
-Contains the core ontological framework defining relationships between business entities, roles, and processes.
-
-### /roles
-Detailed specifications for each specialized role in the digital business ecosystem.
-
-### /loops
-Documentation of key operational cycles for income generation and team collaboration.
-
-### /phases
-Strategic roadmap divided into three progressive phases of business development.
-
-### /automation
-Rules and logic for automated decision-making processes.
-
-### /ai_integration
-Architecture and workflows for AI agent implementation. Documentation is located in `/ai_integration/docs` and includes:
-- `agent-architecture.md`: Comprehensive agent system design, communication flows, and scalability
-- `agent-flow.md`: Detailed step-by-step workflow for agent operations
-- `agent-lifecycle.md`: Agent initialization, state management, and maintenance
-- `multi-agent-workflow.md`: Inter-agent coordination and business process automation
-- `AI-tools.md`: Integration guidelines for AI capabilities
-
-For detailed understanding of the multi-agent system:
-1. Start with `agent-architecture.md` for system overview
-2. Review `agent-flow.md` for operational details
-3. Study `agent-lifecycle.md` for implementation specifics
-4. See `multi-agent-workflow.md` for orchestration patterns
-
-### /knowledge-graph
-Query patterns and examples for exploring relationships between ventures, roles, and processes. See:
-- `queries.md` for comprehensive documentation of query types and patterns
-- `query-examples.yaml` for practical implementation examples
-- Integration guidelines with graph databases like Neo4j, Apache Jena, and Stardog
-
-## Getting Started
-1. Review the ontology schema in `/ontology/ontology-schema.yaml`
-2. Understand role definitions in the `/roles` directory
-3. Study the operational loops in `/loops`
-4. Follow the phase progression in `/phases`
-5. Implement automation rules from `/automation`
-6. Deploy AI agents according to `/ai_integration` guidelines
-7. Explore knowledge graph capabilities in `/knowledge-graph`
-
-## Docker Setup
-The repository now includes a `Dockerfile` and `.env.example` to simplify local development.
-
-1. Copy `.env.example` to `.env` and update the values for your environment.
-2. Build the container image:
-
-   ```bash
-   docker build -t wealthmachine .
-   ```
-
-3. Run the application with your environment file:
-
-   ```bash
-   docker run --env-file .env -p 5000:5000 wealthmachine
-   ```
-
-The API will be available at `http://localhost:5000`.
-
-## Local Usage Examples
-
-### Initialize the database
-
-1. Ensure your `.env` file contains a valid `DATABASE_URL` for PostgreSQL.
-2. Run one of the initialization scripts:
-
-   ```bash
-   python setup_database.py
-   ```
-
-   or
-
-   ```bash
-   python -m src.database.init_db
-   ```
-
-### Start the API server
-
-Run the application directly with Python:
+Python 3.11 or later is required.
 
 ```bash
-python main.py
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+export DATABASE_URL=sqlite:///./uat-preview.db
+uvicorn src.api.main:app --host 127.0.0.1 --port 5000
 ```
 
-Or start it with Uvicorn:
+Open `http://127.0.0.1:5000`.
+
+Development enables two bounded local identities unless
+`UAT_ALLOW_DEMO_USERS=false`:
+
+- `admin` / `admin`: preview governor with API administration permissions;
+- `demo` / `demo`: independent evidence reviewer.
+
+These identities are prohibited in production by default. They receive only
+R0/R1 analysis and sandbox capability when preview bootstrap is enabled.
+
+## Run the release container
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 5000
+cp .env.example .env
+# Replace every placeholder secret and set the public host/origin.
+docker build -t uat-governed-preview:0.2.0-rc1 .
+docker run --env-file .env -p 5000:5000 uat-governed-preview:0.2.0-rc1
 ```
 
-### Run the test suite
+Read [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) before exposing the preview.
 
-Install the package in editable mode with the optional development
-dependencies and execute the unit tests with `pytest`:
+## Governed action flow
 
-```bash
-pip install -e .[dev]
-pytest -q
-```
+1. Register a claim.
+2. Attach source-bound evidence.
+3. Independently verify consequential evidence.
+4. Submit an action request referencing a valid contract and grant.
+5. Let the deterministic policy service check identity, scope, evidence,
+   minimum risk class, action window, budget, rollback, approvals, and kill
+   switches.
+6. Re-evaluate those controls immediately before accepting a human execution
+   record.
+7. Use a different human to verify the resulting external state.
+8. Reconstruct the complete record through
+   `GET /api/v1/governance/actions/{action_id}/reconstruction`.
 
-Use `ruff` to run the linter locally:
+The API workflow is documented in
+[`docs/CONTROL_PLANE_PREVIEW.md`](docs/CONTROL_PLANE_PREVIEW.md).
+
+## Principal endpoints
+
+| Endpoint | Purpose | Authentication |
+| --- | --- | --- |
+| `GET /` | Operator console and public truth boundary | Public |
+| `GET /health/live` | Process liveness | Public |
+| `GET /health/ready` | Database and audit-chain readiness | Public |
+| `GET /api/v1/system/capabilities` | Machine-readable capability limits | Public |
+| `POST /auth/login` | Bounded operator authentication | Credential required |
+| `GET /api/v1/governance/status` | Control/evidence-plane status | Read permission |
+| `POST /api/v1/governance/actions` | Propose and policy-check an action | Write permission |
+| `POST /api/v1/governance/kill-switches` | Activate containment | Incident permission |
+
+Legacy venture and agent mutation endpoints are held with HTTP `409`; callers
+must use the governance workflow.
+
+## DALEOBANKS compatibility bridge
+
+The existing `OpportunityPacket` intake contract remains available at:
+
+- `POST /api/opportunities/intake`
+- `POST /api/ventures/evaluate`
+- `GET /api/ventures/{assessment_id}/assessment`
+
+In production, the bridge fails closed until
+`WEALTHMACHINE_INTAKE_TOKEN` is configured. Its output is a recommendation that
+always requires human approval; it does not create or launch a venture.
+
+## Verify
 
 ```bash
 ruff check .
+python -m compileall -q src main.py
+node --check static/app.js
+pytest -q
+docker build -t uat-governed-preview:test .
 ```
 
-## DALEOBANKS Bridge (OpportunityPacket intake)
+GitHub CI repeats the test, lint, JavaScript syntax, package-integrity, image
+build, and production-configured container smoke checks. Image publication is a
+separate manual workflow requiring the exact confirmation phrase
+`PUBLISH_GOVERNED_PREVIEW`; it reruns the release matrix before emitting only
+commit-bound tags with provenance and an SBOM.
 
-DALEOBANKS (the media/signal engine) and WealthMachineIntelligence (this
-venture-evaluation engine) stay separate systems connected only by a stable
-wire protocol, mirrored in both repos as `venture_protocol`:
+## What remains before broader authority
 
-- `POST /api/opportunities/intake` — accept an `OpportunityPacket`, run it
-  through the existing `NetworkWealthEngine` venture loop (opportunity
-  scoring, market, product, business model, financial, legal, marketing,
-  partnerships, risk), and return a `VentureAssessment`
-  (`go | defer | kill | needs_more_evidence`).
-- `POST /api/ventures/evaluate` — alias for the same evaluation.
-- `GET /api/ventures/{id}/assessment` — fetch a stored assessment by
-  assessment id or opportunity packet id.
+- independent AG0 review;
+- complete AG1/AG2 review and immutable external audit anchoring;
+- versioned production database migrations and tested restoration;
+- AG3 isolated runtime, tool gateway, secret broker, and egress controls;
+- one real, paid, bounded Venture Pod proving customer value;
+- independent security, privacy, legal, reliability, and recovery assurance.
 
-Hardcoded guardrails: every assessment carries
-`requires_human_approval: true`; packets with legal risk flags are killed
-and escalated to the operator; finance-flagged packets always require legal
-review and stay educational (no revenue promises, no personalized advice).
-The endpoints run locally with zero credentials; set
-`WEALTHMACHINE_INTAKE_TOKEN` to require a shared bearer token in
-deployment. On the DALEOBANKS side, point `WEALTHMACHINE_URL` at this
-server to switch its bridge from mock to HTTP mode.
-
-## Future Development
-- Expansion of ontology with domain-specific extensions
-- Integration of advanced AI capabilities
-- Development of automated validation systems
-- Enhancement of multi-agent coordination
-- Implementation of live knowledge graph queries
-## Continuous Integration
-This project includes a basic GitHub Actions workflow located in `.github/workflows/ci.yml`. The workflow installs dependencies, runs lint checks with `ruff`, and executes the unit tests with `pytest` on every push and pull request.
+No README, dashboard, score, or passing test may be used to claim those gates
+have already cleared.

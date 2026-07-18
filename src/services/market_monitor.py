@@ -5,13 +5,12 @@ Market Monitor Service
 This module defines a background service that periodically collects
 market and operational metrics for each venture and feeds them into
 the decision engine.  It demonstrates how the rule engine, knowledge
-graph connector and simulated data collection can work together to
-provide real-time insights.
+graph connector and synthetic data collection can work together in a local
+simulation. It provides no live market intelligence.
 
-The monitor relies on an external JSON rules file to define the
-conditions and actions.  In production the metrics should be
-collected from live data streams or third-party APIs.  Here we use
-randomised simulations for demonstration purposes.
+The monitor relies on an external JSON rules file to define simulated
+conditions and proposed outcomes. Metrics are randomized fixtures and must not
+enter the authoritative evidence plane.
 """
 
 from __future__ import annotations
@@ -90,7 +89,10 @@ class MarketMonitor:
             self.connector.update_venture_metrics(venture['id'], metrics)
             outcomes = self.engine.evaluate(venture['id'], venture['type'], metrics)
             if outcomes:
-                logger.info("Actions executed", extra={"venture_id": venture['id'], "outcomes": outcomes})
+                logger.info(
+                    "Simulation rule outcomes produced",
+                    extra={"venture_id": venture['id'], "outcomes": outcomes},
+                )
 
     async def start(self) -> None:
         """Continuously run monitoring cycles with a fixed interval."""

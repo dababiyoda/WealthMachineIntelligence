@@ -7,7 +7,7 @@ models, and their outputs carry recommendation-only authority.
 import asyncio
 import numpy as np
 from typing import Dict, List, Optional, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
@@ -71,7 +71,7 @@ class MarketIntelligenceService:
                         'simulated_trend_index': trend_score,
                         'evidence_status': 'simulation_heuristic_unvalidated',
                     },
-                    analyzed_at=datetime.utcnow()
+                    analyzed_at=datetime.now(timezone.utc)
                 )
                 session.add(analysis)
                 session.commit()
@@ -174,7 +174,7 @@ class RiskAssessmentService:
                     recommendations=recommendations,
                     model_version=self.model_version,
                     heuristic_confidence=0.0,
-                    assessed_at=datetime.utcnow()
+                    assessed_at=datetime.now(timezone.utc)
                 )
                 session.add(assessment)
                 
@@ -373,7 +373,7 @@ class DecisionOrchestrator:
                 'market_analysis': market_analysis,
                 'risk_analysis': risk_analysis,
                 'final_decision': final_decision,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).isoformat()
             }
             
         except SQLAlchemyError as e:

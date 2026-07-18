@@ -1,32 +1,44 @@
 [project]
-name = "wealthmachine-enterprise"
-version = "1.0.0"
-description = "Evidence-labeled simulation and architecture skeleton for governed venture experiments"
+name = "uat-governed-preview"
+version = "0.2.0rc1"
+description = "Governed, evidence-labeled UAT venture simulation preview with no autonomous external authority"
 requires-python = ">=3.11"
 dependencies = [
-    "alembic>=1.16.4",
-    "celery>=5.5.3",
-    "fastapi>=0.116.1",
-    "numpy>=2.2.2",
-    "pandas>=2.2.3",
-    "passlib[bcrypt]>=1.7.4",
-    "prometheus-client>=0.22.1",
-    "psycopg2-binary>=2.9.10",
-    "pydantic>=2.11.7",
-    "python-dotenv>=1.1.1",
-    "python-jose[cryptography]>=3.5.0",
-    "python-multipart>=0.0.20",
-    "redis>=6.2.0",
-    "scikit-learn>=1.6.1",
-    "sqlalchemy>=2.0.41",
-    "structlog>=25.4.0",
-    "tensorflow>=2.14.0",
-    "transformers>=4.48.1",
-    "uvicorn>=0.35.0",
+    "fastapi>=0.116.1,<1",
+    "prometheus-client>=0.22.1,<1",
+    "PyJWT>=2.10.1,<3",
+    "pydantic>=2.11.7,<3",
+    "python-dotenv>=1.1.1,<2",
+    "python-multipart>=0.0.20,<1",
+    "sqlalchemy>=2.0.41,<3",
+    "structlog>=25.4.0,<26",
+    "uvicorn>=0.35.0,<1",
 ]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.2.2",
-    "pytest-asyncio>=0.23.5",
+    "httpx>=0.27,<1",
+    "pip-audit>=2.10,<3",
+    "pytest>=9.0.3,<10",
+    "pytest-asyncio>=1.3,<2",
+    "ruff>=0.12,<1",
 ]
+legacy-simulation = [
+    "numpy>=2.2.2,<3",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+namespaces = true

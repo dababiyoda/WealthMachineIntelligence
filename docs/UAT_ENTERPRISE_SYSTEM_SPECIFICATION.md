@@ -8,7 +8,7 @@
 | Version | `1.0.0-draft` |
 | Date | 2026-07-18 |
 | Status | Normative design draft |
-| Current runtime status | Simulation skeleton, not production-grade |
+| Current runtime status | Governed preview release candidate; external autonomy `none`; not production-grade |
 | Human owner | System Governor |
 | Machine-readable root | `spec/uat/v1/system-manifest.json` |
 
@@ -41,21 +41,34 @@ This specification defines the target system. It does not describe the current r
 
 The current repository proves the following limited facts:
 
+- One canonical FastAPI preview application exposes the public truth boundary,
+  authenticated operator views, and governance-record APIs.
 - The high-level `NetworkWealthEngine` can run deterministic Income Streams and Team Loop simulations.
 - Eight specialized heuristic agents are wired into that simulation.
 - Opportunity packets can enter through the DALEOBANKS bridge.
 - The bridge forces `requires_human_approval: true` in its returned assessment contract.
 - Phase, risk, decision-rule, and SMART-goal scaffolding exists.
-- The current local suite passed 29 tests on 2026-07-18.
+- A bounded relational control/evidence vertical slice persists identities,
+  contracts, grants, budgets, claims, evidence, approvals, policy decisions,
+  kill switches, human execution records, independent verification, and an
+  application hash chain.
+- Deterministic policy tests exercise deny-by-default action checks, R3 dual
+  control, R4 human-only execution, kill switches, idempotency, reconstruction,
+  and audit-tamper detection.
+- The repository test suite covers specification integrity, credibility,
+  governance, API behavior, and legacy compatibility. The exact release commit
+  MUST pass CI before publication.
 
 The current repository does not prove:
 
 - calibrated venture success or failure probabilities;
 - real market intelligence or willingness to pay;
-- durable evidence, approvals, or lifecycle state;
+- independently anchored immutable audit evidence, production migrations,
+  restart recovery, or the complete AG2 replay and retention contract;
 - secure agent tool execution;
 - tenant or Venture Pod isolation;
-- production identity and capability enforcement;
+- enterprise identity federation, phishing-resistant authentication, or a
+  hardened distributed capability service;
 - financial execution controls;
 - autonomous venture creation or operation;
 - commercial repeatability;
@@ -1087,16 +1100,33 @@ Every confirmed failure MUST produce a regression test, control change, or expli
 ### 24.1 GPS lock
 
 - **Destination:** UAT can take one real opportunity from source-bound signal through paid, repeatable Venture Pod operation, then use verified reusable assets to make a second venture reach proof faster or cheaper, while all consequential actions remain attributable, bounded, reversible where possible, and human-controlled where reserved.
-- **Current position:** 58 repository tests pass in the AG0 candidate; the claim inventory, current-capability record, simulation disclosures, heuristic-risk terminology, forged-token rejection, and blocking lint gate exist. The repository still lacks the authoritative Evidence Plane and durable external control plane.
-- **Active node:** AG0 independent review, epistemic credibility.
-- **Active gate:** current interfaces and models blur simulation scores, probabilities, evidence, and capability claims.
-- **Gate-crossing evidence:** every consequential repository claim is either source-traceable, measured, or explicitly labeled simulation, heuristic, hypothesis, or target.
-- **Active Single Bottleneck Metric:** credible claim coverage, defined as consequential claims with valid evidence or an explicit non-factual label divided by all consequential claims inventoried.
-- **Baseline:** unknown until the automated and human claim inventory is complete; known violations already exist.
-- **Target:** 100 percent before external autonomy expands.
-- **Resource ceiling:** time-box AG0 to ten working days, zero new external autonomy, and no new financial execution. Recalculate scope if the inventory reveals a deeper migration dependency.
-- **Three-step system:** select one unsupported claim class, replace or relabel it with evidence, then record the test and update coverage.
-- **Review cadence:** daily during AG0; gate review when coverage reaches 100 percent and the required evaluations pass.
+- **Current position:** the AG0 implementation candidate and a bounded AG1/AG2
+  control/evidence vertical slice exist. The preview has deterministic policy,
+  relational governance records, public capability disclosure, explicit legacy
+  mutation holds, release packaging, and automated tests. Independent review,
+  exact-commit CI, external audit anchoring, production migrations, recovery,
+  and the remaining AG1/AG2 evaluations are open.
+- **Active node:** governed-preview release review, including AG0 review and the
+  bounded AG1/AG2 candidate.
+- **Active gate:** each public release claim must be reconstructable from an
+  implementation location, an automated test, an explicit scope, and a stated
+  limitation on the exact release commit.
+- **Gate-crossing evidence:** the release-control inventory is complete, the
+  exact commit passes the full validation matrix, no critical credibility or
+  security finding remains open, and named humans review the capability record.
+- **Active Single Bottleneck Metric:** reviewable control-claim coverage,
+  defined as candidate release claims with implementation, test, scope, and
+  limitation divided by all candidate release claims.
+- **Baseline:** fifteen candidate release-control claims are inventoried;
+  independent review and exact-commit CI remain open.
+- **Target:** 100 percent inventory coverage and green exact-commit CI, with no
+  increase in external autonomy.
+- **Resource ceiling:** one stacked release-candidate branch, no external tool
+  gateway, no financial execution, and no image publication before human
+  checklist authorization.
+- **Three-step system:** select one unproven release claim, bind it to executable
+  evidence or remove it, then rerun the complete release matrix.
+- **Review cadence:** after every candidate commit and again after GitHub CI.
 
 ### 24.2 Route tournament
 
@@ -1169,6 +1199,14 @@ evaluations. External autonomy remains held.
 
 ### 25.2 AG1 and AG2: build one control/evidence vertical slice
 
+The governed preview candidate implements a bounded subset of this node:
+relational governance records, deterministic action evaluation, approvals,
+budgets, kill switches, human execution records, independent verification,
+reconstruction, and an application hash chain. This is not AG1 or AG2
+completion. Versioned migrations, transactional outbox delivery, object
+storage, independent audit anchoring, restart/replay evidence, retention, and
+the complete evaluation catalog remain required.
+
 Implement, in a modular monolith first:
 
 1. database migrations for claims, evidence, ventures, transitions, decisions, agents, capabilities, actions, policies, approvals, budgets, audit, and outbox;
@@ -1205,25 +1243,31 @@ Use only approved abstractions and reusable assets from the first pod to acceler
 
 ### Select
 
-- **Tiny Yes:** build the complete AG0 claim inventory.
-- **Target:** UI, API response models, seed data, risk services, README, analysis documents, and deployment claims.
-- **Expected evidence:** a version-controlled table containing claim, location, type, support, contradiction, disposition, owner, and test.
-- **Resource ceiling:** one focused repository pass before any new feature work.
+- **Tiny Yes:** prove or remove every governed-preview release-control claim.
+- **Target:** canonical app, authentication, capability boundary, deterministic
+  policy and risk floor, dual control, R4 hold, immediate reauthorization, kill
+  switches, reconstruction, audit chain, legacy mutation holds, container
+  contract, and manual publication gate.
+- **Expected evidence:** a version-controlled inventory linking every claim to
+  implementation, test, scope, and limitation on the exact commit.
+- **Resource ceiling:** one stacked release-candidate branch; no additional
+  autonomy and no image publication.
 
 ### Execute
 
-- Search for certainty and capability terms.
-- Classify each occurrence as verified, measured target, heuristic, simulation, hypothesis, or unsupported.
-- Remove, rename, source, or label every unsupported item.
-- Add regression tests for the highest-risk claims and JWT behavior.
-- Stop if a change would break the DALEOBANKS contract; create a versioned compatibility path instead.
+- Validate the release-control inventory against existing implementation.
+- Add adversarial and release-readiness tests for every uncovered boundary.
+- Remove unreachable mutation code and disable unimplemented interface actions.
+- Rebuild dependency metadata, lint, compile, test, and smoke the container.
+- Stop before registry publication; the manual workflow and human checklist
+  remain mandatory.
 
 ### Evidence
 
-- Record the total consequential claims and compliant claims.
-- Update credible claim coverage.
-- Repeat until 100 percent.
-- Advance only after independent review and required AG0 evaluations.
+- Record the exact commit, test count, CI result, and branch comparison.
+- Confirm every release-control claim remains bounded by its stated limitation.
+- Open a reviewable stacked pull request only after local gates pass.
+- Advance to image publication only after the human checklist is authorized.
 
 ## 27. Definition of completion
 

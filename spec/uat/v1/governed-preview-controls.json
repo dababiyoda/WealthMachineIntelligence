@@ -1,0 +1,227 @@
+{
+  "spec_version": "1.0.0-draft",
+  "record_version": "2026-07-18.2",
+  "release": "0.2.0-rc1",
+  "classification": "governed_preview_release_candidate",
+  "external_assurance": "pending",
+  "claim_rule": "A control is listed only when its implementation, automated test, scope, and limitation can be inspected in this repository. Passing these tests does not clear an enterprise acceptance gate or establish resistance to every attack.",
+  "controls": [
+    {
+      "id": "GPC-001",
+      "claim": "The preview exposes one canonical FastAPI application, and the root module is only a compatibility import.",
+      "scope": "repository entrypoints",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/api/main.py",
+        "main.py"
+      ],
+      "tests": [
+        "tests/test_release_readiness.py::test_root_module_reexports_the_canonical_application"
+      ],
+      "limitation": "This establishes entrypoint consistency, not distributed deployment correctness."
+    },
+    {
+      "id": "GPC-002",
+      "claim": "Production authentication rejects a missing or weak JWT secret and does not enable built-in demo identities by default.",
+      "scope": "process startup and configured preview identities",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/api/auth.py",
+        ".env.example"
+      ],
+      "tests": [
+        "tests/test_release_readiness.py::test_production_authentication_fails_closed",
+        "tests/test_release_readiness.py::test_production_identity_configuration_has_no_demo_users"
+      ],
+      "limitation": "Environment-backed operators are not enterprise federation or phishing-resistant authentication."
+    },
+    {
+      "id": "GPC-003",
+      "claim": "The public capability record authorizes no external autonomy, and the preview has no external execution endpoint or tool gateway.",
+      "scope": "governed preview API",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "spec/uat/v1/current-capability.json",
+        "src/api/routes/governance.py"
+      ],
+      "tests": [
+        "tests/test_release_readiness.py::test_capability_record_denies_external_autonomy",
+        "tests/test_release_readiness.py::test_governance_routes_expose_records_not_external_execution"
+      ],
+      "limitation": "Repository-surface inspection does not prove that an operator cannot add an unreviewed integration after deployment."
+    },
+    {
+      "id": "GPC-004",
+      "claim": "R0 through R4 action requests are evaluated by deterministic deny-by-default policy code outside language models.",
+      "scope": "GovernanceService action evaluation",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/service.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_valid_r1_action_is_authorized_and_reconstructable",
+        "tests/test_uat_governance.py::test_missing_capability_and_budget_fail_closed"
+      ],
+      "limitation": "The bounded policy service has not completed independent penetration testing or the full AG1 evaluation catalog."
+    },
+    {
+      "id": "GPC-005",
+      "claim": "R3 and R4 requests require verified evidence and at least two distinct human approval identities with the required authorities.",
+      "scope": "GovernanceService R3 and R4 policy",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/service.py",
+        "spec/uat/v1/approval-matrix.json"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_r3_requires_verified_evidence_and_two_distinct_human_approvers"
+      ],
+      "limitation": "Recorded identities and approvals do not replace legal authority or prove that an approver understood the action."
+    },
+    {
+      "id": "GPC-006",
+      "claim": "An R4 request cannot receive autonomous execution authority; after required approvals its maximum state is human_execution_only.",
+      "scope": "GovernanceService R4 policy",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/service.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_r4_is_never_authorized_for_autonomous_execution"
+      ],
+      "limitation": "The service records human execution but cannot verify the legitimacy of an external action without independent evidence."
+    },
+    {
+      "id": "GPC-007",
+      "claim": "Portfolio, venture, identity, and action-type kill switches can hold matching requests without cooperation from the affected requester.",
+      "scope": "GovernanceService policy evaluation",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/service.py",
+        "src/api/routes/governance.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_kill_switch_blocks_existing_capability_without_model_cooperation",
+        "tests/test_uat_governance.py::test_kill_switch_is_rechecked_before_execution_is_recorded"
+      ],
+      "limitation": "There is no production tool gateway to test downstream credential revocation or network containment."
+    },
+    {
+      "id": "GPC-008",
+      "claim": "A recorded action can be reconstructed across referenced evidence, policy decisions, approvals, human execution, independent outcome verification, and audit state.",
+      "scope": "relational governance records",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/models.py",
+        "src/governance/service.py",
+        "src/api/routes/governance.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_valid_r1_action_is_authorized_and_reconstructable",
+        "tests/test_uat_governance.py::test_execution_and_outcome_verification_require_independent_humans"
+      ],
+      "limitation": "Object storage, retention policy, schema migrations, restart recovery, and the complete AG2 replay suite remain open."
+    },
+    {
+      "id": "GPC-009",
+      "claim": "Material governance events are linked by an application-enforced SHA-256 audit hash chain and tampering is detectable by the preview service.",
+      "scope": "application database audit records",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/models.py",
+        "src/governance/service.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_audit_chain_detects_direct_record_tampering"
+      ],
+      "limitation": "The chain is not anchored to independent immutable storage and is not a cryptographic transparency service."
+    },
+    {
+      "id": "GPC-010",
+      "claim": "Legacy venture and agent write endpoints are held with HTTP 409 instead of mutating authoritative state.",
+      "scope": "legacy API compatibility surface",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/api/routes/ventures.py",
+        "src/api/routes/agents.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_canonical_web_app_exposes_governance_and_blocks_legacy_mutations",
+        "tests/test_release_readiness.py::test_all_legacy_mutation_routes_are_held"
+      ],
+      "limitation": "Read-only legacy records may still contain unverified fixtures or operator-supplied values."
+    },
+    {
+      "id": "GPC-011",
+      "claim": "The release container runs as a named non-root user and defines a readiness health check against the canonical application.",
+      "scope": "container image definition",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "Dockerfile",
+        ".github/workflows/ci.yml"
+      ],
+      "tests": [
+        "tests/test_release_readiness.py::test_container_contract_is_bounded_and_non_root"
+      ],
+      "limitation": "A Dockerfile contract and CI smoke test do not establish host, cluster, network, or supply-chain security."
+    },
+    {
+      "id": "GPC-012",
+      "claim": "Preview image publication is manual, requires the exact PUBLISH_GOVERNED_PREVIEW confirmation phrase, reruns the release matrix, and emits commit-bound tags with provenance and an SBOM.",
+      "scope": "GitHub Actions publication workflow",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        ".github/workflows/release-preview.yml",
+        "RELEASE_CHECKLIST.md"
+      ],
+      "tests": [
+        "tests/test_release_readiness.py::test_release_workflow_requires_explicit_manual_confirmation"
+      ],
+      "limitation": "Repository policy cannot prove branch protection, reviewer identity, registry immutability, attestation verification, or deployment authorization outside this repository."
+    },
+    {
+      "id": "GPC-013",
+      "claim": "The release test job installs the locked dependency graph, checks dependency integrity, and audits the installed environment for known vulnerabilities.",
+      "scope": "GitHub CI dependency gate",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "uv.lock",
+        ".github/workflows/ci.yml"
+      ],
+      "tests": [
+        "tests/test_release_readiness.py::test_runtime_dependencies_and_lock_are_bounded_and_in_sync",
+        "tests/test_release_readiness.py::test_ci_uses_the_lock_and_runs_dependency_audit"
+      ],
+      "limitation": "A clean vulnerability-database result is time-bound, database-dependent, and does not detect unknown vulnerabilities or malicious build infrastructure."
+    },
+    {
+      "id": "GPC-014",
+      "claim": "A requester cannot lower the deterministic minimum risk class derived from the target environment, data class, relationship exposure, resource impact, and recognized action semantics.",
+      "scope": "GovernanceService preview action classification",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/service.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_requester_cannot_understate_the_minimum_risk_class",
+        "tests/test_uat_governance.py::test_future_and_expired_action_windows_fail_closed"
+      ],
+      "limitation": "The preview uses a bounded deterministic taxonomy and conservative environment floors; a production action registry, policy-as-code review, and adversarial synonym coverage remain open."
+    },
+    {
+      "id": "GPC-015",
+      "claim": "Authorization is re-evaluated immediately before a human execution record is accepted, including the action window, active approvals, evidence, budget, and kill-switch state.",
+      "scope": "GovernanceService human execution-record boundary",
+      "status": "implemented_candidate_pending_independent_review",
+      "implementation": [
+        "src/governance/service.py"
+      ],
+      "tests": [
+        "tests/test_uat_governance.py::test_kill_switch_is_rechecked_before_execution_is_recorded",
+        "tests/test_uat_governance.py::test_expired_human_cannot_approve_or_release_a_kill_switch",
+        "tests/test_uat_governance.py::test_execution_and_outcome_verification_require_independent_humans"
+      ],
+      "limitation": "This check governs acceptance of a human execution record. No external tool gateway exists, so it cannot prevent a human from acting outside the system or prove downstream side-effect containment."
+    }
+  ]
+}

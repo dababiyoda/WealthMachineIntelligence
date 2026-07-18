@@ -17,10 +17,19 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        if request.url.scheme == "https":
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Content-Security-Policy"] = "default-src 'self'"
+        response.headers["Permissions-Policy"] = (
+            "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        )
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; font-src 'self'; connect-src 'self'; "
+            "object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+        )
+        if request.url.path.startswith(("/auth", "/api/")):
+            response.headers["Cache-Control"] = "no-store"
         
         return response
 
@@ -40,7 +49,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                    request_id=request_id,
                    method=request.method,
                    path=request.url.path,
-                   query_params=dict(request.query_params),
+                   query_parameter_names=sorted(request.query_params.keys()),
                    client_ip=request.client.host if request.client else None,
                    user_agent=request.headers.get("user-agent"))
         
@@ -72,7 +81,11 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             raise
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """Basic rate limiting middleware"""
+    """Single-process preview rate limiting.
+
+    A distributed deployment must replace this with gateway-level enforcement;
+    it is intentionally not represented as an enterprise rate limiter.
+    """
     
     def __init__(self, app, calls: int = 100, period: int = 60):
         super().__init__(app)

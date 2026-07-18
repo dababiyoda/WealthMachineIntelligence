@@ -4,7 +4,7 @@ Database initialization script.
 Seed records are explicit simulation fixtures. They are not production
 outcomes, audited financials, model evaluations, or compliance evidence.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .connection import db, get_db
 from .models import (
@@ -43,7 +43,7 @@ def populate_initial_data():
                     accuracy=0.0,
                     success_rate=0.0,
                     decisions_made=0,
-                    last_activity=datetime.utcnow()
+                    last_activity=datetime.now(timezone.utc)
                 ),
                 AIAgent(
                     agent_type=AgentType.RISK_ASSESSMENT,
@@ -54,7 +54,7 @@ def populate_initial_data():
                     accuracy=0.0,
                     success_rate=0.0,
                     decisions_made=0,
-                    last_activity=datetime.utcnow()
+                    last_activity=datetime.now(timezone.utc)
                 ),
                 AIAgent(
                     agent_type=AgentType.LEGAL_COMPLIANCE,
@@ -65,7 +65,7 @@ def populate_initial_data():
                     accuracy=0.0,
                     success_rate=0.0,
                     decisions_made=0,
-                    last_activity=datetime.utcnow()
+                    last_activity=datetime.now(timezone.utc)
                 ),
                 AIAgent(
                     agent_type=AgentType.FINANCIAL_STRATEGIST,
@@ -76,7 +76,7 @@ def populate_initial_data():
                     accuracy=0.0,
                     success_rate=0.0,
                     decisions_made=0,
-                    last_activity=datetime.utcnow()
+                    last_activity=datetime.now(timezone.utc)
                 )
             ]
             

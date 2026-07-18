@@ -1,9 +1,8 @@
 """Risk management helper utilities.
 
-The production repository ships with an advanced
-``RiskAssessmentService`` backed by SQLAlchemy models.  For the
-autonomous Wealth Machine orchestration we also need an in-memory
-fallback so the loops can execute without a configured database.  The
+The legacy simulation repository includes a ``RiskAssessmentService`` backed
+by SQLAlchemy models. For local loop evaluation, this module also provides an
+in-memory fallback so the simulation can run without a configured database. The
 ``RiskManager`` defined here delegates to the existing service when it
 is available and otherwise returns a deterministic simulation heuristic.
 The heuristic is an uncalibrated review index, not a failure probability,

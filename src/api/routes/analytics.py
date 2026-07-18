@@ -10,7 +10,7 @@ from sqlalchemy import func, and_
 from sqlalchemy.exc import SQLAlchemyError
 from src.logging_config import logger
 
-from ...database.connection import get_db
+from ...database.connection import session_dependency as get_db
 from ...core.epistemic import evidence_disclosure
 from ...database.models import (
     DigitalVenture,

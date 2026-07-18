@@ -2,29 +2,82 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Install dependencies
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.28"
+          enable-cache: true
+      - name: Install the locked runtime and test dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -e . --no-deps
-          # --no-deps keeps the heavy optional stack (tensorflow, transformers,
-          # celery, redis) out of CI; install only what the test suite imports.
-          pip install fastapi httpx structlog sqlalchemy python-dotenv prometheus-client 'python-jose[cryptography]'
-          pip install pytest pytest-asyncio ruff
+          uv sync --frozen --extra dev
+          uv pip check --python .venv/bin/python
+      - name: Audit installed dependencies for known vulnerabilities
+        run: .venv/bin/pip-audit --local --skip-editable --cache-dir .cache/pip-audit
+      - name: Compile Python sources
+        run: .venv/bin/python -m compileall -q src main.py
+      - name: Validate browser JavaScript syntax
+        run: node --check static/app.js
       - name: Lint
-        run: ruff check .
-      - name: UAT specification and AG0 credibility gates
-        run: pytest -q tests/test_uat_enterprise_spec.py tests/test_uat_ag0_credibility.py
-      - name: Test
-        run: pytest -q
+        run: .venv/bin/ruff check .
+      - name: UAT specification, credibility, and governance gates
+        run: >-
+          .venv/bin/pytest -q
+          tests/test_uat_enterprise_spec.py
+          tests/test_uat_ag0_credibility.py
+          tests/test_uat_governance.py
+          tests/test_release_readiness.py
+      - name: Full test suite
+        run: .venv/bin/pytest -q
+
+  container-smoke:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build preview image
+        run: docker build --tag uat-governed-preview:ci .
+      - name: Start production-configured container
+        run: |
+          docker run --detach --name uat-preview --publish 5000:5000 \
+            --env ENVIRONMENT=production \
+            --env DATABASE_URL=sqlite:////tmp/uat-preview.db \
+            --env JWT_SECRET_KEY=ci-only-secret-that-is-longer-than-thirty-two-characters \
+            --env UAT_ALLOW_DEMO_USERS=false \
+            --env UAT_BOOTSTRAP_PREVIEW=false \
+            --env UAT_TRUSTED_HOSTS=localhost,127.0.0.1 \
+            uat-governed-preview:ci
+      - name: Verify liveness, readiness, capability disclosure, and console
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5000/health/ready >/tmp/ready.json; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:5000/health/live
+          curl --fail --silent http://127.0.0.1:5000/api/v1/system/capabilities | grep '"authorized_external_autonomy":"none"'
+          curl --fail --silent http://127.0.0.1:5000/ | grep "UAT Governed Preview"
+          grep '"status":"ready"' /tmp/ready.json
+      - name: Show container logs on failure
+        if: failure()
+        run: docker logs uat-preview
+      - name: Stop container
+        if: always()
+        run: docker rm --force uat-preview || true
