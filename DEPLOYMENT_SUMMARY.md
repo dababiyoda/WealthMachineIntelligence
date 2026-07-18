@@ -1,154 +1,56 @@
-# WealthMachine Enterprise - Deployment Summary
+# WealthMachine Deployment Readiness Summary
 
-## 🚀 **SYSTEM STATUS: PRODUCTION READY**
+## Status: prototype / controlled-pilot preparation
 
-Your enterprise-grade WealthMachine system is now **FULLY OPERATIONAL** with all core components deployed and running.
+The repository contains a runnable FastAPI service, database models, domain
+logic, tests, container configuration, and a foundational constitutional
+control plane. These assets do not establish production readiness,
+enterprise-grade reliability, model accuracy, security certification, legal
+compliance, or a real-world venture failure rate.
 
-### **🎯 SUCCESS METRICS ACHIEVED**
-- **Ultra-Low Failure Rate Target**: P(failure) ≤ 0.01% ✅
-- **Enterprise Architecture**: Multi-agent AI system ✅
-- **Production Database**: PostgreSQL with comprehensive schema ✅
-- **API Server**: FastAPI with authentication and monitoring ✅
-- **AI Integration**: Advanced hybrid ML models ✅
+## What is currently usable
 
----
+- local opportunity intake and venture assessment;
+- deterministic test and demonstration workflows;
+- authenticated API foundations;
+- relational and in-memory graph models;
+- metrics/logging foundations;
+- proposal-only rule execution by default; and
+- control-plane primitives for scoped grants, policy decisions, approvals,
+  budgets, evidence, incidents, and execution receipts.
 
-## **🏗️ DEPLOYED ARCHITECTURE**
+## Release blockers
 
-### **Core Infrastructure**
-- **Database**: PostgreSQL with full enterprise schema
-- **API Server**: FastAPI running on port 5000
-- **Authentication**: JWT-based security system
-- **Monitoring**: Structured logging + Prometheus metrics
-- **Documentation**: Comprehensive API docs available
+- [ ] Remove demo credentials and validate authentication/authorization end to end.
+- [ ] Inventory every consequential runtime and administrative side-effect path.
+- [ ] Make gateway mediation and downstream policy unavoidable.
+- [ ] Remove direct consequential credentials and unrestricted egress from agent runtimes.
+- [ ] Persist control state and idempotency transactionally.
+- [ ] Anchor the Evidence Ledger outside the writer's trust domain.
+- [ ] Replace startup schema creation with controlled migrations.
+- [ ] Protect destructive database administration with break-glass dual control.
+- [ ] Validate models on representative data and calibrate any probability claims.
+- [ ] Run dependency, secret, SAST, DAST, and infrastructure security reviews.
+- [ ] Test backup, restore, reconciliation, incident response, pause, and kill paths.
+- [ ] Complete privacy, legal, regulatory, and customer-communication review for the intended use case.
+- [ ] Establish human authority coverage and approval expiry/escalation operations.
 
-### **AI Agent System**
-- **Market Intelligence Agent**: LSTM + Sentiment Analysis
-- **Risk Assessment Agent**: Hybrid LSTM + Random Forest
-- **Legal Compliance Agent**: BERT + Regulatory NLP
-- **Financial Strategy Agent**: Monte Carlo + Portfolio Optimization
+## Sample data warning
 
-### **Business Intelligence**
-- **Real-time Dashboard**: Portfolio performance and KPIs
-- **Risk Analysis**: Continuous P(failure) monitoring
-- **Analytics API**: Business metrics and reporting
-- **Decision Support**: AI-driven opportunity evaluation
+Seeded venture revenue, ROI, risk, and agent accuracy values are demonstration
+fixtures. They are not observed business results or validated model metrics.
 
----
+## Controlled pilot gate
 
-## **🔗 API ENDPOINTS**
+A workflow may enter shadow mode only when it has a narrow charter, verified
+identity, registered action definition, scoped grant, trusted adapter, complete
+logging, objective outcome labels, rollback procedure, and no direct bypass.
+External side effects require the additional capability-stage evidence in
+`docs/PROGRESSIVE_AUTONOMY_LEVELS.md`.
 
-### **Authentication**
-- `POST /auth/login` - User authentication
-- `GET /health` - System health check
+## Operational references
 
-### **Core Business Logic**
-- `GET /api/v1/ventures` - List digital ventures
-- `GET /api/v1/agents` - AI agent status
-- `GET /api/v1/analytics/dashboard` - Business dashboard
-- `POST /api/v1/ventures/{id}/evaluate` - AI venture evaluation
-
-### **System Information**
-- `GET /` - API root with full endpoint listing
-- `GET /metrics` - Prometheus monitoring metrics
-
----
-
-## **📊 SAMPLE DATA DEPLOYED**
-
-### **Digital Ventures**
-1. **AI-Powered SaaS Analytics** 
-   - Type: SaaS | Status: MVP
-   - Revenue: $8,500/month | Risk: 0.08% (ULTRA-LOW)
-   - Automation: 75% | ROI: 62%
-
-2. **B2B Digital Marketplace**
-   - Type: E-commerce | Status: Scaling  
-   - Revenue: $15,200/month | Risk: 0.03% (ULTRA-LOW)
-   - Automation: 85% | ROI: 55%
-
-### **AI Agents**
-- Market Intelligence: 85% accuracy, 82% success rate
-- Risk Assessment: 92% accuracy, 89% success rate  
-- Legal Compliance: 88% accuracy, 91% success rate
-
----
-
-## **🧪 TESTING THE SYSTEM**
-
-### **Quick Health Check**
-```bash
-curl http://localhost:5000/health
-```
-
-### **Login (Demo Credentials)**
-```bash
-curl -X POST "http://localhost:5000/auth/login?username=demo&password=demo"
-```
-
-### **View Dashboard**
-```bash
-curl -H "Authorization: Bearer demo" http://localhost:5000/api/v1/analytics/dashboard
-```
-
----
-
-## **🔧 ENTERPRISE FEATURES**
-
-### **Security & Compliance**
-- JWT authentication with role-based access
-- Security headers and CORS protection
-- SQL injection prevention with ORM
-- Audit logging for all operations
-
-### **Scalability & Performance**
-- Connection pooling (20 base + 40 overflow)
-- Async/await for concurrent operations
-- Database indexing for optimized queries
-- Prometheus metrics for monitoring
-
-### **Business Intelligence**
-- Real-time portfolio performance tracking
-- Risk assessment with 10-version history
-- Automated compliance monitoring
-- Multi-channel decision notifications
-
-### **AI/ML Pipeline**
-- Hybrid model architecture (LSTM + Random Forest)
-- Continuous learning and model improvement
-- Feature engineering and data preprocessing
-- Monte Carlo simulation for risk analysis
-
----
-
-## **🎯 NEXT STEPS FOR PRODUCTION**
-
-### **Immediate Actions**
-1. **Configure Production Secrets** - Replace demo credentials
-2. **Enable SSL/TLS** - Add HTTPS for production deployment
-3. **Set Up Monitoring** - Connect Prometheus to dashboards
-4. **Configure Backups** - Database backup and recovery plan
-
-### **Business Operations**
-1. **Connect Real Data Sources** - Market data APIs, financial feeds
-2. **Train AI Models** - Use historical data for model training
-3. **Set Up Alerts** - Risk threshold and performance alerts
-4. **Deploy Workflows** - Automated decision-making rules
-
-### **Scaling Considerations**
-1. **Horizontal Scaling** - Multi-instance deployment
-2. **Load Balancing** - Distribute traffic across instances  
-3. **Caching Layer** - Redis for performance optimization
-4. **Microservices** - Split into specialized services
-
----
-
-## **💎 SYSTEM HIGHLIGHTS**
-
-- **Ultra-Reliable**: Designed for P(failure) ≤ 0.01%
-- **AI-Driven**: 4 specialized AI agents for decision-making
-- **Enterprise-Ready**: Production security, monitoring, and scalability
-- **Business-Focused**: Optimized for digital opportunity identification
-- **Comprehensive**: Full-stack solution from database to AI to API
-
-**Your WealthMachine system is ready to identify, validate, and scale digital business opportunities with enterprise-grade reliability and AI-powered intelligence.**
+- `docs/CONSTITUTIONAL_CONTROL_LAYER.md`
+- `docs/VENTURE_CELL_CHARTER_TEMPLATE.md`
+- `docs/IMPLEMENTATION_ROADMAP.md`
+- `docs/SIDE_EFFECT_INVENTORY.md`

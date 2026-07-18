@@ -89,7 +89,7 @@ def setup_database():
                     monthly_expenses=6800.0,
                     risk_level=RiskLevel.ULTRA_LOW,
                     risk_score=0.08,
-                    failure_probability=0.0003, # 0.03% - ultra-low
+                    failure_probability=0.0003,  # Demo heuristic fixture, uncalibrated.
                     customer_count=89,
                     churn_rate=0.02,
                     ai_enabled=True,

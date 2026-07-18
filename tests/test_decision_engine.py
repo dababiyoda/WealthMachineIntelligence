@@ -53,8 +53,8 @@ def test_condition_node_nested_and_or() -> None:
     assert condition.evaluate({'a': 4, 'b': 2, 'c': 'No'}) is False
 
 
-def test_decision_engine_rule_trigger() -> None:
-    # Define a simple rule: if metric x > 0.5 -> update status to "Triggered"
+def test_decision_engine_rule_trigger_is_proposal_only_without_gateway() -> None:
+    # A matching rule proposes a side effect but cannot execute one by default.
     cond = ConditionNode.from_dict({'metric': 'x', 'operator': 'greater_than', 'value': 0.5})
     action = ActionSpec(type='update_venture_status', parameters={'new_status': 'Triggered'})
     rule = Rule(rule_id='r1', name='Test Rule', venture_type='DigitalVenture', condition=cond, action=action)
@@ -64,11 +64,11 @@ def test_decision_engine_rule_trigger() -> None:
     # Prepare metrics that should trigger
     metrics = {'x': 0.6}
     outcomes = engine.evaluate('venture-1', 'DigitalVenture', metrics)
-    assert outcomes and outcomes[0]['new_status'] == 'Triggered'
-    # Validate that the knowledge graph node now has the updated status
+    assert outcomes and outcomes[0]['execution_status'] == 'proposed'
+    assert outcomes[0]['policy_disposition'] == 'review'
+    # No control gateway means no mutation.
     node = knowledge_graph.get_node('venture-1')
-    assert node is not None
-    assert node.properties['status'] == 'Triggered'
+    assert node is None or node.properties.get('status') != 'Triggered'
 
     # Metrics that do not trigger
     metrics2 = {'x': 0.3}

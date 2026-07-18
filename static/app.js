@@ -151,7 +151,14 @@ class WealthMachineApp {
         // Animate number updates
         this.animateValue('totalVentures', 0, data.total_ventures || 0, 1000);
         this.animateValue('monthlyRevenue', 0, data.total_monthly_revenue || 0, 1000, true);
-        this.animateValue('successRate', 0, data.ultra_low_failure_rate_percentage || 0, 1000, false, true);
+        this.animateValue(
+            'successRate',
+            0,
+            data.lowest_heuristic_bucket_percentage || 0,
+            1000,
+            false,
+            true
+        );
     }
 
     animateValue(id, start, end, duration, isCurrency = false, isPercentage = false) {
@@ -242,16 +249,16 @@ class WealthMachineApp {
                 this.showNotification('🎯 Opportunity Detection: AI-powered market analysis active');
                 break;
             case 'risk':
-                this.showNotification('🛡️ Risk Analysis: Ultra-low failure rate P(failure) ≤ 0.01%');
+                this.showNotification('🛡️ Risk Analysis: heuristic outputs are uncalibrated');
                 break;
             case 'market':
-                this.showNotification('📈 Market Intelligence: LSTM trend analysis updated');
+                this.showNotification('📈 Market Intelligence: synthetic demo analysis updated');
                 break;
             case 'compliance':
-                this.showNotification('⚖️ Compliance: All ventures regulatory compliant');
+                this.showNotification('⚖️ Compliance: case-specific review is required');
                 break;
             case 'automation':
-                this.showNotification('⚙️ Automation: 47 rules active, 1,247 tasks automated');
+                this.showNotification('⚙️ Automation: development demonstration only');
                 break;
         }
     }
@@ -288,7 +295,7 @@ class WealthMachineApp {
                 </div>
                 <div class="venture-status ${this.getStatusClass(venture.failure_probability)}">
                     <span class="status-dot"></span>
-                    <span>Failure Rate: ${(venture.failure_probability * 100).toFixed(3)}%</span>
+                    <span>Legacy risk proxy: ${(venture.failure_probability * 100).toFixed(3)} (uncalibrated)</span>
                 </div>
             </div>
         `).join('');
@@ -397,19 +404,17 @@ class WealthMachineApp {
             
             // Update results with animation
             const score = Math.random() * 30 + 70;
-            const successProb = 99.9 + Math.random() * 0.09;
-            const riskLevel = successProb > 99.95 ? 'Ultra Low' : 'Low';
-            
+
             this.animateValue('opportunityScore', 0, score, 1000);
-            document.getElementById('failureProbability').textContent = `${successProb.toFixed(2)}%`;
-            document.getElementById('riskLevel').textContent = riskLevel;
+            document.getElementById('failureProbability').textContent = 'Not calibrated';
+            document.getElementById('riskLevel').textContent = 'Synthetic demo';
             
             // Update recommendation
             document.getElementById('recommendation').innerHTML = `
                 <span class="material-icons-round">lightbulb</span>
-                <p><strong>Recommendation:</strong> This venture shows excellent potential with ultra-low risk profile. 
-                The AI analysis indicates strong market fit and minimal competition risk. 
-                Consider proceeding with MVP development.</p>
+                <p><strong>Recommendation:</strong> Treat this synthetic score as a hypothesis only.
+                Define the cheapest paid-demand or retained-usage test, set a small capital cap,
+                and require human approval before any launch or external action.</p>
             `;
             
             // Add to ventures after delay
@@ -560,8 +565,8 @@ class WealthMachineApp {
         return {
             total_ventures: 3,
             total_monthly_revenue: 27500,
-            ultra_low_failure_rate_percentage: 92.5,
-            target_achievement: 'SUCCESS'
+            lowest_heuristic_bucket_percentage: 0,
+            model_validation_status: 'UNVALIDATED'
         };
     }
 
