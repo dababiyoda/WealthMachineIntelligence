@@ -3,9 +3,10 @@ Authentication and authorization module
 JWT token handling and user management
 """
 import os
-import jwt
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
+
+from jose import JWTError, jwt
 
 try:  # pragma: no cover - dependency may be unavailable in tests
     from passlib.context import CryptContext  # type: ignore
@@ -25,6 +26,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+JWT_ISSUER = os.getenv("JWT_ISSUER", "wealthmachine-local")
+JWT_AUDIENCE = os.getenv("JWT_AUDIENCE", "wealthmachine-api")
 
 def demo_auth_enabled() -> bool:
     """Return whether local demo identities were explicitly enabled."""
@@ -43,6 +46,10 @@ def validate_auth_configuration() -> None:
     unsafe_secrets = {"", "change-me", "your-secret-key-change-in-production"}
     if SECRET_KEY in unsafe_secrets or len(SECRET_KEY) < 32:
         raise RuntimeError("JWT_SECRET_KEY must be a non-default 32+ character secret")
+    if JWT_ISSUER in {"", "wealthmachine-local"}:
+        raise RuntimeError("JWT_ISSUER must be explicitly configured in production")
+    if JWT_AUDIENCE in {"", "wealthmachine-api"}:
+        raise RuntimeError("JWT_AUDIENCE must be explicitly configured in production")
     if os.getenv("ALLOW_DEMO_AUTH", "false").lower() == "true":
         raise RuntimeError("demo authentication cannot be enabled in production")
 
@@ -71,35 +78,76 @@ def get_password_hash(password: str) -> str:
     return f"plaintext::{password}"
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
-    """Create a JWT access token"""
+    """Create an issuer/audience-bound JWT for trusted local authentication."""
+
     to_encode = data.copy()
+    subject = to_encode.get("sub")
+    if not isinstance(subject, str) or not subject:
+        raise ValueError("access tokens require a non-empty string subject")
+    role = to_encode.get("role", "user")
+    permissions = to_encode.get("permissions", [])
+    if not isinstance(role, str) or not role:
+        raise ValueError("access token role must be a non-empty string")
+    if not isinstance(permissions, list) or not all(
+        isinstance(permission, str) and permission
+        for permission in permissions
+    ):
+        raise ValueError("access token permissions must be a list of strings")
     
+    issued_at = datetime.now(timezone.utc)
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = issued_at + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = issued_at + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
-    to_encode.update({"exp": expire})
+    to_encode.update(
+        {
+            "sub": subject,
+            "role": role,
+            "permissions": permissions,
+            "iat": issued_at,
+            "exp": expire,
+            "iss": JWT_ISSUER,
+            "aud": JWT_AUDIENCE,
+        }
+    )
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 def verify_token(token: str) -> Optional[Dict[str, Any]]:
-    """Verify and decode a JWT token"""
+    """Verify a JWT and return a normalized signed principal."""
+
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            return None
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+            options={"require_exp": True, "require_sub": True},
+        )
+        user_id = payload.get("sub")
+        role = payload.get("role", "user")
+        permissions = payload.get("permissions", [])
+        username = payload.get("username")
+        if not isinstance(user_id, str) or not user_id:
+            raise JWTError("token subject is missing")
+        if not isinstance(role, str) or not role:
+            raise JWTError("token role is invalid")
+        if not isinstance(permissions, list) or not all(
+            isinstance(permission, str) and permission
+            for permission in permissions
+        ):
+            raise JWTError("token permissions are invalid")
+        if username is not None and not isinstance(username, str):
+            raise JWTError("token username is invalid")
         return {
             "user_id": user_id,
-            "username": payload.get("username"),
-            "role": payload.get("role", "user"),
-            "permissions": payload.get("permissions", [])
+            "username": username,
+            "role": role,
+            "permissions": permissions,
         }
-    except jwt.ExpiredSignatureError:
-        logger.warning("Token expired")
-        return None
-    except jwt.JWTError as e:
+    except JWTError as e:
         logger.warning("JWT decode error", error=str(e))
         return None
 
@@ -156,19 +204,7 @@ async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Dic
             detail="Invalid authentication credentials",
         )
 
-    user = DEMO_USERS.get(payload.get("username", ""))
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-
-    return {
-        "user_id": user["user_id"],
-        "username": user["username"],
-        "role": user["role"],
-        "permissions": user["permissions"],
-    }
+    return payload
 
 
 async def require_admin_user(

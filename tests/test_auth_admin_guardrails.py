@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import timedelta
 
 import pytest
 from fastapi import HTTPException
@@ -41,6 +42,94 @@ def test_production_rejects_default_or_short_jwt_secret(monkeypatch) -> None:
     monkeypatch.setattr(auth, "SECRET_KEY", "change-me")
     with pytest.raises(RuntimeError, match=r"32\+"):
         auth.validate_auth_configuration()
+
+
+def test_production_requires_explicit_issuer_and_audience(monkeypatch) -> None:
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("ALLOW_DEMO_AUTH", "false")
+    monkeypatch.setattr(auth, "SECRET_KEY", "s" * 32)
+    monkeypatch.setattr(auth, "JWT_ISSUER", "wealthmachine-local")
+    monkeypatch.setattr(auth, "JWT_AUDIENCE", "wealthmachine-api")
+    with pytest.raises(RuntimeError, match="JWT_ISSUER"):
+        auth.validate_auth_configuration()
+
+    monkeypatch.setattr(auth, "JWT_ISSUER", "https://identity.example.com")
+    with pytest.raises(RuntimeError, match="JWT_AUDIENCE"):
+        auth.validate_auth_configuration()
+
+    monkeypatch.setattr(auth, "JWT_AUDIENCE", "wealthmachine-production-api")
+    auth.validate_auth_configuration()
+
+
+def test_signed_admin_claims_resolve_without_demo_user_lookup(monkeypatch) -> None:
+    monkeypatch.setattr(auth, "SECRET_KEY", "a" * 32)
+    monkeypatch.setattr(auth, "JWT_ISSUER", "https://issuer.example.com")
+    monkeypatch.setattr(auth, "JWT_AUDIENCE", "wealthmachine-api-tests")
+    token = auth.create_access_token(
+        {
+            "sub": "production-human-7",
+            "username": "operator@example.com",
+            "role": "admin",
+            "permissions": ["read", "admin"],
+        }
+    )
+
+    principal = asyncio.run(auth.get_current_user(token))
+    authorized = asyncio.run(auth.require_admin_user(principal))
+
+    assert authorized == {
+        "user_id": "production-human-7",
+        "username": "operator@example.com",
+        "role": "admin",
+        "permissions": ["read", "admin"],
+    }
+
+
+def test_tampered_expired_and_wrong_audience_tokens_fail_closed(monkeypatch) -> None:
+    monkeypatch.setattr(auth, "SECRET_KEY", "b" * 32)
+    monkeypatch.setattr(auth, "JWT_ISSUER", "https://issuer.example.com")
+    monkeypatch.setattr(auth, "JWT_AUDIENCE", "wealthmachine-api-tests")
+    claims = {
+        "sub": "human-8",
+        "role": "user",
+        "permissions": ["read"],
+    }
+    valid = auth.create_access_token(claims)
+    header, payload, signature = valid.split(".")
+    changed_signature = ("A" if signature[0] != "A" else "B") + signature[1:]
+    tampered = ".".join((header, payload, changed_signature))
+
+    expired = auth.create_access_token(
+        claims,
+        expires_delta=timedelta(seconds=-1),
+    )
+    wrong_audience = auth.jwt.encode(
+        {
+            "sub": "human-8",
+            "role": "user",
+            "permissions": ["read"],
+            "iss": auth.JWT_ISSUER,
+            "aud": "some-other-service",
+            "exp": auth.datetime.now(auth.timezone.utc) + timedelta(minutes=5),
+        },
+        auth.SECRET_KEY,
+        algorithm=auth.ALGORITHM,
+    )
+
+    assert auth.verify_token(valid)["user_id"] == "human-8"
+    assert auth.verify_token(tampered) is None
+    assert auth.verify_token(expired) is None
+    assert auth.verify_token(wrong_audience) is None
+
+
+def test_token_creation_rejects_malformed_authority_claims(monkeypatch) -> None:
+    monkeypatch.setattr(auth, "SECRET_KEY", "c" * 32)
+    with pytest.raises(ValueError, match="subject"):
+        auth.create_access_token({"role": "admin", "permissions": ["admin"]})
+    with pytest.raises(ValueError, match="permissions"):
+        auth.create_access_token(
+            {"sub": "human-9", "role": "admin", "permissions": "admin"}
+        )
 
 
 def test_production_requires_an_explicit_host_allowlist(monkeypatch) -> None:

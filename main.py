@@ -122,7 +122,14 @@ async def login(request: Request):
             detail="Invalid username or password"
         )
     
-    token = create_access_token({"sub": user["user_id"], "username": user["username"]})
+    token = create_access_token(
+        {
+            "sub": user["user_id"],
+            "username": user["username"],
+            "role": user["role"],
+            "permissions": user["permissions"],
+        }
+    )
     return {"access_token": token, "token_type": "bearer", "user": user}
 
 # Include API routes (simplified versions without complex dependencies)

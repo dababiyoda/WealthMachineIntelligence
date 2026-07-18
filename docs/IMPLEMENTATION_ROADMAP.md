@@ -40,7 +40,9 @@ The next hardening slice removes direct AI-service SQL writes and self-minted
 agent records. Synthetic market and risk artifacts are proposal-only or
 gateway-mediated. Venture and agent CRUD are explicitly human-admin operations,
 anonymous requests no longer default to admin, demo authentication requires an
-opt-in outside production, and schema auto-creation is forbidden in production.
+opt-in outside production, real JWT verification binds signature/expiry/issuer/
+audience and authority-claim shape, and schema auto-creation is forbidden in
+production.
 
 The current durability slice adds an optional SQLite reference store. It
 reconstructs policy definitions, charters, capability grants, exact approvals,
