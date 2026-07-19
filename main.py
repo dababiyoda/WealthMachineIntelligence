@@ -161,18 +161,26 @@ async def dashboard_simple(current_user=Depends(get_current_user)):
             total_ventures = session.query(DigitalVenture).count()
             total_revenue = session.query(func.sum(DigitalVenture.monthly_revenue)).scalar() or 0
             
-            ultra_low_risk = session.query(DigitalVenture).filter(
+            lowest_heuristic_bucket = session.query(DigitalVenture).filter(
                 DigitalVenture.failure_probability <= 0.0001
             ).count()
-            
-            success_rate = (ultra_low_risk / total_ventures * 100) if total_ventures > 0 else 0
+
+            heuristic_bucket_rate = (
+                lowest_heuristic_bucket / total_ventures * 100
+                if total_ventures > 0
+                else 0
+            )
             
             return {
                 "total_ventures": total_ventures,
                 "total_monthly_revenue": total_revenue,
-                "ventures_meeting_target": ultra_low_risk,
-                "ultra_low_failure_rate_percentage": success_rate,
-                "target_achievement": "SUCCESS" if success_rate > 80 else "IN_PROGRESS"
+                "ventures_in_lowest_heuristic_bucket": lowest_heuristic_bucket,
+                "lowest_heuristic_bucket_percentage": heuristic_bucket_rate,
+                "model_validation_status": "UNVALIDATED",
+                "metric_warning": (
+                    "Legacy failure_probability values are uncalibrated heuristic "
+                    "scores, not observed success or failure rates."
+                ),
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -207,10 +215,11 @@ async def serve_static(file_path: str):
 async def api_root():
     """API root"""
     return {
-        "name": "WealthMachine Enterprise API",
+        "name": "WealthMachine API",
         "version": "1.0.0",
         "description": "AI-driven digital business opportunity identification system",
-        "target": "P(failure) ≤ 0.01%",
+        "operating_mode": "controlled-pilot preparation",
+        "model_warning": "Heuristic scores are uncalibrated and recommendation-only.",
         "endpoints": {
             "health": "/health",
             "login": "/auth/login",

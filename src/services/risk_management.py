@@ -1,12 +1,13 @@
-"""Risk management helper utilities.
+"""Heuristic risk-screening helper utilities.
 
 The production repository ships with an advanced
 ``RiskAssessmentService`` backed by SQLAlchemy models.  For the
 autonomous Wealth Machine orchestration we also need an in-memory
 fallback so the loops can execute without a configured database.  The
 ``RiskManager`` defined here delegates to the existing service when it
-is available and gracefully degrades to a deterministic heuristic that
-produces actionable metrics for decision making.
+is available and otherwise produces an uncalibrated deterministic score.
+The score supports hypothesis screening; it is not a failure probability,
+investment approval, or autonomy evidence.
 """
 
 from __future__ import annotations
@@ -71,12 +72,15 @@ class RiskManager:
             "confidence_level": 0.72,
             "model_version": "heuristic-1.0",
             "features_used": ["opportunity_score", "execution_confidence", "expected_roi", "risk_buffer"],
+            "probability_calibrated": False,
+            "score_semantics": "heuristic screening score; external validation required",
+            "execution_authority": False,
         }
 
     @staticmethod
     def _determine_risk_level(risk_score: float) -> str:
         if risk_score <= 0.2:
-            return "Ultra Low"
+            return "Low"
         if risk_score <= 0.35:
             return "Low"
         if risk_score <= 0.5:
@@ -88,8 +92,8 @@ class RiskManager:
     @staticmethod
     def _generate_recommendations(risk_level: str, metrics: Dict[str, Any]) -> Dict[str, Any]:
         base_actions = {
-            "Ultra Low": ["Accelerate investment", "Document success patterns"],
-            "Low": ["Proceed with standard oversight", "Share playbooks across ventures"],
+            "Ultra Low": ["Validate externally", "Document the evidence trail"],
+            "Low": ["Run a bounded validation test", "Document the evidence trail"],
             "Moderate": ["Proceed with caution", "Add contingency reviews"],
             "High": ["Mitigate key risks", "Delay scaling"],
             "Very High": ["Pause venture", "Re-evaluate fundamentals"],
@@ -101,4 +105,3 @@ class RiskManager:
 
 
 __all__ = ["RiskManager"]
-

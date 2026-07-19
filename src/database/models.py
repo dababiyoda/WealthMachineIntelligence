@@ -34,7 +34,7 @@ class VentureType(enum.Enum):
 
 class RiskLevel(enum.Enum):
     """Risk assessment levels"""
-    ULTRA_LOW = "ultra_low"  # P(failure) ≤ 0.01%
+    ULTRA_LOW = "ultra_low"  # Legacy lowest heuristic bucket; not calibrated.
     LOW = "low"              # P(failure) ≤ 0.1%
     MODERATE = "moderate"    # P(failure) ≤ 1%
     HIGH = "high"            # P(failure) ≤ 5%
@@ -69,7 +69,8 @@ class DigitalVenture(Base):
     # Risk assessment
     risk_level = Column(SQLEnum(RiskLevel), default=RiskLevel.MODERATE)
     risk_score = Column(Float, default=0.5)  # 0-1 scale
-    failure_probability = Column(Float, default=0.01)  # Target ≤ 0.01%
+    # Legacy probability-shaped heuristic. Do not present as calibrated without validation.
+    failure_probability = Column(Float, default=0.01)
     
     # Growth metrics
     customer_count = Column(Integer, default=0)
