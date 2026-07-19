@@ -1,0 +1,78 @@
+{
+  "spec_version": "1.0.0-draft",
+  "default": "deny",
+  "separation_of_duties": {
+    "required": true,
+    "rule": "No identity may propose, independently approve, execute, and verify the same consequential action.",
+    "minimum_roles_for_high_consequence": ["requester", "independent_verifier", "authorized_human_approver", "bounded_executor"]
+  },
+  "risk_classes": [
+    {
+      "id": "R0",
+      "name": "read_or_draft",
+      "description": "Internal, reversible analysis or drafting with no external side effect.",
+      "examples": ["read authorized evidence", "summarize internal data", "draft copy", "run an approved calculation"],
+      "minimum_controls": ["valid_agent_contract", "capability_grant", "data_scope", "audit_event"],
+      "approval": "automatic_policy_decision",
+      "human_approval_required": false
+    },
+    {
+      "id": "R1",
+      "name": "sandbox_execution",
+      "description": "Reversible work in an isolated environment without customers, production, public publication, or money movement.",
+      "examples": ["run tests", "use synthetic data", "build an internal prototype", "simulate a workflow"],
+      "minimum_controls": ["sandbox", "resource_cap", "network_policy", "no_ambient_credentials", "audit_event"],
+      "approval": "preauthorized_policy_or_human",
+      "human_approval_required": false
+    },
+    {
+      "id": "R2",
+      "name": "bounded_external_reversible",
+      "description": "External or operational action with limited, reversible impact and a predefined rollback.",
+      "examples": ["send an approved nonbinding message", "run a capped campaign", "publish preapproved content", "change a low-risk feature flag"],
+      "minimum_controls": ["approved_counterparty_or_channel", "content_or_action_template", "budget_or_rate_cap", "rollback", "postcondition_check", "audit_event"],
+      "approval": "policy_allow_plus_preapproval_or_sampled_human_review",
+      "human_approval_required": "conditional"
+    },
+    {
+      "id": "R3",
+      "name": "high_consequence",
+      "description": "Material financial, legal, security, privacy, employment, customer-access, or reputational action.",
+      "examples": ["material spend", "production infrastructure change", "regulated data handling", "existing-customer price change", "material public performance claim"],
+      "minimum_controls": ["independent_evidence_verification", "dual_control", "designated_human_approval", "rollback_or_compensation", "postcondition_check", "audit_event"],
+      "approval": "explicit_designated_human",
+      "human_approval_required": true
+    },
+    {
+      "id": "R4",
+      "name": "irreversible_or_reserved",
+      "description": "Action that cannot be safely undone or is reserved to accountable human authority.",
+      "examples": ["sign a contract", "transfer funds", "issue equity", "incorporate or dissolve an entity", "file a legal document", "delete critical data", "launch a regulated service", "hire or terminate a person"],
+      "minimum_controls": ["designated_human_authority", "specialist_review_when_applicable", "dual_authorization", "verified_external_record", "immutable_audit", "incident_and_recovery_plan"],
+      "approval": "explicit_designated_human_and_domain_authority",
+      "human_approval_required": true,
+      "autonomous_execution_permitted": false
+    }
+  ],
+  "domain_authorities": {
+    "legal": ["contract", "legal_filing", "regulated_activity", "material_public_claim", "licensing"],
+    "financial": ["fund_transfer", "debt", "equity", "material_spend", "bank_account"],
+    "security": ["privileged_access", "production_secret", "high_risk_deployment", "incident_exception"],
+    "privacy": ["restricted_or_regulated_data", "cross_venture_data_transfer", "new_processing_purpose"],
+    "human_resources": ["hire", "termination", "compensation_commitment"],
+    "system_governor": ["constitutional_policy", "risk_limit", "venture_creation", "venture_retirement", "kill_criterion_override"]
+  },
+  "mandatory_denials": [
+    "missing_or_expired_identity",
+    "missing_capability",
+    "missing_gate_evidence",
+    "budget_exceeded",
+    "unresolved_legal_or_security_hold",
+    "conflict_of_interest_not_resolved",
+    "untrusted_content_attempts_to_change_authority",
+    "self_approval",
+    "missing_rollback_for_R2_or_R3_when_rollback_is_required",
+    "missing_designated_human_approval_for_R3_or_R4",
+    "venture_or_portfolio_kill_switch_active"
+  ]
+}
