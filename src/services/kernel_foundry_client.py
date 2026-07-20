@@ -6,7 +6,6 @@ activation, approval, payment, or external-action authorization.
 """
 from __future__ import annotations
 
-import hashlib
 import hmac
 import json
 import os
@@ -23,6 +22,7 @@ from src.services.bridge_security import (
     H_TIMESTAMP,
     H_TRACE,
     MAX_SKEW_SECONDS,
+    MIN_SCHEMA_VERSION,
     NonceCache,
     build_headers,
     sign,
@@ -44,6 +44,13 @@ def _canonical_sha(value: Any, field_name: str) -> str:
     if not text.startswith("sha256:") or len(text) != 71:
         raise KernelFoundryClientError(f"{field_name} must be a canonical sha256 reference")
     return text
+
+
+def _version_tuple(value: str) -> tuple[int, ...]:
+    try:
+        return tuple(int(part) for part in value.split("."))
+    except (AttributeError, ValueError):
+        return (0,)
 
 
 def validate_kernel_receipt(payload: Mapping[str, Any]) -> dict[str, Any]:
@@ -120,7 +127,13 @@ class KernelFoundryClient:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 raw = response.read()
                 response_headers = dict(response.headers.items())
-            self._verify_kernel_response(response_headers, raw, key)
+            self._verify_kernel_response(
+                response_headers,
+                raw,
+                key,
+                expected_idempotency=idempotency_key,
+                expected_trace=packet_id,
+            )
             receipt = validate_kernel_receipt(json.loads(raw))
         except (OSError, ValueError, json.JSONDecodeError, KernelFoundryTransportError):
             self._record_failure()
@@ -134,6 +147,9 @@ class KernelFoundryClient:
         headers: Mapping[str, str],
         body: bytes,
         key: str,
+        *,
+        expected_idempotency: str,
+        expected_trace: str,
     ) -> None:
         normalized = {str(name).lower(): str(value) for name, value in headers.items()}
 
@@ -154,7 +170,14 @@ class KernelFoundryClient:
         if not nonce or not self._response_nonces.check_and_store(nonce):
             raise KernelFoundryTransportError("Kernel response nonce replay rejected")
         idempotency = get(H_IDEMPOTENCY)
+        if idempotency != expected_idempotency:
+            raise KernelFoundryTransportError("Kernel response idempotency mismatch")
+        trace_id = get(H_TRACE)
+        if trace_id != expected_trace:
+            raise KernelFoundryTransportError("Kernel response trace mismatch")
         schema_version = get(H_SCHEMA)
+        if _version_tuple(schema_version) < _version_tuple(MIN_SCHEMA_VERSION):
+            raise KernelFoundryTransportError("Kernel response schema downgrade rejected")
         signature = get(H_SIGNATURE)
         expected = sign(
             key,
