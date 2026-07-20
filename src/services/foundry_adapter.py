@@ -38,6 +38,8 @@ class FoundryUnderwritingEnvelope:
     packet_digest: str
     assessment_id: str
     assessment_digest: str
+    observed_pain: str
+    core_thesis: str
     go_no_go: str
     opportunity_score: float
     market_alignment: float
@@ -136,6 +138,8 @@ def build_foundry_underwriting_envelope(
         packet_digest=_digest(packet),
         assessment_id=str(assessment.get("id") or ""),
         assessment_digest=_digest(assessment),
+        observed_pain=str(packet.get("observed_pain") or ""),
+        core_thesis=str(packet.get("core_thesis") or ""),
         go_no_go=verdict,
         opportunity_score=float(assessment.get("opportunity_score") or 0.0),
         market_alignment=float(assessment.get("market_alignment") or 0.0),
