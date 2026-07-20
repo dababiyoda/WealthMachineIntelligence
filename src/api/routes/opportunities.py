@@ -17,7 +17,8 @@ Transport security (zero-trust, local-first):
   the previously computed assessment without re-running the engine.
 
 A valid signature proves sender authenticity only. It never carries
-authorization — the assessment still has no execution authority anywhere.
+authorization — the assessment and Foundry envelope have no execution
+authority anywhere.
 """
 
 from __future__ import annotations
@@ -33,15 +34,22 @@ from src.services.bridge_security import (
     BridgeSecurityError,
     NonceCache,
     build_headers,
-    signing_key,
     verify_headers,
 )
+from src.services.foundry_adapter import (
+    FoundryUnderwritingError,
+    build_foundry_underwriting_envelope,
+)
 from src.services.opportunity_intake import get_intake_service
-from src.services.venture_protocol import SCHEMA_VERSION
+from src.services.venture_protocol import SCHEMA_VERSION, validate_packet_wire
 
 router = APIRouter()
 
 _nonce_cache = NonceCache()
+# The normalized packet that actually produced each assessment. This prevents
+# a later Foundry request from substituting a different packet with the same id.
+_packets_by_assessment: Dict[str, Dict[str, Any]] = {}
+_packets_by_packet_id: Dict[str, Dict[str, Any]] = {}
 
 
 def _check_token(authorization: str | None) -> None:
@@ -88,6 +96,13 @@ async def _verified_payload(request: Request) -> tuple[Dict[str, Any], Dict[str,
     return payload, transport
 
 
+def _remember_packet(packet: Dict[str, Any], assessment: Dict[str, Any]) -> None:
+    normalized = validate_packet_wire(packet)
+    snapshot = dict(normalized)
+    _packets_by_assessment[assessment["id"]] = snapshot
+    _packets_by_packet_id[normalized["id"]] = snapshot
+
+
 async def _evaluate(request: Request) -> JSONResponse:
     payload, transport = await _verified_payload(request)
     service = get_intake_service()
@@ -100,6 +115,7 @@ async def _evaluate(request: Request) -> JSONResponse:
 
     try:
         assessment = await service.evaluate_packet_async(payload)
+        _remember_packet(payload, assessment)
     except ValueError as exc:
         # Contract violation in the inbound packet — untrusted input.
         raise HTTPException(
@@ -132,3 +148,45 @@ async def get_assessment(assessment_id: str, request: Request) -> JSONResponse:
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
         )
     return _signed_response(assessment)
+
+
+@router.post("/ventures/{assessment_id}/foundry-envelope")
+async def create_foundry_envelope(assessment_id: str, request: Request) -> JSONResponse:
+    """Build a proposal-only Foundry envelope from the assessed packet.
+
+    The request body is the separately verified commercial foundation. The
+    packet and assessment are retrieved from the exact intake episode rather
+    than accepted again from the caller. The result has zero execution
+    authority and still requires Kernel intake, human approval, and gates.
+    """
+    foundation, transport = await _verified_payload(request)
+    service = get_intake_service()
+    assessment = service.get_assessment(assessment_id)
+    if assessment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
+        )
+    packet = (
+        _packets_by_assessment.get(assessment["id"])
+        or _packets_by_packet_id.get(assessment["opportunity_packet_id"])
+    )
+    if packet is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="The normalized source packet is unavailable; re-evaluate before Foundry export",
+        )
+    try:
+        envelope = build_foundry_underwriting_envelope(
+            packet,
+            assessment,
+            foundation=foundation,
+        )
+    except (ValueError, FoundryUnderwritingError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        )
+    return _signed_response(
+        envelope.to_wire(),
+        transport.get("idempotency_key", ""),
+    )
