@@ -34,6 +34,7 @@ def envelope(**overrides):
         "packet_digest": "sha256:" + "a" * 64,
         "assessment_id": "assessment-1",
         "assessment_digest": "sha256:" + "b" * 64,
+        "human_approval_record_hash": "sha256:" + "d" * 64,
         "observed_pain": "proof is unreliable",
         "core_thesis": "verified proof may reduce disputes",
         "go_no_go": "go",
@@ -71,7 +72,7 @@ def receipt(**overrides):
     payload = {
         "status": "accepted_for_foundry_analysis",
         "opportunity_id": "packet-1:assessment-1",
-        "opportunity_digest": "sha256:" + "d" * 64,
+        "opportunity_digest": "sha256:" + "e" * 64,
         "duplicate": False,
         "requires_human_approval": True,
         "execution_authority": "none",
@@ -83,7 +84,7 @@ def receipt(**overrides):
 def signed_response(
     payload,
     *,
-    idempotency="kernel-foundry:packet-1:" + "b" * 16,
+    idempotency="kernel-foundry:packet-1:bbbbbbbb:dddddddd",
     trace_id="packet-1",
     identity="uniimente-kernel",
 ):
@@ -117,18 +118,23 @@ def test_submit_sends_signed_zero_authority_envelope(monkeypatch):
     result = KernelFoundryClient().submit(envelope())
     assert seen["url"] == "http://kernel.local/foundry/underwriting/intake"
     assert seen["body"]["execution_authority"] == "none"
+    assert seen["body"]["human_approval_record_hash"].startswith("sha256:")
     assert seen["headers"]["x-service-identity"] == "wealthmachine"
-    assert seen["headers"]["x-idempotency-key"].startswith("kernel-foundry:packet-1:")
+    assert seen["headers"]["x-idempotency-key"] == "kernel-foundry:packet-1:bbbbbbbb:dddddddd"
     assert result["execution_authority"] == "none"
     assert result["requires_human_approval"] is True
 
 
-def test_not_ready_or_authority_widened_envelope_is_not_sent(monkeypatch):
+def test_not_ready_authority_widened_or_unapproved_envelope_is_not_sent(monkeypatch):
     configure(monkeypatch)
     with pytest.raises(KernelFoundryClientError):
         KernelFoundryClient().submit(envelope(ready_for_foundry=False))
     with pytest.raises(KernelFoundryClientError):
         KernelFoundryClient().submit(envelope(execution_authority="launch"))
+    with pytest.raises(KernelFoundryClientError):
+        KernelFoundryClient().submit(envelope(human_approval_record_hash=""))
+    with pytest.raises(KernelFoundryClientError):
+        KernelFoundryClient().submit(envelope(human_approval_record_hash="approval:unverified"))
 
 
 def test_kernel_response_identity_idempotency_and_trace_are_bound(monkeypatch):
