@@ -103,11 +103,18 @@ class KernelFoundryClient:
         assessment_digest = _canonical_sha(
             body_payload.get("assessment_digest"), "assessment_digest"
         )
+        approval_hash = _canonical_sha(
+            body_payload.get("human_approval_record_hash"),
+            "human_approval_record_hash",
+        )
         if not packet_id:
             raise KernelFoundryClientError("opportunity_packet_id is required")
 
         body = json.dumps(body_payload, sort_keys=True, separators=(",", ":"), default=str).encode()
-        idempotency_key = f"kernel-foundry:{packet_id}:{assessment_digest[-16:]}"
+        idempotency_key = (
+            f"kernel-foundry:{packet_id}:"
+            f"{assessment_digest[-8:]}:{approval_hash[-8:]}"
+        )
         headers = {"Content-Type": "application/json"}
         headers.update(build_headers(
             body,
