@@ -3,10 +3,22 @@
 ## Purpose
 A unified ontological backbone for digital business ventures that emphasizes AI integration and multi-agent orchestration. This framework provides a structured approach to identifying, launching, and scaling digital business opportunities through AI-driven processes and human expertise.
 
+This system does not promise outcomes. Ventures fail, signals mislead, and
+models are wrong in ways nobody predicted. What the architecture provides is
+governance: bounded exposure, explicit human authority over consequential
+decisions, and a durable record of what was assumed and why.
+
 ## Core Principles
 
+### Governed Autonomy
+- Every consequential action routes through the Constitutional Control Layer
+- Agents act only within explicit, revocable contracts
+- Autonomy is earned with external evidence and revoked without ceremony
+- See `docs/CONSTITUTIONAL_CONTROL_LAYER.md` and
+  `docs/PROGRESSIVE_AUTONOMY_LEVELS.md`
+
 ### Digital-First Approach
-- Systematic identification of low-risk, high-reward digital opportunities
+- Systematic identification of digital opportunities with bounded downside
 - Focus on scalable digital business models (SaaS, e-commerce, subscription services)
 - Integration of automation at every level of operations
 
@@ -36,6 +48,14 @@ Strategic roadmap divided into three progressive phases of business development.
 
 ### /automation
 Rules and logic for automated decision-making processes.
+
+### /docs
+Governance documentation:
+- `CONSTITUTIONAL_CONTROL_LAYER.md`: the policy engine, agent contracts, and
+  Evidence Ledger that bound what any agent may do
+- `PROGRESSIVE_AUTONOMY_LEVELS.md`: the 0–4 autonomy ladder, how levels are
+  earned, and how they are revoked
+- `IMPLEMENTATION_ROADMAP.md`: phased plan toward a doctrine-compliant system
 
 ### /ai_integration
 Architecture and workflows for AI agent implementation. Documentation is located in `/ai_integration/docs` and includes:
@@ -146,10 +166,17 @@ wire protocol, mirrored in both repos as `venture_protocol`:
 - `GET /api/ventures/{id}/assessment` — fetch a stored assessment by
   assessment id or opportunity packet id.
 
+- `GET /api/ventures/{packet_id}/governance` — the audit trail behind an
+  assessment: policy decisions, Assumption Register entries, and Evidence
+  Ledger events.
+
 Hardcoded guardrails: every assessment carries
 `requires_human_approval: true`; packets with legal risk flags are killed
 and escalated to the operator; finance-flagged packets always require legal
 review and stay educational (no revenue promises, no personalized advice).
+Assessment itself is authorized by the policy engine under the
+`opportunity_intake` contract, which permits proposing and nothing else —
+zero spend, no launches, no publishing.
 The endpoints run locally with zero credentials; set
 `WEALTHMACHINE_INTAKE_TOKEN` to require a shared bearer token in
 deployment. On the DALEOBANKS side, point `WEALTHMACHINE_URL` at this

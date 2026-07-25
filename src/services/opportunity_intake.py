@@ -25,6 +25,13 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 from uuid import uuid4
 
+from src.control import (
+    ActionRequest,
+    AgentContract,
+    ContractRegistry,
+    EvidenceLedger,
+    PolicyEngine,
+)
 from src.network_my_networth.system import NetworkWealthEngine
 from src.services.venture_protocol import (
     FINANCE_EDUCATION_FLAG,
@@ -35,6 +42,27 @@ from src.services.venture_protocol import (
 )
 
 logger = logging.getLogger(__name__)
+
+# The intake agent's own contract. It may observe and propose (an
+# assessment is a proposal); it may execute nothing, spend nothing, and
+# its prohibited list names the actions this service must never grow into
+# without a deliberate human decision.
+INTAKE_AGENT_ID = "opportunity_intake"
+
+
+def _build_intake_contract() -> AgentContract:
+    return AgentContract(
+        agent_id=INTAKE_AGENT_ID,
+        mission="Evaluate opportunity signals and propose venture assessments "
+                "for human decision",
+        autonomy_level=1,
+        permitted_actions=frozenset({"assess_opportunity"}),
+        limits={"max_spend_usd": 0.0},
+        prohibited_actions=frozenset({
+            "launch_venture", "commit_capital", "publish_content",
+        }),
+        escalation_triggers=["capital", "launch"],
+    )
 
 _URGENCY_IMPACT = {"high": 0.8, "medium": 0.65, "low": 0.5}
 _URGENCY_DEMAND = {"high": 0.75, "medium": 0.6, "low": 0.45}
@@ -84,12 +112,44 @@ def packet_to_engine_payload(packet: Dict[str, Any]) -> Dict[str, Any]:
 class OpportunityIntakeService:
     """Validates packets, runs the venture loop, returns assessments."""
 
-    def __init__(self, engine: Optional[NetworkWealthEngine] = None) -> None:
+    def __init__(
+        self,
+        engine: Optional[NetworkWealthEngine] = None,
+        policy_engine: Optional[PolicyEngine] = None,
+        ledger: Optional[EvidenceLedger] = None,
+    ) -> None:
         self.engine = engine or NetworkWealthEngine(
             rules=[NetworkWealthEngine.build_risk_rule()]
         )
+        if policy_engine is None:
+            registry = ContractRegistry()
+            registry.register(_build_intake_contract())
+            policy_engine = PolicyEngine(registry)
+        self.policy_engine = policy_engine
+        self.ledger = ledger or EvidenceLedger()
         self._assessments: Dict[str, Dict[str, Any]] = {}
         self._by_packet: Dict[str, str] = {}
+
+    def _authorize_assessment(self, packet: Dict[str, Any]) -> None:
+        """Route the act of assessing through the policy engine.
+
+        Producing an assessment is a proposal — reversible, no spend —
+        so a level-1 contract allows it. Anything else this service might
+        one day be asked to do is denied or escalated here first.
+        """
+        decision = self.policy_engine.evaluate(ActionRequest(
+            agent_id=INTAKE_AGENT_ID,
+            action_type="assess_opportunity",
+            description=f"assess opportunity packet {packet['id']}",
+            category="propose",
+            consequence="low",
+            reversibility="reversible",
+            venture_id=f"opp-{packet['id']}",
+        ))
+        if not decision.allowed:
+            raise PermissionError(
+                f"policy engine blocked assessment: {'; '.join(decision.reasons)}"
+            )
 
     # ------------------------------------------------------------------ #
     # Evaluation
@@ -97,6 +157,7 @@ class OpportunityIntakeService:
     def evaluate_packet(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Synchronous evaluation (tests, scripts, CLIs)."""
         packet = validate_packet_wire(payload)
+        self._authorize_assessment(packet)
         report = self.engine.run_venture_sync(
             f"opp-{packet['id']}", packet_to_engine_payload(packet)
         )
@@ -105,6 +166,7 @@ class OpportunityIntakeService:
     async def evaluate_packet_async(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Async evaluation for use inside a running event loop (FastAPI)."""
         packet = validate_packet_wire(payload)
+        self._authorize_assessment(packet)
         report = await self.engine.run_venture(
             f"opp-{packet['id']}", packet_to_engine_payload(packet)
         )
@@ -116,12 +178,69 @@ class OpportunityIntakeService:
 
         self._assessments[assessment["id"]] = assessment
         self._by_packet[packet["id"]] = assessment["id"]
+        self._record_governance(packet, assessment)
         logger.info(
             "venture_assessment packet=%s go_no_go=%s score=%s risk=%s",
             packet["id"], assessment["go_no_go"],
             assessment["opportunity_score"], assessment["risk_level"],
         )
         return assessment
+
+    def _record_governance(
+        self, packet: Dict[str, Any], assessment: Dict[str, Any]
+    ) -> None:
+        """Write the assessment's evidentiary trail into the ledger.
+
+        The packet's thesis enters the Assumption Register as an untested
+        assumption; its evidence items are recorded as external evidence;
+        the go/no-go itself lands as a decision that still requires human
+        approval. The wire payload is unchanged — governance lives beside
+        the assessment, keyed by the same venture id.
+        """
+        venture_id = f"opp-{packet['id']}"
+        thesis = packet["core_thesis"] or packet["observed_pain"]
+        assumption = self.ledger.add_assumption(
+            thesis,
+            venture_id=venture_id,
+            criticality="high",
+            source=packet["source"] or "unknown",
+        )
+        evidence_ids = [
+            self.ledger.record_evidence(
+                item,
+                kind="external",
+                venture_id=venture_id,
+                assumption_id=assumption["id"],
+                source=packet["source"] or "unknown",
+                strength="weak",  # signal-stage evidence is never more than weak
+            )["id"]
+            for item in packet["evidence"]
+        ]
+        self.ledger.record_decision(
+            f"assessment {assessment['go_no_go']} for packet {packet['id']}",
+            venture_id=venture_id,
+            actor=INTAKE_AGENT_ID,
+            reasons=assessment["reasons"],
+            evidence_ids=evidence_ids,
+            requires_human_approval=True,
+        )
+
+    def get_governance_record(self, packet_id: str) -> Optional[Dict[str, Any]]:
+        """The reconstructable trail for one packet: policy decisions,
+        assumptions, and ledger events. None if the packet is unknown."""
+        if packet_id not in self._by_packet:
+            return None
+        venture_id = f"opp-{packet_id}"
+        return {
+            "opportunity_packet_id": packet_id,
+            "assessment_id": self._by_packet[packet_id],
+            "policy_decisions": [
+                d.to_dict() for d in self.policy_engine.decision_log
+                if d.request.venture_id == venture_id
+            ],
+            "assumptions": self.ledger.assumptions_for(venture_id),
+            "ledger_events": self.ledger.events_for(venture_id),
+        }
 
     def get_assessment(self, assessment_id: str) -> Optional[Dict[str, Any]]:
         found = self._assessments.get(assessment_id)
@@ -224,6 +343,7 @@ def set_intake_service(service: Optional[OpportunityIntakeService]) -> None:
 
 
 __all__ = [
+    "INTAKE_AGENT_ID",
     "OpportunityIntakeService",
     "packet_to_engine_payload",
     "get_intake_service",

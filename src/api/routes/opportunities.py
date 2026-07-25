@@ -76,3 +76,19 @@ async def get_assessment(
             status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found"
         )
     return assessment
+
+
+@router.get("/ventures/{packet_id}/governance")
+async def get_governance(
+    packet_id: str,
+    authorization: str | None = Header(default=None),
+) -> Dict[str, Any]:
+    """The audit trail for one packet: policy decisions, the Assumption
+    Register entries, and the Evidence Ledger events behind its assessment."""
+    _check_token(authorization)
+    record = get_intake_service().get_governance_record(packet_id)
+    if record is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Packet not found"
+        )
+    return record

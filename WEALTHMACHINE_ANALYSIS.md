@@ -43,7 +43,7 @@ risk_weights = {
 
 ### 3. **Three-Phase Systematic Scaling**
 
-#### Phase 1: Low-Risk Validation
+#### Phase 1: Bounded-Exposure Validation
 - AI-driven market research and competitor analysis
 - MVP development with automated user testing
 - Risk assessment and market fit validation
@@ -92,7 +92,7 @@ if market_data.volatility > volatility_threshold:
 ## Compounding Returns Strategy
 
 ### 1. **Systematic Portfolio Growth**
-- Start with low-risk digital ventures
+- Start with bounded-exposure digital ventures
 - Reinvest profits into higher-tier opportunities
 - Diversify across SaaS, e-commerce, and content platforms
 - Scale successful patterns across multiple ventures

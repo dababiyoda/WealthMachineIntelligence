@@ -12,7 +12,9 @@ from datetime import datetime, timezone
 import pytest
 from fastapi.testclient import TestClient
 
+from src.control import ActionRequest
 from src.services.opportunity_intake import (
+    INTAKE_AGENT_ID,
     OpportunityIntakeService,
     packet_to_engine_payload,
     set_intake_service,
@@ -183,6 +185,70 @@ def test_assessment_wire_rejects_self_executing_assessment(service):
 
 
 # ---------------------------------------------------------------------- #
+# Constitutional Control Layer integration
+# ---------------------------------------------------------------------- #
+def test_assessment_is_authorized_by_the_policy_engine(service):
+    service.evaluate_packet(fire_packet(id="packet-policy"))
+    decisions = service.policy_engine.decisions_for(INTAKE_AGENT_ID)
+    assert [d.verdict for d in decisions] == ["allow"]
+    assert decisions[0].request.action_type == "assess_opportunity"
+
+
+def test_intake_contract_permits_proposing_and_nothing_else(service):
+    contract = service.policy_engine.registry.get(INTAKE_AGENT_ID)
+    assert contract.autonomy_level == 1
+    assert contract.permitted_actions == frozenset({"assess_opportunity"})
+    assert contract.limits["max_spend_usd"] == 0.0
+    assert "commit_capital" in contract.prohibited_actions
+
+    # The contract's own scope is enforced, not merely documented.
+    for action in ("launch_venture", "commit_capital", "publish_content"):
+        decision = service.policy_engine.evaluate(ActionRequest(
+            agent_id=INTAKE_AGENT_ID, action_type=action,
+        ))
+        assert decision.verdict == "deny"
+
+
+def test_revoked_intake_contract_blocks_assessment(service):
+    service.policy_engine.registry.revoke(INTAKE_AGENT_ID, "operator kill switch")
+    with pytest.raises(PermissionError):
+        service.evaluate_packet(fire_packet(id="packet-revoked"))
+
+
+def test_assessment_writes_its_evidentiary_trail(service):
+    packet = fire_packet(id="packet-ledger", evidence=["reply thread", "waitlist signups"])
+    assessment = service.evaluate_packet(packet)
+    record = service.get_governance_record("packet-ledger")
+
+    assert record["assessment_id"] == assessment["id"]
+    assert len(record["policy_decisions"]) == 1
+
+    # The thesis enters the Assumption Register untested.
+    assumptions = record["assumptions"]
+    assert len(assumptions) == 1
+    assert assumptions[0]["status"] == "untested"
+    assert assumptions[0]["criticality"] == "high"
+
+    # Packet evidence is recorded as external, and never stronger than weak
+    # at signal stage.
+    evidence = [e["payload"] for e in record["ledger_events"]
+                if e["event_type"] == "evidence_recorded"]
+    assert len(evidence) == 2
+    assert all(e["kind"] == "external" and e["strength"] == "weak" for e in evidence)
+
+    # The go/no-go lands as a decision still awaiting a human.
+    decisions = [e["payload"] for e in record["ledger_events"]
+                 if e["event_type"] == "decision_recorded"]
+    assert len(decisions) == 1
+    assert decisions[0]["requires_human_approval"] is True
+    assert assessment["go_no_go"] in decisions[0]["decision"]
+
+
+def test_governance_record_absent_for_unknown_packet(service):
+    assert service.get_governance_record("never-seen") is None
+
+
+# ---------------------------------------------------------------------- #
 # HTTP endpoints (the surface DALEOBANKS actually calls)
 # ---------------------------------------------------------------------- #
 @pytest.fixture()
@@ -222,6 +288,20 @@ def test_intake_endpoint_rejects_bad_packet(client):
 
 def test_intake_endpoint_missing_assessment_404s(client):
     assert client.get("/api/ventures/unknown-id/assessment").status_code == 404
+
+
+def test_governance_endpoint_exposes_the_audit_trail(client):
+    client.post("/api/opportunities/intake", json=fire_packet(id="packet-gov"))
+
+    response = client.get("/api/ventures/packet-gov/governance")
+    assert response.status_code == 200
+    record = response.json()
+    assert record["opportunity_packet_id"] == "packet-gov"
+    assert record["policy_decisions"][0]["verdict"] == "allow"
+    assert record["assumptions"]
+    assert record["ledger_events"]
+
+    assert client.get("/api/ventures/unknown/governance").status_code == 404
 
 
 def test_intake_token_enforced_when_configured(service, monkeypatch):

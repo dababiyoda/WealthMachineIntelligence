@@ -1,7 +1,10 @@
-# Phase 1: Ideation & Low-Risk Digital Ventures
+# Phase 1: Ideation & Bounded-Exposure Digital Ventures
 
 ## Overview
-Initial phase focusing on market research, MVP development, and minimal overhead digital platforms.
+Initial phase focusing on market research, MVP development, and minimal overhead
+digital platforms. "Bounded exposure" describes the size of the loss if the
+venture fails, not the likelihood of success — early ventures fail often, and
+the phase is designed so that they can.
 
 ## Key Components
 
