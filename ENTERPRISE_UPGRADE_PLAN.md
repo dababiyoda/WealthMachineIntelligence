@@ -1,6 +1,8 @@
 # WealthMachine Enterprise Upgrade Plan
 ## Production-Grade Enhancement Roadmap
 
+> **Status: superseded and non-normative.** This historical checklist is retained for provenance. Use [`docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md`](docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md) and the machine-readable contracts under `spec/uat/v1/` for all new architecture and implementation decisions.
+
 ### Phase 1: Core Infrastructure Enhancement (Foundation)
 - [ ] Database Integration (PostgreSQL)
 - [ ] API Gateway & Security Layer

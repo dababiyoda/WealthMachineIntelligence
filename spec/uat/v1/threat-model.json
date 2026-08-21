@@ -1,0 +1,199 @@
+{
+  "spec_version": "1.0.0-draft",
+  "method": "Threats cover AI behavior, application and infrastructure security, business logic, governance, human misuse, and operational failure. External frameworks are threat libraries, not certifications.",
+  "control_catalog": [
+    {"id": "C-POL-001", "name": "deny-by-default external policy decision"},
+    {"id": "C-IAM-001", "name": "unique workload identity and scoped capability grants"},
+    {"id": "C-IAM-002", "name": "short-lived credentials and independent revocation"},
+    {"id": "C-TOOL-001", "name": "schema-validating, policy-enforcing tool gateway"},
+    {"id": "C-RUNTIME-001", "name": "isolated runtime without ambient credentials"},
+    {"id": "C-DATA-001", "name": "data classification, minimization, and egress enforcement"},
+    {"id": "C-EVID-001", "name": "provenance and integrity-bound evidence records"},
+    {"id": "C-EVID-002", "name": "contradiction, freshness, scope, and independent verification"},
+    {"id": "C-MEM-001", "name": "unverified-memory quarantine and typed knowledge classes"},
+    {"id": "C-TENANT-001", "name": "venture-scoped namespaces, secrets, keys, retrieval, and authorization"},
+    {"id": "C-BUDGET-001", "name": "hard per-agent, per-venture, per-vendor, and portfolio resource caps"},
+    {"id": "C-SPAWN-001", "name": "factory-only creation, depth and count quotas, expiry, and idle termination"},
+    {"id": "C-SOD-001", "name": "separation of proposal, approval, execution, and verification"},
+    {"id": "C-AUDIT-001", "name": "append-only, integrity-checked, remotely replicated audit events"},
+    {"id": "C-SUPPLY-001", "name": "dependency locking, SBOM, signed artifacts, and build provenance"},
+    {"id": "C-OPS-001", "name": "idempotency, bounded retries, reconciliation, and postcondition verification"},
+    {"id": "C-INC-001", "name": "out-of-band agent, tool, spend, publication, venture, and portfolio kill switches"},
+    {"id": "C-HUMAN-001", "name": "designated human approval for high-consequence and reserved actions"},
+    {"id": "C-BIZ-001", "name": "external commitment and outcome evidence before capital or authority expansion"},
+    {"id": "C-BIZ-002", "name": "independent adversarial review and causal verification"},
+    {"id": "C-MODEL-001", "name": "model and prompt versioning, benchmark gates, canary, and rollback"},
+    {"id": "C-RECOVERY-001", "name": "tested backup, restore, degraded mode, and manual takeover"}
+  ],
+  "threats": [
+    {
+      "id": "T-AI-001",
+      "name": "prompt_or_goal_injection",
+      "scenario": "Untrusted content attempts to change mission, policy, evidence, permissions, or tool behavior.",
+      "assets": ["agent intent", "tool authority", "evidence integrity"],
+      "controls": ["C-POL-001", "C-TOOL-001", "C-RUNTIME-001", "C-EVID-002"],
+      "evaluations": ["EVAL-PROMPT-001", "EVAL-POLICY-001"]
+    },
+    {
+      "id": "T-AI-002",
+      "name": "memory_or_retrieval_poisoning",
+      "scenario": "False or malicious content is persisted and later treated as authoritative institutional memory.",
+      "assets": ["knowledge base", "decisions", "cross-venture learning"],
+      "controls": ["C-EVID-001", "C-EVID-002", "C-MEM-001", "C-TENANT-001"],
+      "evaluations": ["EVAL-MEM-001", "EVAL-EVID-001"]
+    },
+    {
+      "id": "T-AI-003",
+      "name": "hallucinated_evidence_or_authority",
+      "scenario": "An agent invents a source, approval, customer commitment, legal status, or completed action.",
+      "assets": ["decision integrity", "legal authority", "capital"],
+      "controls": ["C-EVID-001", "C-EVID-002", "C-SOD-001", "C-AUDIT-001"],
+      "evaluations": ["EVAL-EVID-001", "EVAL-AUTH-001"]
+    },
+    {
+      "id": "T-AI-004",
+      "name": "excessive_agency_or_goal_hijack",
+      "scenario": "An agent takes side effects beyond the minimum authority needed or silently pursues a substituted objective.",
+      "assets": ["capital", "customers", "production", "mission"],
+      "controls": ["C-IAM-001", "C-POL-001", "C-TOOL-001", "C-BUDGET-001", "C-INC-001"],
+      "evaluations": ["EVAL-POLICY-001", "EVAL-IAM-001", "EVAL-KILL-001"]
+    },
+    {
+      "id": "T-AI-005",
+      "name": "agent_collusion_or_circular_validation",
+      "scenario": "Agents repeat or reinforce the same unsupported claim until it appears independently validated.",
+      "assets": ["evidence integrity", "portfolio capital"],
+      "controls": ["C-EVID-001", "C-EVID-002", "C-SOD-001", "C-BIZ-002"],
+      "evaluations": ["EVAL-EVID-001", "EVAL-GOV-001", "EVAL-BIZ-001"]
+    },
+    {
+      "id": "T-IAM-001",
+      "name": "privilege_escalation_or_impersonation",
+      "scenario": "An agent, user, or service obtains or claims capabilities it was not granted.",
+      "assets": ["identity", "secrets", "policy", "venture isolation"],
+      "controls": ["C-IAM-001", "C-IAM-002", "C-POL-001", "C-AUDIT-001"],
+      "evaluations": ["EVAL-IAM-001", "EVAL-AUTH-001"]
+    },
+    {
+      "id": "T-DATA-001",
+      "name": "data_exfiltration",
+      "scenario": "Restricted data or secrets leave the authorized venture, model, tool, or destination boundary.",
+      "assets": ["customer data", "portfolio data", "secrets", "legal privilege"],
+      "controls": ["C-DATA-001", "C-TENANT-001", "C-TOOL-001", "C-IAM-002"],
+      "evaluations": ["EVAL-EGRESS-001", "EVAL-TENANT-001"]
+    },
+    {
+      "id": "T-TENANT-001",
+      "name": "cross_venture_contamination",
+      "scenario": "One Venture Pod reads, writes, retrieves, or influences another venture's private state.",
+      "assets": ["venture confidentiality", "customer trust", "model context"],
+      "controls": ["C-TENANT-001", "C-DATA-001", "C-IAM-001", "C-MEM-001"],
+      "evaluations": ["EVAL-TENANT-001", "EVAL-MEM-001"]
+    },
+    {
+      "id": "T-FIN-001",
+      "name": "financial_drain_or_fraud",
+      "scenario": "Repeated, disguised, unauthorized, or manipulated actions consume money, compute, subscriptions, advertising, or contractor budgets.",
+      "assets": ["cash", "runway", "vendor accounts"],
+      "controls": ["C-BUDGET-001", "C-SOD-001", "C-HUMAN-001", "C-INC-001", "C-AUDIT-001"],
+      "evaluations": ["EVAL-BUDGET-001", "EVAL-GOV-001", "EVAL-KILL-001"]
+    },
+    {
+      "id": "T-OPS-001",
+      "name": "runaway_agent_creation_or_resource_exhaustion",
+      "scenario": "Recursive workers multiply, persist, or retry until limits, services, or human review capacity are exhausted.",
+      "assets": ["compute", "budget", "operator attention", "availability"],
+      "controls": ["C-SPAWN-001", "C-BUDGET-001", "C-OPS-001", "C-INC-001"],
+      "evaluations": ["EVAL-SPAWN-001", "EVAL-BUDGET-001", "EVAL-KILL-001"]
+    },
+    {
+      "id": "T-OPS-002",
+      "name": "duplicate_or_ambiguous_execution",
+      "scenario": "Retries, timeouts, or partial failures execute an external action more than once or leave contradictory state.",
+      "assets": ["money", "customer records", "workflow state"],
+      "controls": ["C-OPS-001", "C-AUDIT-001", "C-TOOL-001"],
+      "evaluations": ["EVAL-IDEMP-001", "EVAL-TOOL-001"]
+    },
+    {
+      "id": "T-TOOL-001",
+      "name": "malicious_or_stale_tool_result",
+      "scenario": "A tool or vendor returns false, stale, malformed, or attacker-controlled data that drives a consequential action.",
+      "assets": ["decision integrity", "external systems"],
+      "controls": ["C-TOOL-001", "C-EVID-002", "C-OPS-001", "C-POL-001"],
+      "evaluations": ["EVAL-TOOL-001", "EVAL-EVID-001"]
+    },
+    {
+      "id": "T-SUPPLY-001",
+      "name": "software_or_model_supply_chain_compromise",
+      "scenario": "A dependency, build, model, dataset, image, or deployment artifact is replaced or tampered with.",
+      "assets": ["application integrity", "agent behavior", "production"],
+      "controls": ["C-SUPPLY-001", "C-MODEL-001", "C-AUDIT-001"],
+      "evaluations": ["EVAL-SUPPLY-001", "EVAL-MODEL-001"]
+    },
+    {
+      "id": "T-AUDIT-001",
+      "name": "audit_suppression_or_tampering",
+      "scenario": "A privileged actor hides, edits, delays, or deletes evidence of a consequential action.",
+      "assets": ["accountability", "forensics", "legal record"],
+      "controls": ["C-AUDIT-001", "C-SOD-001", "C-IAM-001"],
+      "evaluations": ["EVAL-AUDIT-001", "EVAL-GOV-001"]
+    },
+    {
+      "id": "T-MODEL-001",
+      "name": "model_or_prompt_regression",
+      "scenario": "A provider, model, prompt, tool, or policy change degrades accuracy, safety, cost, latency, or escalation behavior.",
+      "assets": ["agent reliability", "venture operations"],
+      "controls": ["C-MODEL-001", "C-EVID-002", "C-INC-001"],
+      "evaluations": ["EVAL-MODEL-001", "EVAL-KILL-001"]
+    },
+    {
+      "id": "T-GOV-001",
+      "name": "self_approval_or_emergency_bypass",
+      "scenario": "An agent or powerful human collapses separation of duties, abuses an emergency path, or repeatedly overrides holds.",
+      "assets": ["constitution", "capital", "human sovereignty"],
+      "controls": ["C-SOD-001", "C-HUMAN-001", "C-AUDIT-001", "C-POL-001"],
+      "evaluations": ["EVAL-GOV-001", "EVAL-AUTH-001"]
+    },
+    {
+      "id": "T-BIZ-001",
+      "name": "fabricated_demand_or_buyer_authority",
+      "scenario": "Attention, friendliness, fake identities, circular revenue, or nonbinding interest is represented as commercial proof.",
+      "assets": ["capital allocation", "market thesis", "relationships"],
+      "controls": ["C-BIZ-001", "C-BIZ-002", "C-EVID-001", "C-EVID-002"],
+      "evaluations": ["EVAL-BIZ-001", "EVAL-EVID-001"]
+    },
+    {
+      "id": "T-BIZ-002",
+      "name": "metric_gaming_or_sunk_cost_escalation",
+      "scenario": "Agents optimize proxies, suppress guardrails, or seek more capital because prior resources were spent.",
+      "assets": ["portfolio decisions", "cash", "mission"],
+      "controls": ["C-BIZ-002", "C-SOD-001", "C-AUDIT-001", "C-BUDGET-001"],
+      "evaluations": ["EVAL-METRIC-001", "EVAL-GOV-001"]
+    },
+    {
+      "id": "T-BIZ-003",
+      "name": "dependency_or_incumbent_retaliation",
+      "scenario": "A platform, customer, vendor, channel, regulator, or incumbent blocks access, changes terms, bundles, copies, litigates, or withdraws.",
+      "assets": ["distribution", "revenue", "data access", "continuity"],
+      "controls": ["C-BIZ-002", "C-RECOVERY-001", "C-EVID-002"],
+      "evaluations": ["EVAL-DEPENDENCY-001", "EVAL-RECOVERY-001"]
+    },
+    {
+      "id": "T-HUMAN-001",
+      "name": "malicious_or_coerced_operator",
+      "scenario": "A human uses the platform for fraud, exploitation, harassment, unlawful surveillance, or policy bypass.",
+      "assets": ["people", "lawful operation", "reputation", "capital"],
+      "controls": ["C-IAM-001", "C-SOD-001", "C-HUMAN-001", "C-AUDIT-001", "C-INC-001"],
+      "evaluations": ["EVAL-GOV-001", "EVAL-KILL-001"]
+    },
+    {
+      "id": "T-RECOVERY-001",
+      "name": "unrecoverable_failure",
+      "scenario": "Backups, failover, manual takeover, or incident plans exist on paper but fail when exercised.",
+      "assets": ["authoritative state", "customer service", "audit history"],
+      "controls": ["C-RECOVERY-001", "C-INC-001", "C-AUDIT-001"],
+      "evaluations": ["EVAL-RECOVERY-001", "EVAL-KILL-001"]
+    }
+  ],
+  "risk_dispositions": ["prevent", "detect", "contain", "recover", "accept_with_owner_and_expiry"]
+}

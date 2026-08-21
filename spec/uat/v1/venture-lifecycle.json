@@ -1,0 +1,156 @@
+{
+  "spec_version": "1.0.0-draft",
+  "machine_id": "uat-venture-lifecycle",
+  "initial_state": "signal",
+  "active_postures": ["active", "held", "paused", "quarantined"],
+  "terminal_states": ["mature", "integrated", "harvest", "retired"],
+  "states": [
+    {
+      "id": "signal",
+      "gate": 0,
+      "purpose": "Record a traceable observation without treating it as an opportunity.",
+      "minimum_evidence": ["source", "observed_at", "affected_actor", "initial_consequence"],
+      "exit_evidence": ["source provenance is preserved", "relevance is stated", "a falsifiable opportunity-forming question exists"],
+      "failure_actions": ["archive", "monitor", "kill"]
+    },
+    {
+      "id": "opportunity",
+      "gate": 1,
+      "purpose": "Form a bounded commercial hypothesis and its cheapest falsification test.",
+      "minimum_evidence": ["defined_problem", "affected_participant", "plausible_buyer", "existing_workaround", "persistence_hypothesis", "falsification_test"],
+      "exit_evidence": ["critical assumptions are registered", "red-team countercase exists", "validation cost ceiling is approved"],
+      "failure_actions": ["return_for_evidence", "defer", "kill"]
+    },
+    {
+      "id": "problem_validated",
+      "gate": 2,
+      "purpose": "Prove that a recurring problem changes money, time, risk, throughput, eligibility, payment, or outcomes.",
+      "minimum_evidence": ["multiple_independent_confirmations", "direct_workflow_observation_or_operational_record", "bounded_consequence", "recurrence_evidence"],
+      "exit_evidence": ["alternative explanations were tested", "the harmed actor and risk owner are identified", "evidence grade is at least E2"],
+      "failure_actions": ["redesign_problem", "monitor", "kill"]
+    },
+    {
+      "id": "buyer_validated",
+      "gate": 3,
+      "purpose": "Identify a reachable economic buyer with authority, budget path, urgency, and decision criteria.",
+      "minimum_evidence": ["economic_buyer", "authority", "budget_source", "procurement_path", "decision_criteria", "costly_or_binding_behavior"],
+      "exit_evidence": ["user and buyer are distinguished", "blockers and veto holders are mapped", "at least one qualified buyer performs a costly or binding action"],
+      "failure_actions": ["change_buyer", "change_wedge", "defer", "kill"]
+    },
+    {
+      "id": "solution_validated",
+      "gate": 4,
+      "purpose": "Demonstrate the minimum value event with a prototype, concierge workflow, or bounded product.",
+      "minimum_evidence": ["intervention", "minimum_value_event", "measurable_change", "guardrail_result", "customer_effort", "causal_mechanism"],
+      "exit_evidence": ["the intended outcome occurred", "no disqualifying harm occurred", "external state confirms execution"],
+      "failure_actions": ["modify_intervention", "change_mechanism", "pause", "kill"]
+    },
+    {
+      "id": "economics_validated",
+      "gate": 5,
+      "purpose": "Bound price, margin, acquisition, delivery, cash timing, and capital-at-risk with paid evidence where feasible.",
+      "minimum_evidence": ["price_range", "gross_margin_range", "acquisition_path", "delivery_cost", "implementation_cost", "cash_timing", "sensitivity_analysis", "capital_ceiling"],
+      "exit_evidence": ["unit economics are source-backed", "downside and failure cases are modeled", "payment or equivalent commitment evidence exists"],
+      "failure_actions": ["change_price", "change_delivery_model", "reduce_scope", "pause", "kill"]
+    },
+    {
+      "id": "readiness_validated",
+      "gate": 6,
+      "purpose": "Establish legal, security, privacy, operational, and human-approval readiness for a controlled pilot.",
+      "minimum_evidence": ["legal_issue_register", "data_flow_map", "threat_model", "capability_grants", "incident_plan", "rollback_test", "production_owner", "recorded_approvals"],
+      "exit_evidence": ["no unresolved mandatory hold", "least-privilege access is tested", "pilot rollback and kill switch are demonstrated"],
+      "failure_actions": ["legal_hold", "security_hold", "operations_hold", "quarantine"]
+    },
+    {
+      "id": "controlled_pilot",
+      "gate": 7,
+      "purpose": "Operate with bounded customers, data, permissions, capital, duration, and direct monitoring.",
+      "minimum_evidence": ["pilot_charter", "customer_scope", "data_scope", "budget", "duration", "success_metric", "guardrail_metric", "rollback", "monitoring_owner"],
+      "exit_evidence": ["pilot outcome is verified", "customer obligation and outcome are recorded", "incidents and exceptions are reconciled"],
+      "failure_actions": ["correct", "extend_once_with_approval", "pause", "quarantine", "kill"]
+    },
+    {
+      "id": "paid_launch",
+      "gate": 8,
+      "purpose": "Operate an approved paid offer with billing, support, telemetry, escalation, and recovery.",
+      "minimum_evidence": ["approved_terms", "payment_event", "service_owner", "support_path", "billing_reconciliation", "telemetry", "recovery_plan"],
+      "exit_evidence": ["customer pays and receives the promised outcome", "cash receipt is reconciled", "service obligations are met"],
+      "failure_actions": ["remediate", "refund_or_credit_as_required", "pause", "retire"]
+    },
+    {
+      "id": "repeatable",
+      "gate": 9,
+      "purpose": "Prove that acquisition, delivery, collection, retention, and incident handling repeat without hidden founder improvisation.",
+      "minimum_evidence": ["second_independent_customer_or_cohort", "repeatable_acquisition", "standard_delivery", "collection", "retention_window", "acceptable_economics", "incident_resolution"],
+      "exit_evidence": ["another operator or bounded pod executes the workflow", "outcomes remain inside approved variance", "contribution margin and cash survival meet the venture charter"],
+      "failure_actions": ["standardize", "reduce_scope", "return_to_paid_launch", "pause", "retire"]
+    },
+    {
+      "id": "scale",
+      "gate": 10,
+      "purpose": "Increase resources only after repeatability, capacity, security, cash, and concentration controls are proven.",
+      "minimum_evidence": ["repeatability", "capacity_test", "security_review", "cash_survival", "concentration_limits", "expansion_budget", "scale_rollback"],
+      "exit_evidence": ["scaled load remains within service and economic limits", "no unresolved critical control failure", "incremental capital produces predefined evidence or return"],
+      "failure_actions": ["freeze_growth", "regress_to_repeatable", "quarantine", "retire"]
+    },
+    {
+      "id": "mature",
+      "gate": 11,
+      "purpose": "Compound independently under dedicated governance and operating controls.",
+      "minimum_evidence": ["stable_governance", "independent_reporting", "business_continuity", "capital_allocation_target"],
+      "exit_evidence": ["portfolio disposition is approved"],
+      "failure_actions": ["integrate", "harvest", "retire"]
+    },
+    {
+      "id": "integrated",
+      "gate": 11,
+      "purpose": "Transfer approved capabilities or combine the venture without losing provenance, obligations, or isolation.",
+      "minimum_evidence": ["integration_plan", "data_and_contract_review", "asset_transfer_record"],
+      "exit_evidence": ["integration reconciliation is complete"],
+      "failure_actions": ["rollback_integration", "retire"]
+    },
+    {
+      "id": "harvest",
+      "gate": 11,
+      "purpose": "Operate for controlled cash yield without pretending the venture remains a growth candidate.",
+      "minimum_evidence": ["harvest_policy", "maintenance_budget", "customer_obligation_plan"],
+      "exit_evidence": ["retirement or sale disposition is approved"],
+      "failure_actions": ["retire"]
+    },
+    {
+      "id": "retired",
+      "gate": 11,
+      "purpose": "Stop operation safely and preserve reusable assets, evidence, obligations, and lessons.",
+      "minimum_evidence": ["shutdown_plan", "customer_and_vendor_resolution", "data_retention_or_deletion", "credential_revocation", "asset_registry", "lessons_record"],
+      "exit_evidence": ["retirement reconciliation is complete"],
+      "failure_actions": ["remain_restricted_until_reconciled"]
+    }
+  ],
+  "forward_transitions": [
+    ["signal", "opportunity"],
+    ["opportunity", "problem_validated"],
+    ["problem_validated", "buyer_validated"],
+    ["buyer_validated", "solution_validated"],
+    ["solution_validated", "economics_validated"],
+    ["economics_validated", "readiness_validated"],
+    ["readiness_validated", "controlled_pilot"],
+    ["controlled_pilot", "paid_launch"],
+    ["paid_launch", "repeatable"],
+    ["repeatable", "scale"],
+    ["scale", "mature"],
+    ["mature", "integrated"],
+    ["mature", "harvest"],
+    ["mature", "retired"],
+    ["integrated", "retired"],
+    ["harvest", "retired"]
+  ],
+  "universal_transition_rules": {
+    "advance": "Requires satisfied exit evidence, independent assurance, policy allow, required approvals, and an append-only decision record.",
+    "hold": "Preserves lifecycle state and blocks increased authority or capital until named evidence is supplied.",
+    "pause": "Stops new work while preserving recoverable state and obligations.",
+    "quarantine": "Immediately revokes affected capabilities and routes control to incident command.",
+    "kill": "Routes the venture to retired after obligations, data, credentials, and reusable assets are reconciled.",
+    "no_skip": "No actor may skip a forward gate. Prior evidence may be reused only when its scope, provenance, freshness, and applicability are verified."
+  },
+  "cycle_outcomes": ["progress", "proof", "correction", "protection"]
+}

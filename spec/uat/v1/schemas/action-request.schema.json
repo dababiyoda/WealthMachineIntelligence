@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://networkmynetworth.example/spec/uat/v1/action-request.schema.json",
+  "title": "UAT Consequential Action Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "action_id",
+    "idempotency_key",
+    "requester_id",
+    "agent_contract_id",
+    "venture_id",
+    "action_type",
+    "target",
+    "risk_class",
+    "purpose",
+    "evidence_refs",
+    "expected_preconditions",
+    "expected_postconditions",
+    "resource_impact",
+    "rollback_or_compensation",
+    "requested_at",
+    "expires_at"
+  ],
+  "properties": {
+    "action_id": {"type": "string", "minLength": 1},
+    "idempotency_key": {"type": "string", "minLength": 8},
+    "requester_id": {"type": "string", "minLength": 1},
+    "agent_contract_id": {"type": "string", "minLength": 1},
+    "venture_id": {"type": "string", "minLength": 1},
+    "action_type": {"type": "string", "minLength": 1},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resource_type", "resource_id", "environment"],
+      "properties": {
+        "resource_type": {"type": "string"},
+        "resource_id": {"type": "string"},
+        "environment": {"enum": ["analysis", "sandbox", "staging", "production", "external"]},
+        "counterparty_id": {"type": ["string", "null"]}
+      }
+    },
+    "risk_class": {"enum": ["R0", "R1", "R2", "R3", "R4"]},
+    "purpose": {"type": "string", "minLength": 1},
+    "active_bottleneck_id": {"type": ["string", "null"]},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "expected_preconditions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "expected_postconditions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "resource_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currency", "money_minor", "token_estimate", "compute_seconds_estimate", "relationship_risk", "data_classifications"],
+      "properties": {
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "money_minor": {"type": "integer", "minimum": 0},
+        "token_estimate": {"type": "integer", "minimum": 0},
+        "compute_seconds_estimate": {"type": "integer", "minimum": 0},
+        "relationship_risk": {"enum": ["none", "low", "medium", "high"]},
+        "data_classifications": {"type": "array", "items": {"enum": ["public", "internal", "confidential", "restricted", "regulated"]}, "uniqueItems": true}
+      }
+    },
+    "rollback_or_compensation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "plan", "owner_id", "deadline_seconds"],
+      "properties": {
+        "available": {"type": "boolean"},
+        "plan": {"type": "string"},
+        "owner_id": {"type": "string"},
+        "deadline_seconds": {"type": "integer", "minimum": 0}
+      }
+    },
+    "requested_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "approval_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "policy_decision_ref": {"type": ["string", "null"]},
+    "execution_ref": {"type": ["string", "null"]},
+    "verification_ref": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"risk_class": {"enum": ["R3", "R4"]}}},
+      "then": {"required": ["approval_refs"], "properties": {"approval_refs": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"risk_class": {"const": "R4"}}},
+      "then": {"properties": {"rollback_or_compensation": {"properties": {"plan": {"minLength": 1}}}}}
+    }
+  ]
+}

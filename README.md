@@ -3,6 +3,12 @@
 ## Purpose
 A unified ontological backbone for digital business ventures that emphasizes AI integration and multi-agent orchestration. This framework provides a structured approach to identifying, launching, and scaling digital business opportunities through AI-driven processes and human expertise.
 
+## Normative enterprise specification
+
+The governing target architecture is [UAT Enterprise System Specification](docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md). Its machine-readable contracts begin at [`spec/uat/v1/system-manifest.json`](spec/uat/v1/system-manifest.json).
+
+The current application is a simulation and architectural skeleton. It is not a production autonomous venture operator, and its heuristic scores are not validated probabilities. Runtime authority must not expand until the applicable acceptance gates in the specification are implemented and independently verified.
+
 ## Core Principles
 
 ### Digital-First Approach
