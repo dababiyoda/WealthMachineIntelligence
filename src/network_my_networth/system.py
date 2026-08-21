@@ -25,6 +25,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, Mapping, Optional
 
+from src.control.gateway import ExecutionGateway
 from src.core.knowledge_graph_connector import KnowledgeGraphConnector
 from src.core.performance import PerformanceTracker, SMARTGoal
 from src.services.decision_engine import (
@@ -58,6 +59,8 @@ class NetworkWealthEngine:
         performance_tracker: Optional[PerformanceTracker] = None,
         phase_manager: Optional[PhaseManager] = None,
         connector: Optional[KnowledgeGraphConnector] = None,
+        gateway: Optional[ExecutionGateway] = None,
+        control_context_fingerprint: str = "",
     ) -> None:
         self.connector = connector or KnowledgeGraphConnector()
         self.performance_tracker = performance_tracker or PerformanceTracker()
@@ -65,11 +68,26 @@ class NetworkWealthEngine:
 
         if rules is not None:
             rule_list = list(rules)
-            self.decision_engine = DecisionEngine(rule_list, connector=self.connector)
+            self.decision_engine = DecisionEngine(
+                rule_list,
+                connector=self.connector,
+                gateway=gateway,
+                context_fingerprint=control_context_fingerprint,
+            )
         elif rules_path:
-            self.decision_engine = DecisionEngine.from_json_file(rules_path, connector=self.connector)
+            self.decision_engine = DecisionEngine.from_json_file(
+                rules_path,
+                connector=self.connector,
+                gateway=gateway,
+                context_fingerprint=control_context_fingerprint,
+            )
         else:
-            self.decision_engine = DecisionEngine([], connector=self.connector)
+            self.decision_engine = DecisionEngine(
+                [],
+                connector=self.connector,
+                gateway=gateway,
+                context_fingerprint=control_context_fingerprint,
+            )
 
         self.risk_manager = RiskManager(connector=self.connector)
         self.orchestrator = WealthMachineOrchestrator(

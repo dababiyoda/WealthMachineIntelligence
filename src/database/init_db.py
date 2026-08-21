@@ -95,7 +95,7 @@ def populate_initial_data():
                     profit_margin=0.62,
                     risk_level=RiskLevel.LOW,
                     risk_score=0.15,
-                    failure_probability=0.0008, # 0.08% - meets ultra-low target
+                    failure_probability=0.0008,  # Demo heuristic fixture, uncalibrated.
                     customer_count=127,
                     churn_rate=0.03,
                     growth_rate=0.18,
@@ -113,7 +113,7 @@ def populate_initial_data():
                     profit_margin=0.55,
                     risk_level=RiskLevel.ULTRA_LOW,
                     risk_score=0.08,
-                    failure_probability=0.0003, # 0.03% - ultra-low risk
+                    failure_probability=0.0003,  # Demo heuristic fixture, uncalibrated.
                     customer_count=89,
                     churn_rate=0.02,
                     growth_rate=0.22,

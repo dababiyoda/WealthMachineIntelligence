@@ -26,8 +26,9 @@ class DashboardMetrics(BaseModel):
     active_ventures: int
     total_revenue: float
     average_roi: float
-    low_risk_ventures: int
-    ultra_low_failure_rate: float
+    low_heuristic_risk_ventures: int
+    lowest_heuristic_bucket_rate: float
+    risk_model_validation_status: str
     
 class VentureMetrics(BaseModel):
     venture_id: str
@@ -48,12 +49,12 @@ class PortfolioPerformance(BaseModel):
     roi_by_type: Dict[str, float]
 
 class RiskAnalysis(BaseModel):
-    ultra_low_risk_count: int
-    low_risk_count: int
-    moderate_risk_count: int
-    high_risk_count: int
-    average_failure_probability: float
-    ventures_meeting_target: int  # P(failure) ≤ 0.01%
+    lowest_heuristic_bucket_count: int
+    low_heuristic_bucket_count: int
+    moderate_heuristic_bucket_count: int
+    high_heuristic_bucket_count: int
+    average_legacy_risk_proxy: float
+    risk_model_validation_status: str
 
 @router.get("/dashboard", response_model=DashboardMetrics)
 async def get_dashboard_metrics(
@@ -91,24 +92,29 @@ async def get_dashboard_metrics(
         average_roi = total_roi / roi_count if roi_count > 0 else 0
         
         # Risk metrics
-        low_risk_ventures = db.query(DigitalVenture).filter(
+        low_heuristic_risk_ventures = db.query(DigitalVenture).filter(
             DigitalVenture.risk_level.in_([RiskLevel.ULTRA_LOW, RiskLevel.LOW])
         ).count()
-        
-        # Ultra-low failure rate (target ≤ 0.01%)
-        ultra_low_failure_ventures = db.query(DigitalVenture).filter(
+
+        # Legacy lowest score bucket. Values are not calibrated probabilities.
+        lowest_heuristic_bucket_ventures = db.query(DigitalVenture).filter(
             DigitalVenture.failure_probability <= 0.0001
         ).count()
-        
-        ultra_low_failure_rate = (ultra_low_failure_ventures / total_ventures * 100) if total_ventures > 0 else 0
+
+        lowest_heuristic_bucket_rate = (
+            lowest_heuristic_bucket_ventures / total_ventures * 100
+            if total_ventures > 0
+            else 0
+        )
         
         return DashboardMetrics(
             total_ventures=total_ventures,
             active_ventures=active_ventures,
             total_revenue=revenue_sum,
             average_roi=average_roi,
-            low_risk_ventures=low_risk_ventures,
-            ultra_low_failure_rate=ultra_low_failure_rate
+            low_heuristic_risk_ventures=low_heuristic_risk_ventures,
+            lowest_heuristic_bucket_rate=lowest_heuristic_bucket_rate,
+            risk_model_validation_status="unvalidated",
         )
         
     except SQLAlchemyError as e:
@@ -197,37 +203,34 @@ async def get_risk_analysis(
     """Get comprehensive risk analysis"""
     try:
         # Count ventures by risk level
-        ultra_low_risk = db.query(DigitalVenture).filter(
+        lowest_heuristic_bucket = db.query(DigitalVenture).filter(
             DigitalVenture.risk_level == RiskLevel.ULTRA_LOW
         ).count()
         
-        low_risk = db.query(DigitalVenture).filter(
+        low_heuristic_bucket = db.query(DigitalVenture).filter(
             DigitalVenture.risk_level == RiskLevel.LOW
         ).count()
         
-        moderate_risk = db.query(DigitalVenture).filter(
+        moderate_heuristic_bucket = db.query(DigitalVenture).filter(
             DigitalVenture.risk_level == RiskLevel.MODERATE
         ).count()
         
-        high_risk = db.query(DigitalVenture).filter(
+        high_heuristic_bucket = db.query(DigitalVenture).filter(
             DigitalVenture.risk_level.in_([RiskLevel.HIGH, RiskLevel.VERY_HIGH])
         ).count()
         
-        # Average failure probability
-        avg_failure_prob = db.query(func.avg(DigitalVenture.failure_probability)).scalar() or 0
-        
-        # Ventures meeting target (P(failure) ≤ 0.01%)
-        ventures_meeting_target = db.query(DigitalVenture).filter(
-            DigitalVenture.failure_probability <= 0.0001
-        ).count()
+        # Legacy probability-shaped risk proxy; not empirically calibrated.
+        average_legacy_risk_proxy = (
+            db.query(func.avg(DigitalVenture.failure_probability)).scalar() or 0
+        )
         
         return RiskAnalysis(
-            ultra_low_risk_count=ultra_low_risk,
-            low_risk_count=low_risk,
-            moderate_risk_count=moderate_risk,
-            high_risk_count=high_risk,
-            average_failure_probability=avg_failure_prob,
-            ventures_meeting_target=ventures_meeting_target
+            lowest_heuristic_bucket_count=lowest_heuristic_bucket,
+            low_heuristic_bucket_count=low_heuristic_bucket,
+            moderate_heuristic_bucket_count=moderate_heuristic_bucket,
+            high_heuristic_bucket_count=high_heuristic_bucket,
+            average_legacy_risk_proxy=average_legacy_risk_proxy,
+            risk_model_validation_status="unvalidated",
         )
         
     except SQLAlchemyError as e:
