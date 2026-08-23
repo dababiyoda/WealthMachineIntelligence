@@ -187,9 +187,47 @@ def test_assessment_wire_rejects_self_executing_assessment(service):
 # ---------------------------------------------------------------------- #
 @pytest.fixture()
 def client(service, monkeypatch):
+    """Local intake, with the unsigned path asked for BY NAME.
+
+    Before 2026-08-23 these tests passed with no signing key and no opt-in,
+    because `verify_headers` inferred `must_sign` from whether a key happened
+    to be configured. An unset key therefore did not fail — it accepted the
+    request and returned the caller's *claimed* identity. That reached all the
+    way to this HTTP endpoint: unsigned POSTs got 200 whenever the key was
+    unset, which is a forgotten environment variable away in any new
+    deployment.
+
+    The transport now fails closed, so a local test that wants the legacy path
+    has to say so. `test_the_intake_endpoint_fails_closed_without_the_opt_in`
+    below pins the other half.
+    """
     monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
+    monkeypatch.setenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", "1")
     from src.api.main import app
     return TestClient(app)
+
+
+def test_the_intake_endpoint_fails_closed_without_the_opt_in(service, monkeypatch):
+    """No signing key and no explicit dev opt-in must NOT be accepted.
+
+    The finding this converts into a guard: an unsigned POST to a live intake
+    endpoint used to return 200 whenever WEALTHMACHINE_SIGNING_KEY was unset.
+    Ratified under FOUNDER-RULING-2026-08-22 — legacy HMAC may survive only as
+    an explicit development compatibility mode that fails closed and never
+    auto-downgrades.
+    """
+    monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
+    monkeypatch.delenv("WEALTHMACHINE_SIGNING_KEY", raising=False)
+    monkeypatch.delenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", raising=False)
+    from src.api.main import app
+
+    response = TestClient(app).post("/api/opportunities/intake",
+                                    json=fire_packet(id="packet-closed"))
+    assert response.status_code == 401, (
+        "the intake endpoint accepted an unsigned request with no signing key "
+        "and no explicit opt-in; absence of configuration must never disable "
+        "authentication"
+    )
 
 
 def test_intake_endpoint_round_trip(client):
@@ -225,7 +263,17 @@ def test_intake_endpoint_missing_assessment_404s(client):
 
 
 def test_intake_token_enforced_when_configured(service, monkeypatch):
+    """Isolates the TOKEN layer; the transport layer is a separate concern.
+
+    The opt-in below is not incidental. Before 2026-08-23 this test passed with
+    no signing key because transport verification silently accepted unsigned
+    requests when none was configured — so it was exercising the token check
+    through a transport layer that happened to be waved through. Making that
+    explicit means a future failure here is about the token, which is what the
+    test is named for.
+    """
     monkeypatch.setenv("WEALTHMACHINE_INTAKE_TOKEN", "sekrit")
+    monkeypatch.setenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", "1")
     from src.api.main import app
     client = TestClient(app)
 

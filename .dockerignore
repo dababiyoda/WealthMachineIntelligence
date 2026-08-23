@@ -1,0 +1,16 @@
+# Defence in depth for the shadowing hazard documented in jwt.py.
+#
+# `Dockerfile` does `COPY . .` into `WORKDIR /app`, which precedes site-packages
+# on sys.path. Any top-level module here that shares a name with an installed
+# package silently outranks it. `jwt.py` did exactly that and disabled
+# authentication in the image.
+#
+# jwt.py is now inert by default, so this is belt-and-braces rather than the
+# fix — but the file has no reason to be in a production image at all.
+jwt.py
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+.git/
+.pytest_cache/
