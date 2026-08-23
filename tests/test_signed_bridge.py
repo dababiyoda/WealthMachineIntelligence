@@ -116,14 +116,42 @@ def test_unsigned_request_rejected_when_key_configured(client):
                        headers={"Content-Type": "application/json"}).status_code == 401
 
 
-def test_unsigned_allowed_in_local_mode(monkeypatch):
+def test_unsigned_allowed_in_local_mode_when_asked_for_by_name(monkeypatch):
+    """Amended 2026-08-23 for transport parity with the kernel mirror.
+
+    This test previously proved that an unset signing key made unsigned
+    requests acceptable. That was the auto-downgrade the founder's 2026-08-22
+    ruling removed: absence of configuration must never disable authentication,
+    because a forgotten environment variable in a new deployment then reads as a
+    working trust boundary.
+
+    Local mode still exists. It now has to be requested.
+    """
     monkeypatch.delenv("WEALTHMACHINE_SIGNING_KEY", raising=False)
     monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
+    monkeypatch.setenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", "1")
     set_intake_service(OpportunityIntakeService())
     from src.api.main import app
     client = TestClient(app)
     response = client.post("/api/opportunities/intake", json=fire_packet(id="sb-local"))
     assert response.status_code == 200
+    set_intake_service(None)
+
+
+def test_an_unset_signing_key_is_refused_rather_than_treated_as_local_mode(monkeypatch):
+    """The protection the amendment above added, asserted at the HTTP surface.
+
+    With no key and no explicit opt-in the endpoint must refuse. This is the
+    case that used to return 200 carrying an unverified claimed identity.
+    """
+    monkeypatch.delenv("WEALTHMACHINE_SIGNING_KEY", raising=False)
+    monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
+    monkeypatch.delenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", raising=False)
+    set_intake_service(OpportunityIntakeService())
+    from src.api.main import app
+    client = TestClient(app)
+    response = client.post("/api/opportunities/intake", json=fire_packet(id="sb-closed"))
+    assert response.status_code == 401
     set_intake_service(None)
 
 

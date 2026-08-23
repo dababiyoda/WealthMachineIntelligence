@@ -188,6 +188,13 @@ def test_assessment_wire_rejects_self_executing_assessment(service):
 @pytest.fixture()
 def client(service, monkeypatch):
     monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
+    # These endpoint tests exercise the LEGACY UNSIGNED path, which since the
+    # 2026-08-23 transport-parity change must be asked for by name rather than
+    # obtained by leaving WEALTHMACHINE_SIGNING_KEY unset. Making it explicit
+    # here is the point of the change: an unsigned request is now a deliberate
+    # development choice, and a deployment that simply forgot to configure a key
+    # fails closed instead of silently accepting claimed identities.
+    monkeypatch.setenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", "1")
     from src.api.main import app
     return TestClient(app)
 
@@ -226,6 +233,11 @@ def test_intake_endpoint_missing_assessment_404s(client):
 
 def test_intake_token_enforced_when_configured(service, monkeypatch):
     monkeypatch.setenv("WEALTHMACHINE_INTAKE_TOKEN", "sekrit")
+    # This test's subject is the intake TOKEN, not the transport. It builds its
+    # own client rather than using the `client` fixture, so it opts into the
+    # legacy unsigned path itself — otherwise the authorized request below is
+    # refused by transport verification and the test stops measuring the token.
+    monkeypatch.setenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", "1")
     from src.api.main import app
     client = TestClient(app)
 
