@@ -233,6 +233,11 @@ def test_intake_endpoint_missing_assessment_404s(client):
 
 def test_intake_token_enforced_when_configured(service, monkeypatch):
     monkeypatch.setenv("WEALTHMACHINE_INTAKE_TOKEN", "sekrit")
+    # This test's subject is the intake TOKEN, not the transport. It builds its
+    # own client rather than using the `client` fixture, so it opts into the
+    # legacy unsigned path itself — otherwise the authorized request below is
+    # refused by transport verification and the test stops measuring the token.
+    monkeypatch.setenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", "1")
     from src.api.main import app
     client = TestClient(app)
 
