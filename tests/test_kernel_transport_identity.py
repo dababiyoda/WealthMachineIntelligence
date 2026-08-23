@@ -76,8 +76,16 @@ def test_verification_returns_transport_facts_and_no_authority():
 
     result = verify_headers(_headers(), BODY, nonce_cache=NonceCache(),
                             require_signature=True)
+    # Allowlist moved 2026-08-23 to admit `identity_isolated`, deliberately.
+    # That field is a transport fact and an ANTI-authority one: it reports that
+    # a valid signature proves possession of the shared secret and not which
+    # holder sent it. It makes this result strictly LESS mistakable for
+    # authorization, which is the property this test defends. The list stays
+    # closed so the next addition is also a decision.
     assert set(result) <= {"identity", "schema_version", "signed",
+                           "identity_isolated", "dev_compatibility_mode",
                            "idempotency_key", "trace_id"}
+    assert result["identity_isolated"] == "false"
     for forbidden in ("authority", "role", "permissions", "capabilities",
                       "approved", "grant"):
         assert forbidden not in result

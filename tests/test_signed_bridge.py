@@ -117,8 +117,15 @@ def test_unsigned_request_rejected_when_key_configured(client):
 
 
 def test_unsigned_allowed_in_local_mode(monkeypatch):
+    """Local mode survives, but must be requested rather than inherited.
+
+    The opt-in line is the change: deleting the signing key used to be enough
+    to disable verification. It now takes a deliberate second act, so the
+    legacy path can never be entered by forgetting to configure something.
+    """
     monkeypatch.delenv("WEALTHMACHINE_SIGNING_KEY", raising=False)
     monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
+    monkeypatch.setenv("UNIIMENTE_BRIDGE_DEV_UNSIGNED", "1")
     set_intake_service(OpportunityIntakeService())
     from src.api.main import app
     client = TestClient(app)
