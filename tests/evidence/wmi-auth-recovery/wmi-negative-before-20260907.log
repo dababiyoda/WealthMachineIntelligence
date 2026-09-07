@@ -1,0 +1,552 @@
+FFFFFFFFFFFFFFFFFFFFFFFF..FFFFFF                                         [100%]
+=================================== FAILURES ===================================
+_____________ test_anonymous_and_literal_identities_rejected[None] _____________
+tests/test_auth_boundary.py:41: in test_anonymous_and_literal_identities_rejected
+    with pytest.raises(HTTPException) as err:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE HTTPException
+_____________ test_anonymous_and_literal_identities_rejected[demo] _____________
+tests/test_auth_boundary.py:43: in test_anonymous_and_literal_identities_rejected
+    assert err.value.status_code == 401
+E   AssertionError: assert 404 == 401
+E    +  where 404 = HTTPException(status_code=404, detail='User not found').status_code
+E    +    where HTTPException(status_code=404, detail='User not found') = <ExceptionInfo HTTPException(status_code=404, detail='User not found') tblen=5>.value
+__________ test_anonymous_and_literal_identities_rejected[demo_token] __________
+tests/test_auth_boundary.py:43: in test_anonymous_and_literal_identities_rejected
+    assert err.value.status_code == 401
+E   AssertionError: assert 404 == 401
+E    +  where 404 = HTTPException(status_code=404, detail='User not found').status_code
+E    +    where HTTPException(status_code=404, detail='User not found') = <ExceptionInfo HTTPException(status_code=404, detail='User not found') tblen=5>.value
+________ test_anonymous_and_literal_identities_rejected[arbitrary-text] ________
+tests/test_auth_boundary.py:43: in test_anonymous_and_literal_identities_rejected
+    assert err.value.status_code == 401
+E   AssertionError: assert 404 == 401
+E    +  where 404 = HTTPException(status_code=404, detail='User not found').status_code
+E    +    where HTTPException(status_code=404, detail='User not found') = <ExceptionInfo HTTPException(status_code=404, detail='User not found') tblen=5>.value
+__________ test_anonymous_and_literal_identities_rejected[stub-token] __________
+tests/test_auth_boundary.py:43: in test_anonymous_and_literal_identities_rejected
+    assert err.value.status_code == 401
+E   AssertionError: assert 404 == 401
+E    +  where 404 = HTTPException(status_code=404, detail='User not found').status_code
+E    +    where HTTPException(status_code=404, detail='User not found') = <ExceptionInfo HTTPException(status_code=404, detail='User not found') tblen=5>.value
+__________________ test_signed_identity_is_not_a_demo_lookup ___________________
+tests/test_auth_boundary.py:47: in test_signed_identity_is_not_a_demo_lookup
+    principal = asyncio.run(configured.get_current_user(token()))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+src/api/auth.py:141: in get_current_user
+    raise HTTPException(
+E   fastapi.exceptions.HTTPException: 404: User not found
+______________________ test_bad_claims_rejected[claims0] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...XSwiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoxfQ.Ejy4wOWgPqV3Ukb50IuHsnm95P7Life9XZfhZjkbjyQ')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...XSwiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoxfQ.Ejy4wOWgPqV3Ukb50IuHsnm95P7Life9XZfhZjkbjyQ' = token(**{'exp': 1})
+______________________ test_bad_claims_rejected[claims1] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...QiXSwiaXNzIjoid3JvbmciLCJhdWQiOiJ3bWktdGVzdC1hcGkiLCJleHAiOjE3ODg3NzQ3NTZ9.n6gGGfDEyAPku6QNPFFNhBAFuijpub8ZHr6ybVh1yp8')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...QiXSwiaXNzIjoid3JvbmciLCJhdWQiOiJ3bWktdGVzdC1hcGkiLCJleHAiOjE3ODg3NzQ3NTZ9.n6gGGfDEyAPku6QNPFFNhBAFuijpub8ZHr6ybVh1yp8' = token(**{'iss': 'wrong'})
+______________________ test_bad_claims_rejected[claims2] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...wiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid3JvbmciLCJleHAiOjE3ODg3NzQ3NTZ9.WLPf0odwVXK_sxNVQsjyqgwyyhblZZBo3uJKm3jn_AY')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...wiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid3JvbmciLCJleHAiOjE3ODg3NzQ3NTZ9.WLPf0odwVXK_sxNVQsjyqgwyyhblZZBo3uJKm3jn_AY' = token(**{'aud': 'wrong'})
+______________________ test_bad_claims_rejected[claims3] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJ1c2VybmFtZSI6InN5bnRoZXRpYy1zZXJ2aWNlIiwicm9sZSI6InVzZXIiLCJwZXJt...ndtaS10ZXN0LWlzc3VlciIsImF1ZCI6IndtaS10ZXN0LWFwaSIsImV4cCI6MTc4ODc3NDc1Nn0.FZRUuVqGS5d5ZSnsrGsZIv57dkO3cWA98NU7d3AMiqU')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJ1c2VybmFtZSI6InN5bnRoZXRpYy1zZXJ2aWNlIiwicm9sZSI6InVzZXIiLCJwZXJt...ndtaS10ZXN0LWlzc3VlciIsImF1ZCI6IndtaS10ZXN0LWFwaSIsImV4cCI6MTc4ODc3NDc1Nn0.FZRUuVqGS5d5ZSnsrGsZIv57dkO3cWA98NU7d3AMiqU' = token(**{'sub': ''})
+______________________ test_bad_claims_rejected[claims4] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...aXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjpudWxsfQ.XzVd4s6ujOtvhQc-3fmoopZFbFzGs2u18wLknGY1DNE')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...aXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjpudWxsfQ.XzVd4s6ujOtvhQc-3fmoopZFbFzGs2u18wLknGY1DNE' = token(**{'exp': None})
+______________________ test_bad_claims_rejected[claims5] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...LXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoiOTk5OTk5OTk5OTkifQ.b58gzmzbP4FdUqOSCZ9dyubjo4cC0ESmZZHt83USKXY')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...LXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoiOTk5OTk5OTk5OTkifQ.b58gzmzbP4FdUqOSCZ9dyubjo4cC0ESmZZHt83USKXY' = token(**{'exp': '99999999999'})
+______________________ test_bad_claims_rejected[claims6] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...aXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjp0cnVlfQ.d-OVqM99_832PFr1gzarD41QYRVuQz2YJWds9BtLRvE')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...aXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjp0cnVlfQ.d-OVqM99_832PFr1gzarD41QYRVuQz2YJWds9BtLRvE' = token(**{'exp': True})
+______________________ test_bad_claims_rejected[claims7] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...J3bWktdGVzdC1pc3N1ZXIiLCJhdWQiOiJ3bWktdGVzdC1hcGkiLCJleHAiOjE3ODg3NzQ3NTZ9.4WKE29ryC89qmk8PnHd9G06yWBXxbo7aWxfAp9X5cS8')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...J3bWktdGVzdC1pc3N1ZXIiLCJhdWQiOiJ3bWktdGVzdC1hcGkiLCJleHAiOjE3ODg3NzQ3NTZ9.4WKE29ryC89qmk8PnHd9G06yWBXxbo7aWxfAp9X5cS8' = token(**{'role': []})
+______________________ test_bad_claims_rejected[claims8] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...J3bWktdGVzdC1pc3N1ZXIiLCJhdWQiOiJ3bWktdGVzdC1hcGkiLCJleHAiOjE3ODg3NzQ3NTZ9.sDmt63HscofvtSj81AbGND9CAFJ0WLkULNbIiCTCnH4')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...J3bWktdGVzdC1pc3N1ZXIiLCJhdWQiOiJ3bWktdGVzdC1hcGkiLCJleHAiOjE3ODg3NzQ3NTZ9.sDmt63HscofvtSj81AbGND9CAFJ0WLkULNbIiCTCnH4' = token(**{'permissions': 'admin'})
+______________________ test_bad_claims_rejected[claims9] _______________________
+tests/test_auth_boundary.py:58: in test_bad_claims_rejected
+    assert configured.verify_token(token(**claims)) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjpbXSwicm9sZSI6InVzZXIiLCJwZXJt...ndtaS10ZXN0LWlzc3VlciIsImF1ZCI6IndtaS10ZXN0LWFwaSIsImV4cCI6MTc4ODc3NDc1Nn0.HYtpgMUgWeXi7bW1raJ-1_tKI4rFUq25umw_pE0h1tA')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjpbXSwicm9sZSI6InVzZXIiLCJwZXJt...ndtaS10ZXN0LWlzc3VlciIsImF1ZCI6IndtaS10ZXN0LWFwaSIsImV4cCI6MTc4ODc3NDc1Nn0.HYtpgMUgWeXi7bW1raJ-1_tKI4rFUq25umw_pE0h1tA' = token(**{'username': []})
+__________________________ test_required_claims[exp] ___________________________
+tests/test_auth_boundary.py:65: in test_required_claims
+    assert configured.verify_token(jwt.encode(claims, KEY, algorithm="HS256")) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...jpbInJlYWQiXSwiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIn0.ArIRCKt6mFJaFTSqgN3MxlSlTFBPsIP4T4CRMd_uZfY')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...jpbInJlYWQiXSwiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiYXVkIjoid21pLXRlc3QtYXBpIn0.ArIRCKt6mFJaFTSqgN3MxlSlTFBPsIP4T4CRMd_uZfY' = <function encode at 0x7f7906b6ce00>({'sub': 'synthetic-service', 'username': 'synthetic-service', 'role': 'user', 'permissions': ['read'], ...}, 'synthetic-test-only-jwt-key-not-for-production-2026', algorithm='HS256')
+E    +      where <function encode at 0x7f7906b6ce00> = jwt.encode
+__________________________ test_required_claims[sub] ___________________________
+tests/test_auth_boundary.py:65: in test_required_claims
+    assert configured.verify_token(jwt.encode(claims, KEY, algorithm="HS256")) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN5bnRoZXRpYy1zZXJ2aWNlIiwicm9sZSI6InVzZXIiLCJwZXJtaXNzaW9ucyI6...ndtaS10ZXN0LWlzc3VlciIsImF1ZCI6IndtaS10ZXN0LWFwaSIsImV4cCI6MTc4ODc3NDc1Nn0.SfB2FS0sXxYOnJIVyvQkptrOWWlpKwmXXAUX4CCo4Io')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN5bnRoZXRpYy1zZXJ2aWNlIiwicm9sZSI6InVzZXIiLCJwZXJtaXNzaW9ucyI6...ndtaS10ZXN0LWlzc3VlciIsImF1ZCI6IndtaS10ZXN0LWFwaSIsImV4cCI6MTc4ODc3NDc1Nn0.SfB2FS0sXxYOnJIVyvQkptrOWWlpKwmXXAUX4CCo4Io' = <function encode at 0x7f7906b6ce00>({'username': 'synthetic-service', 'role': 'user', 'permissions': ['read'], 'iss': 'wmi-test-issuer', ...}, 'synthetic-test-only-jwt-key-not-for-production-2026', algorithm='HS256')
+E    +      where <function encode at 0x7f7906b6ce00> = jwt.encode
+__________________________ test_required_claims[iss] ___________________________
+tests/test_auth_boundary.py:65: in test_required_claims
+    assert configured.verify_token(jwt.encode(claims, KEY, algorithm="HS256")) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...c3Npb25zIjpbInJlYWQiXSwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoxNzg4Nzc0NzU2fQ.gQ3j-zDOyMCJBTJO-eqklq3rsGBg5l0fYPnzVh8c-hQ')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...c3Npb25zIjpbInJlYWQiXSwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoxNzg4Nzc0NzU2fQ.gQ3j-zDOyMCJBTJO-eqklq3rsGBg5l0fYPnzVh8c-hQ' = <function encode at 0x7f7906b6ce00>({'sub': 'synthetic-service', 'username': 'synthetic-service', 'role': 'user', 'permissions': ['read'], ...}, 'synthetic-test-only-jwt-key-not-for-production-2026', algorithm='HS256')
+E    +      where <function encode at 0x7f7906b6ce00> = jwt.encode
+__________________________ test_required_claims[aud] ___________________________
+tests/test_auth_boundary.py:65: in test_required_claims
+    assert configured.verify_token(jwt.encode(claims, KEY, algorithm="HS256")) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...b25zIjpbInJlYWQiXSwiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiZXhwIjoxNzg4Nzc0NzU2fQ.rFqx52Iwg_OqMtIZ3YApqhxZrAPxocWpPq4sSZCs598')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...b25zIjpbInJlYWQiXSwiaXNzIjoid21pLXRlc3QtaXNzdWVyIiwiZXhwIjoxNzg4Nzc0NzU2fQ.rFqx52Iwg_OqMtIZ3YApqhxZrAPxocWpPq4sSZCs598' = <function encode at 0x7f7906b6ce00>({'sub': 'synthetic-service', 'username': 'synthetic-service', 'role': 'user', 'permissions': ['read'], ...}, 'synthetic-test-only-jwt-key-not-for-production-2026', algorithm='HS256')
+E    +      where <function encode at 0x7f7906b6ce00> = jwt.encode
+_________________________ test_wrong_algorithm_and_key _________________________
+tests/test_auth_boundary.py:70: in test_wrong_algorithm_and_key
+    assert configured.verify_token(jwt.encode(claims, KEY, algorithm="HS384")) is None
+E   AssertionError: assert {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} is None
+E    +  where {'user_id': 'test-user', 'username': None, 'role': 'user', 'permissions': []} = <function verify_token at 0x7f79060316c0>('eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...iwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoxNzg4Nzc0NzU2fQ.9YGPpxM1wHoWRyMjxVme3CURW51IihYXyWM_IBnAstmuOlr0SfCqxYWFeZei3jug')
+E    +    where <function verify_token at 0x7f79060316c0> = <module 'src.api.auth' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/auth.py'>.verify_token
+E    +    and   'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzeW50aGV0aWMtc2VydmljZSIsInVzZXJuYW1lIjoic3ludGhldGljLXNlcnZpY2UiLCJy...iwiYXVkIjoid21pLXRlc3QtYXBpIiwiZXhwIjoxNzg4Nzc0NzU2fQ.9YGPpxM1wHoWRyMjxVme3CURW51IihYXyWM_IBnAstmuOlr0SfCqxYWFeZei3jug' = <function encode at 0x7f7906b6ce00>({'sub': 'synthetic-service', 'username': 'synthetic-service', 'role': 'user', 'permissions': ['read'], ...}, 'synthetic-test-only-jwt-key-not-for-production-2026', algorithm='HS384')
+E    +      where <function encode at 0x7f7906b6ce00> = jwt.encode
+___________ test_missing_configuration_fails_closed[JWT_SECRET_KEY] ____________
+tests/test_auth_boundary.py:78: in test_missing_configuration_fails_closed
+    configured.validate_auth_configuration()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'src.api.auth' has no attribute 'validate_auth_configuration'
+_____________ test_missing_configuration_fails_closed[JWT_ISSUER] ______________
+tests/test_auth_boundary.py:78: in test_missing_configuration_fails_closed
+    configured.validate_auth_configuration()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'src.api.auth' has no attribute 'validate_auth_configuration'
+____________ test_missing_configuration_fails_closed[JWT_AUDIENCE] _____________
+tests/test_auth_boundary.py:78: in test_missing_configuration_fails_closed
+    configured.validate_auth_configuration()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'src.api.auth' has no attribute 'validate_auth_configuration'
+___________ test_protected_routes_reject_literals[/api/v1/ventures/] ___________
+../../wmi-test-deps/fastapi/concurrency.py:29: in contextmanager_in_threadpool
+    yield await run_in_threadpool(cm.__enter__)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../../wmi-test-deps/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+../../wmi-test-deps/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+E   TypeError: '_GeneratorContextManager' object is not an iterator
+
+The above exception was the direct cause of the following exception:
+tests/test_auth_boundary.py:92: in test_protected_routes_reject_literals
+    assert method(path, headers=headers).status_code == 401
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/starlette/testclient.py:483: in get
+    return super().get(
+../../wmi-test-deps/httpx/_client.py:1053: in get
+    return self.request(
+../../wmi-test-deps/starlette/testclient.py:455: in request
+    return super().request(
+../../wmi-test-deps/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+../../wmi-test-deps/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../wmi-test-deps/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/starlette/testclient.py:354: in handle_request
+    raise exc
+../../wmi-test-deps/starlette/testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+../../wmi-test-deps/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+../../wmi-test-deps/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+../../wmi-test-deps/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../wmi-test-deps/starlette/middleware/errors.py:186: in __call__
+    raise exc
+../../wmi-test-deps/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+../../wmi-test-deps/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/api/middleware.py:48: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+../../wmi-test-deps/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../wmi-test-deps/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/api/middleware.py:15: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+../../wmi-test-deps/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../wmi-test-deps/starlette/middleware/cors.py:88: in __call__
+    await self.app(scope, receive, send)
+../../wmi-test-deps/starlette/middleware/trustedhost.py:36: in __call__
+    await self.app(scope, receive, send)
+../../wmi-test-deps/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../../wmi-test-deps/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../../wmi-test-deps/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../../wmi-test-deps/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+../../wmi-test-deps/starlette/routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../wmi-test-deps/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+../../wmi-test-deps/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+../../wmi-test-deps/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+../../wmi-test-deps/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+../../wmi-test-deps/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+../../wmi-test-deps/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../../wmi-test-deps/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../../wmi-test-deps/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../../wmi-test-deps/fastapi/routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+../../wmi-test-deps/fastapi/routing.py:481: in app
+    solved_result = await solve_dependencies(
+../../wmi-test-deps/fastapi/dependencies/utils.py:668: in solve_dependencies
+    solved = await _solve_generator(
+../../wmi-test-deps/fastapi/dependencies/utils.py:574: in _solve_generator
+    return await stack.enter_async_context(cm)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:659: in enter_async_context
+    result = await _enter(cm)
+             ^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+../../wmi-test-deps/fastapi/concurrency.py:32: in contextmanager_in_threadpool
+    await anyio.to_thread.run_sync(
+../../wmi-test-deps/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../../wmi-test-deps/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+../../wmi-test-deps/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+    ^^^^^^^^^^^^^^
+E   AttributeError: '_GeneratorContextManager' object has no attribute 'throw'
+------------------------------ Captured log call -------------------------------
+ERROR    src.database.connection:middleware.py:67 {"request_id": "03c839f1-d8a4-4724-9e85-48d449b21a54", "error": "'_GeneratorContextManager' object has no attribute 'throw'", "duration": 0.001569509506225586, "event": "Request failed", "timestamp": "2026-09-07T09:50:36.777994Z", "level": "error"}
+ERROR    src.database.connection:main.py:99 {"error": "'_GeneratorContextManager' object has no attribute 'throw'", "path": "/api/v1/ventures/", "method": "GET", "event": "Unhandled exception", "timestamp": "2026-09-07T09:50:36.778280Z", "level": "error"}
+________________________ test_root_is_same_application _________________________
+tests/test_auth_boundary.py:97: in test_root_is_same_application
+    assert importlib.import_module("main").app is app
+E   AssertionError: assert <fastapi.applications.FastAPI object at 0x7f790537bfe0> is <fastapi.applications.FastAPI object at 0x7f7904b9b8f0>
+E    +  where <fastapi.applications.FastAPI object at 0x7f790537bfe0> = <module 'main' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/main.py'>.app
+E    +    where <module 'main' from '/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/main.py'> = <function import_module at 0x7f790890eca0>('main')
+E    +      where <function import_module at 0x7f790890eca0> = importlib.import_module
+___________________ test_stub_and_demo_issuer_not_importable ___________________
+tests/test_auth_boundary.py:101: in test_stub_and_demo_issuer_not_importable
+    assert not (ROOT / "jwt.py").exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = (PosixPath('/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery') / 'jwt.py').exists
+_____________ test_missing_transport_key_fails_even_with_dev_flags _____________
+tests/test_auth_boundary.py:114: in test_missing_transport_key_fails_even_with_dev_flags
+    assert response.status_code in (401, 503)
+E   assert 200 in (401, 503)
+E    +  where 200 = <Response [200 OK]>.status_code
+------------------------------ Captured log call -------------------------------
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/20/e3q8)", "event": "Database session error", "timestamp": "2026-09-07T09:50:37.234280Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:105 Skipping database metric update
+Traceback (most recent call last):
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/core/knowledge_graph_connector.py", line 97, in update_venture_metrics
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/query.py", line 2766, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/query.py", line 2864, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/session.py", line 2373, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/session.py", line 2271, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/20/e3q8)", "event": "Database session error", "timestamp": "2026-09-07T09:50:37.237622Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:237 Skipping risk assessment DB persistence
+Traceback (most recent call last):
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/core/knowledge_graph_connector.py", line 231, in store_risk_assessment
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/query.py", line 2766, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/query.py", line 2864, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/session.py", line 2373, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/session.py", line 2271, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+______________________ test_missing_jose_never_loads_demo ______________________
+tests/test_auth_boundary.py:131: in test_missing_jose_never_loads_demo
+    assert result.returncode != 0
+E   assert 0 != 0
+E    +  where 0 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python', '-c', "\nimport bui... "static", "event": "Database connection initialized", "timestamp": "2026-09-07T09:50:37.711768Z", "level": "info"}\n').returncode
+_______________________ test_container_source_allowlist ________________________
+tests/test_auth_boundary.py:137: in test_container_source_allowlist
+    assert "COPY . ." not in docker
+E   assert 'COPY . .' not in '# Python 3....", "5000"]\n'
+E     
+E     'COPY . .' is contained here:
+E       tion code
+E       COPY . .
+E       
+E       # Expose API port
+E       EXPOSE 5000...
+E     
+E     ...Full output truncated (3 lines hidden), use '-vv' to show
+=============================== warnings summary ===============================
+../../wmi-test-deps/fastapi/testclient.py:1
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../wmi-test-deps/starlette/testclient.py:53
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/database/models.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/ventures.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VentureResponse(VentureBase):
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/agents.py:20: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AgentResponse(BaseModel):
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/analytics.py:249: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    metric: str = Query("revenue", regex="^(revenue|growth|roi|automation)$"),
+
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/services/orchestrator.py:73: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    time_bound=datetime.utcnow() + timedelta(days=90),
+
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/core/performance.py:123: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "timestamp": datetime.utcnow().isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_auth_boundary.py::test_anonymous_and_literal_identities_rejected[None]
+FAILED tests/test_auth_boundary.py::test_anonymous_and_literal_identities_rejected[demo]
+FAILED tests/test_auth_boundary.py::test_anonymous_and_literal_identities_rejected[demo_token]
+FAILED tests/test_auth_boundary.py::test_anonymous_and_literal_identities_rejected[arbitrary-text]
+FAILED tests/test_auth_boundary.py::test_anonymous_and_literal_identities_rejected[stub-token]
+FAILED tests/test_auth_boundary.py::test_signed_identity_is_not_a_demo_lookup
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims0] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims1] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims2] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims3] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims4] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims5] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims6] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims7] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims8] - Asser...
+FAILED tests/test_auth_boundary.py::test_bad_claims_rejected[claims9] - Asser...
+FAILED tests/test_auth_boundary.py::test_required_claims[exp] - AssertionErro...
+FAILED tests/test_auth_boundary.py::test_required_claims[sub] - AssertionErro...
+FAILED tests/test_auth_boundary.py::test_required_claims[iss] - AssertionErro...
+FAILED tests/test_auth_boundary.py::test_required_claims[aud] - AssertionErro...
+FAILED tests/test_auth_boundary.py::test_wrong_algorithm_and_key - AssertionE...
+FAILED tests/test_auth_boundary.py::test_missing_configuration_fails_closed[JWT_SECRET_KEY]
+FAILED tests/test_auth_boundary.py::test_missing_configuration_fails_closed[JWT_ISSUER]
+FAILED tests/test_auth_boundary.py::test_missing_configuration_fails_closed[JWT_AUDIENCE]
+FAILED tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/v1/ventures/]
+FAILED tests/test_auth_boundary.py::test_root_is_same_application - Assertion...
+FAILED tests/test_auth_boundary.py::test_stub_and_demo_issuer_not_importable
+FAILED tests/test_auth_boundary.py::test_missing_transport_key_fails_even_with_dev_flags
+FAILED tests/test_auth_boundary.py::test_missing_jose_never_loads_demo - asse...
+FAILED tests/test_auth_boundary.py::test_container_source_allowlist - assert ...
+30 failed, 2 passed, 22 warnings in 1.81s
