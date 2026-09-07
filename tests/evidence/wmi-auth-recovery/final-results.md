@@ -18,7 +18,7 @@ Ownership, intent, mechanism extraction, dissent and handoff: ../../../Instructi
 | Editable package build/install, no dependencies/build isolation | passed into temporary target | Local packaging check, not image build |
 | Tracked bytecode | 56 to 0 | Git inventory; original blobs retained |
 | Docker image build / run | NOT RUN: Docker unavailable | Evidence gap |
-| Python 3.11 CI | NOT VERIFIED locally | Evidence gap |
+| Python 3.11 CI | GitHub CI run 34109801918 completed successfully on e865a82 | Remote CI; distinct from local counts |
 | Real founder authentication / CMC / external outcomes | Not established; CMC remains 0 | No claim |
 
 The startup test copies exactly the Dockerfile COPY inputs into a fresh temporary
@@ -47,9 +47,13 @@ to the existing allowed localhost fixed the harness, without changing host polic
 Warnings remain visible. Lint also found one import-layout issue after adding the
 last six controls; formatting was fixed and lint rerun, not ignored.
 
-The staged source check was `git diff --cached --check -- .
-' :(exclude)historical/**' ' :(exclude)tests/evidence/**'` with no spaces before
-the two pathspec colons. Full-tree whitespace warnings are retained because raw
+The staged source check was:
+
+```
+git diff --cached --check -- . ':(exclude)historical/**' ':(exclude)tests/evidence/**'
+```
+
+Full-tree whitespace warnings are retained because raw
 evidence and historical implementation text intentionally retain their whitespace.
 Local packaging command: `python -m pip install --no-deps --no-build-isolation
 --target /workspace/scratch/c1c408c41c36/tmp/wmi-package-check -e .`.
@@ -58,3 +62,29 @@ Gate result: local WMI authentication/startup composition demonstrated. No globa
 security, durable replay, full schema validation, isolated workload identity, or
 runtime integration gate passes by inheritance. Shared-primitive work comes next;
 activation remains prohibited. PR #94 and its Kernel baseline failures are untouched.
+
+## Published candidate and source binding
+
+[Draft WMI PR #33](https://github.com/dababiyoda/WealthMachineIntelligence/pull/33)
+contains implementation commit `e865a82c3611a4ba06445c9fc07938af0aecaebf`.
+Uploaded source tree `b4e702e36a57366d2c15ce7ef80ade0d55fc4f2f` exactly matches
+the locally staged tree. The subsequent evidence-only update does not change code.
+[CI run 34109801918](https://github.com/dababiyoda/WealthMachineIntelligence/actions/runs/34109801918)
+was observed completed/success for that implementation commit; this does not
+retroactively establish Docker-image evidence or any institutional outcome.
+Kernel #94 was rechecked: draft, unmerged, head
+`5e2f221b1911309db10de26246065553c1bdcbfc`, still targeting Phase 3.
+
+Next-package inspection begun (PR metadata/body evidence, not new execution):
+
+| Source | Inspected head | Disposition |
+| --- | --- | --- |
+| Kernel #71 | 2221705421eed655e5edcb0608593cdf9d3cd72b | Extract canonical transport/identity precedents; runtime remains competitor |
+| Kernel #87 | dfd491d8b34fa963e4902008b5d8dc7690fdde63 | Extract grant/ledger/replay repairs; do not adopt whole branch |
+| Kernel #85 | d611771a38b2679f6f8b5c6c57e819ff0d433b53 | Extract verifier subject-binding, not proof of measured content by itself |
+| Kernel #93 | 21fb21ed803f43e47acb8e6420f6cdc4f74925cd | Extract local integrity checks; benchmark founder loop, not canonical runtime |
+| DALEOBANKS #71 | a13f279210c3dc9722a61c1714b17b064a8c05c8 | Compare stricter explicit unsigned opt-in; not activated |
+| DALEOBANKS #74 | ecbb4b744b69f8ea16ed38ba2f0711c1969547b5 | Compare transport parity; preserve reported 12 environment failures |
+
+These inspections do not complete the shared-primitive package. No Kernel,
+DALEOBANKS, runtime or other organ source was modified by this WMI package.
