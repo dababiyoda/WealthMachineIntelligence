@@ -171,9 +171,9 @@ def test_no_evidence_needs_more_evidence(service):
 # ---------------------------------------------------------------------- #
 def test_requires_human_approval_cannot_be_disabled(service):
     sneaky = fire_packet(id="packet-sneaky")
-    sneaky["requires_human_approval"] = False  # inbound attempt is ignored
-    assessment = service.evaluate_packet(sneaky)
-    assert assessment["requires_human_approval"] is True
+    sneaky["requires_human_approval"] = False  # unknown authority field is refused
+    with pytest.raises(ValueError):
+        service.evaluate_packet(sneaky)
 
 
 def test_assessment_wire_rejects_self_executing_assessment(service):

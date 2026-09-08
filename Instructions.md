@@ -1,5 +1,71 @@
 # Implementation Instructions
 
+## SR-001 shared consumer recovery — 2026-09-08
+
+This separate draft is stacked on authentication/startup PR #33 at
+fbc959936610d529bcb89d2782ec5158791aaadb. #33 remains preserved and unmerged.
+Its reported 69 focused, 126 broader and nine partial parity passes, and its
+implementation CI success, remain separate historical checks. Docker image
+build/run remains UNVERIFIED. No default branch or institution is repaired by
+an unmerged passing candidate. No deployment, credential issuance or founder
+authentication is authorized.
+
+Canonical dependency: uniimente-kernel-boundaries 0.1.1 from Kernel commit
+3e059c20331d96e05a44daac1b097896aaabde93, pinned identically in requirements.txt,
+pyproject.toml and CI. The Kernel owns transport, schemas, translations, ledger
+integrity and event/claim semantics. WMI owns src/api/main.py, JWT admission,
+proposal evaluation and this adapter composition. The compatibility import
+modules name their owner, versions, expiry/removal and fail-closed behavior.
+They contain no security fallback. No release to a package registry is required.
+
+The route requires BOTH the existing configured JWT and transport protocol 2
+authentication over exact request bytes and context. JWT subject must match the
+claimed transport sender. The response signature binds actual response bytes,
+request digest, operation, recipient, logical key and status. Shared symmetric
+keys establish key possession, not isolation between holders or Alfonso's identity.
+Wire contracts 1.0/1.1 remain; transport v1/unsigned clients are incompatible.
+Unknown fields, malformed nested values and version disagreement refuse.
+
+The active HTTP adapter is restricted to explicit synthetic localhost tests
+until Kernel-mediated live routing is composed and reviewed. This is not a
+runtime authorization flag. Missing UNIIMENTE_BRIDGE_STATE_PATH,
+UNIIMENTE_CONSTITUTION_HASH, UNIIMENTE_LEGAL_PRINCIPAL, signing configuration or
+JWT trust configuration fails closed. Synthetic fixtures supply these values;
+do not provision real keys for this draft. One POSIX writer is enforced per state
+path. The state path is canonical EventSpine/EvidenceLedger history, not a second
+transition store. Fresh nonce retries use the same caller/operation/key and exact
+payload digest, returning the retained assessment; conflicting payloads refuse.
+An unfinished claim after replacement is reconciliation_required, never an
+automatic redispatch. A retained proposal assessment is not protected mission
+appraisal or verified external truth. Mission appraisal remains Kernel #94's
+separate protected gate.
+
+Testing/adoption evidence is in tests/evidence/shared-recovery. The real producer
+test uses tests/test_shared_consumer_integration.py with DALEOBANKS_SOURCE set to
+the pinned DALEOBANKS consumer checkout. It runs the actual Docker COPY/CMD
+composition as a subprocess, exercises the protected HTTP route, kills/restarts
+the server and checks retained result/dissent and replay refusal. It does not
+prove container behavior. Absence of the producer checkout is an explicit SKIP,
+not compatibility evidence. See the linked adoption handoff for final source
+commits, dependency versions, commands and review gates. The final local suite
+with Kernel 0.1.1 passes 129 tests with 430 retained warnings in 7.84s. Its real
+producer is DALEOBANKS draft #77 at b3c8722eaf1c8118567eea363204622e21b93412;
+CI checks out that exact public revision and runs this repository's tests only.
+Kernel draft #98 remains blocked by 17 historical migration/repair regressions;
+DALEOBANKS broad execution remains blocked by safety review. No test result is a CMC,
+VDM, autonomous operation, external outcome or economic result.
+
+Migration order: review Kernel boundary candidate; review #33 dependency; review
+this WMI consumer and the DALEOBANKS producer together at the documented pins.
+Retain this draft if a required gate is red or unavailable. Rollback before any
+activation is leaving the existing branches untouched. After any separately
+authorized sandbox trial, stop writers and preserve ledger bytes/head/obligations;
+never reopen v2 history with an old permissive implementation or erase it to
+restore startup. Reverting dependency pins is not an authority transfer.
+Full-suite/default-branch, Docker and live mediated-routing gaps remain explicit.
+The existing September 5 two passes govern; these implementation checks are not
+a third strengthening pass or independent review.
+
 ## Integration Recovery — WMI authentication/startup (2026-09-07)
 
 Binding scope: Alfonso's September 5 audit follow-up, repeated September 7 in

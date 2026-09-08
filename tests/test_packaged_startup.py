@@ -43,6 +43,9 @@ def package(tmp_path):
                        JWT_SECRET_KEY=KEY, JWT_ISSUER="wmi-test-issuer",
                        JWT_AUDIENCE="wmi-test-api", WEALTHMACHINE_SIGNING_KEY=BRIDGE_KEY,
                        PYTHONDONTWRITEBYTECODE="1", ENVIRONMENT="production")
+    environment.update(UNIIMENTE_BRIDGE_MODE='synthetic-localhost',
+        UNIIMENTE_BRIDGE_STATE_PATH=str(tmp_path / 'bridge.jsonl'),
+        UNIIMENTE_CONSTITUTION_HASH='sha256:' + 'a' * 64, UNIIMENTE_LEGAL_PRINCIPAL='alfonso_lopez')
     assert not (tmp_path / "jwt.py").exists()
     assert not (tmp_path / "tests").exists()
     assert not (tmp_path / "historical").exists()
@@ -87,7 +90,7 @@ def test_exact_packaged_command_protected_bridge(package):
                 else:
                     log.seek(0)
                     pytest.fail("Packaged server failed to become ready: " + log.read())
-                body = json.dumps(fire_packet(id="synthetic-packaged-mission")).encode()
+                body = json.dumps(fire_packet(id="synthetic-packaged-mission", schema_version='1.1')).encode()
                 claims = jwt.get_unverified_claims(token())
                 invalid = [None, "demo", "demo_token", "stub-token", "arbitrary-text",
                            token(exp=1), token(iss="wrong"), token(aud="wrong"),
@@ -111,7 +114,13 @@ def test_exact_packaged_command_protected_bridge(package):
                 assert assessment["opportunity_packet_id"] == "synthetic-packaged-mission"
                 target = f"/api/ventures/{assessment['id']}/assessment"
                 assert client.get(target).status_code == 401
-                assert client.get(target, headers={"Authorization": f"Bearer {token()}"}).status_code == 200
+                from src.services.bridge_security import build_headers
+                import unittest.mock
+                with unittest.mock.patch.dict(os.environ, {'WEALTHMACHINE_SIGNING_KEY':BRIDGE_KEY}):
+                    headers = build_headers(b'', identity='daleobanks', schema_version='1.1',
+                        operation='assessment.get:' + assessment['id'])
+                headers['Authorization'] = f'Bearer {token()}'
+                assert client.get(target, headers=headers).status_code == 200
                 assert client.post("/auth/login", data={"username": "demo", "password": "demo"}).status_code == 404
         finally:
             process.terminate()

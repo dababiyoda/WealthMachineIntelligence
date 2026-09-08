@@ -1,0 +1,19 @@
+2026-09-08 UTC. Python 3.12.13; Linux; synthetic offline/localhost fixtures.
+Subject: WMI #33 fbc959936610d529bcb89d2782ec5158791aaadb plus this retained patch.
+Kernel: 3e059c20331d96e05a44daac1b097896aaabde93, boundary distribution 0.1.1.
+Local wheel SHA256: 3dbe7b916528d6fd132c334e53d914762ebdfeead5a02278159b5ca107bfe053
+DALEOBANKS source code: b3c8722eaf1c8118567eea363204622e21b93412 (draft #77).
+The producer code tested was subsequently committed unchanged; its README and
+evidence metadata were updated before publication. CI now pins this commit.
+Command: PATH=/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/bin:$PATH PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/workspace/scratch/c1c408c41c36/tmp/wmi-test-deps:/workspace/scratch/c1c408c41c36/tmp/kernel-boundary-deps DALEOBANKS_SOURCE=/workspace/scratch/c1c408c41c36/tmp/repos/daleobanks-shared-recovery python -m pytest -q --tb=short
+Exit: 0. Raw output: 06-final-pinned-kernel-broader.txt.
+129 passed, 430 warnings in 7.84s.
+Dependencies used: pytest 9.1.1, fastapi 0.141.1, starlette 1.6.0, httpx 0.28.1,
+python-jose 3.5.0, cryptography 50.0.1, SQLAlchemy 2.0.52, uvicorn 0.52.4,
+jsonschema 4.26.0, rfc3339-validator 0.1.4. Warnings remain in raw output.
+An earlier process 4805 became unavailable during a steered turn: INCOMPLETE,
+no completion claimed. This subsequent finished execution is distinct.
+Docker COPY/CMD was exercised in a subprocess, not in an image. Image build/run
+remains UNVERIFIED. ruff unavailable locally (exit 127); not relabeled PASS.
+No WMI #33 history, credentials, JWT refusal, default branch or runtime authority
+was changed. No CMC/VDM increment; independent review and adoption gates remain.

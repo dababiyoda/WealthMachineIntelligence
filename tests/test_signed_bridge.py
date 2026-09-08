@@ -11,6 +11,7 @@ from tests.fixtures.auth import configure, token
 
 from src.services.bridge_security import (
     H_IDEMPOTENCY, H_IDENTITY, H_NONCE, H_SCHEMA, H_SIGNATURE, H_TIMESTAMP,
+    H_PROTOCOL, H_RECIPIENT, H_OPERATION, H_DIRECTION, H_STATUS, H_REQUEST, H_TRACE,
     sign,
 )
 from src.services.opportunity_intake import OpportunityIntakeService, set_intake_service
@@ -37,6 +38,8 @@ def _signed_headers(body: bytes, *, identity="daleobanks", timestamp=None,
     timestamp = timestamp or str(int(time.time()))
     nonce = nonce or f"nonce-{time.time_ns()}"
     return {
+        H_PROTOCOL: '2', H_RECIPIENT: 'wealthmachine', H_OPERATION: 'opportunity.evaluate',
+        H_DIRECTION: 'request', H_STATUS: '', H_REQUEST: '', H_TRACE: '',
         H_IDENTITY: identity,
         H_TIMESTAMP: timestamp,
         H_NONCE: nonce,
@@ -49,7 +52,7 @@ def _signed_headers(body: bytes, *, identity="daleobanks", timestamp=None,
 
 
 def _body(packet_id="sb-1", **overrides):
-    return json.dumps(fire_packet(id=packet_id, **overrides)).encode()
+    return json.dumps(fire_packet(id=packet_id, **{'schema_version':SCHEMA_VERSION, **overrides})).encode()
 
 
 def test_valid_signed_request_succeeds_and_response_is_signed(client):
@@ -135,3 +138,32 @@ def test_malformed_body_is_422_not_500(client):
     headers = _signed_headers(body)
     assert client.post("/api/opportunities/intake", content=body,
                        headers=headers).status_code == 422
+
+
+@pytest.mark.parametrize('uncertain', [False, True])
+def test_claim_persistence_failure_is_explicit_and_no_work_runs(client, monkeypatch, uncertain):
+    from src.services.bridge_state import get_bridge_state
+    from provenance.ledger import ReconciliationRequired
+    state = get_bridge_state()
+    original = state.ledger.append
+    def append(kind, payload, **kwargs):
+        if payload.get('type') == 'bridge.operation.claimed':
+            if uncertain:
+                # Simulate successful persistence followed by lost acknowledgment.
+                original(kind, payload, **kwargs)
+                raise ReconciliationRequired('synthetic lost claim acknowledgment')
+            raise OSError('synthetic definite pre-append refusal')
+        return original(kind, payload, **kwargs)
+    monkeypatch.setattr(state.ledger, 'append', append)
+    async def no_work(*args):
+        pytest.fail('unacknowledged claim must not execute work')
+    from src.services.opportunity_intake import get_intake_service
+    monkeypatch.setattr(get_intake_service(), 'evaluate_packet_async', no_work)
+    body = _body('persistence-case')
+    response = client.post('/api/opportunities/intake', content=body, headers=_signed_headers(body))
+    assert response.status_code == (409 if uncertain else 503)
+    monkeypatch.setattr(state.ledger, 'append', original)
+    if uncertain:
+        response = client.post('/api/opportunities/intake', content=body, headers=_signed_headers(body))
+        assert response.status_code == 409
+        assert 'reconciliation_required' in response.text

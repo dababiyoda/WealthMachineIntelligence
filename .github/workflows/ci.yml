@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check out the pinned real producer
+        uses: actions/checkout@v4
+        with:
+          repository: dababiyoda/DALEOBANKS
+          ref: b3c8722eaf1c8118567eea363204622e21b93412
+          path: .compat/daleobanks
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -22,9 +28,13 @@ jobs:
           # celery, redis) out of CI; install only what the test suite imports.
           pip install fastapi httpx structlog sqlalchemy python-dotenv prometheus-client 'python-jose[cryptography]>=3.5.0' uvicorn
           pip install pytest pytest-asyncio ruff
+          # One canonical, content-pinned Kernel boundary implementation.
+          pip install 'uniimente-kernel-boundaries @ https://github.com/dababiyoda/uniimente-kernel/archive/3e059c20331d96e05a44daac1b097896aaabde93.tar.gz'
       - name: Lint
         run: |
           ruff check . --exit-zero
       - name: Test
+        env:
+          DALEOBANKS_SOURCE: ${{ github.workspace }}/.compat/daleobanks
         run: |
-          pytest -q
+          pytest -q tests
