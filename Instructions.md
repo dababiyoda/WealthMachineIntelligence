@@ -1,6 +1,6 @@
 # Implementation Instructions
 
-> **Before using this work order, read `AGENTS.md`.** WMI inherits UNIIMENTE `INTENT-0029`: **Preserve the intended effect. Do not literalize the metaphor. Search/adapt real mechanisms before inventing architecture.** This rule outranks stale architectural assumptions in this document. WMI does not own founder-intent interpretation or authority.
+> **Before using this work order, read `AGENTS.md`.** WMI inherits UNIIMENTE `INTENT-0030`: **Preserve the intended effect. Do not literalize the metaphor. Search/adapt real mechanisms before inventing architecture.** This rule outranks stale architectural assumptions in this document. WMI does not own founder-intent interpretation or authority.
 
 This document tracks the work required to bring the **WealthMachine** project to full-stack, production-grade quality. It captures the acceptance criteria and the execution plan defined in the work order. As the implementation progresses each item in the checklist below should be checked off. If a blocking issue arises, document it in the `Blockers` section.
 
