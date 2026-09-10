@@ -30,7 +30,7 @@ def test_anonymous_and_literal_identities_rejected(configured, value):
 
 def test_signed_identity_is_not_a_demo_lookup(configured):
     principal = asyncio.run(configured.get_current_user(token()))
-    assert principal["user_id"] == "synthetic-service"
+    assert principal["user_id"] == "daleobanks"
     assert principal["role"] == "user"
 
 

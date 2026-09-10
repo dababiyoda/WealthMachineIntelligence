@@ -34,6 +34,8 @@ async def lifespan(app: FastAPI):
     validate_auth_configuration()
     if not signing_key().strip():
         raise RuntimeError("WEALTHMACHINE_SIGNING_KEY is required")
+    from src.services.bridge_state import get_bridge_state, close_bridge_state
+    get_bridge_state()
     
     # Initialize database
     try:
@@ -45,7 +47,10 @@ async def lifespan(app: FastAPI):
     
     # Metrics use the authenticated app route, not a second unauthenticated port.
     
-    yield
+    try:
+        yield
+    finally:
+        close_bridge_state()
     
     # Shutdown
     logger.info("Shutting down WealthMachine Enterprise API")
