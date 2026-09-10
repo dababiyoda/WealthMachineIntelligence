@@ -1,5 +1,7 @@
 # Implementation Instructions
 
+> **Before using this work order, read `AGENTS.md`.** WMI inherits UNIIMENTE `INTENT-0030`: **Preserve the intended effect. Do not literalize the metaphor. Search/adapt real mechanisms before inventing architecture.** This rule outranks stale architectural assumptions in this document. WMI does not own founder-intent interpretation or authority.
+
 ## Integration Recovery — WMI authentication/startup (2026-09-07)
 
 Binding scope: Alfonso's September 5 audit follow-up, repeated September 7 in
