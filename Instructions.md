@@ -1,5 +1,7 @@
 # Implementation Instructions
 
+> Current adoption status and package 0.1.2 pin: [SR001_ADOPTION_HANDOFF.md](docs/SR001_ADOPTION_HANDOFF.md). The dated recovery sections below preserve earlier decisions and evidence; their draft/no-merge status has been superseded by the founder's explicit merge-and-push direction. Runtime activation remains prohibited.
+
 > **Before using this work order, read `AGENTS.md`.** WMI inherits UNIIMENTE `INTENT-0030`: **Preserve the intended effect. Do not literalize the metaphor. Search/adapt real mechanisms before inventing architecture.** This rule outranks stale architectural assumptions in this document. WMI does not own founder-intent interpretation or authority.
 
 ## SR-001 shared consumer recovery — 2026-09-08

@@ -43,7 +43,7 @@ from db.models import OpportunityPacket
 assert producer_security.build_headers is canonical.build_headers
 assert consumer_security.build_headers is canonical.build_headers
 installed = distribution('uniimente-kernel-boundaries')
-assert installed.version == '0.1.1'
+assert installed.version == '0.1.2'
 bindings = {m.__name__: {'path': m.__file__,
     'sha256': hashlib.sha256(Path(m.__file__).read_bytes()).hexdigest()}
     for m in (canonical, durable, validation, spine, ledger)}

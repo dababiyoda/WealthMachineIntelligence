@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: dababiyoda/DALEOBANKS
-          ref: 3d5e402d206be59bc16efc70b66c492a70797f71
+          ref: 18f1989cacdb9b938cb98a28c22b2eab757ce5b9
           path: .compat/daleobanks
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,7 +29,7 @@ jobs:
           pip install fastapi httpx structlog sqlalchemy python-dotenv prometheus-client 'python-jose[cryptography]>=3.5.0' uvicorn
           pip install pytest pytest-asyncio ruff
           # One canonical, content-pinned Kernel boundary implementation.
-          pip install 'uniimente-kernel-boundaries @ https://github.com/dababiyoda/uniimente-kernel/archive/3e059c20331d96e05a44daac1b097896aaabde93.tar.gz'
+          pip install 'uniimente-kernel-boundaries @ https://github.com/dababiyoda/uniimente-kernel/archive/4999acff1a69502c05af455fbccfca380cad18ee.tar.gz'
       - name: Lint
         run: |
           ruff check . --exit-zero
