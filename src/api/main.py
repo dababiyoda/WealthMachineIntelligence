@@ -2,22 +2,22 @@
 Enterprise FastAPI application for WealthMachine
 Production-ready API with authentication, monitoring, and comprehensive endpoints
 """
-from fastapi import FastAPI, HTTPException, Depends, status, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import JSONResponse
-import time
-from src.logging_config import configure_logging, logger
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
-from prometheus_client import start_http_server
 import os
 from contextlib import asynccontextmanager
 
+from fastapi import Depends, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
+from prometheus_client import Counter, Histogram, generate_latest
+
+from src.logging_config import configure_logging, logger
+from src.services.bridge_security import signing_key
+
 from ..database.connection import db
-from .routes import ventures, agents, analytics, health, opportunities
-from .auth import verify_token
-from .middleware import SecurityHeadersMiddleware, LoggingMiddleware
+from .auth import get_current_user, validate_auth_configuration
+from .middleware import LoggingMiddleware, SecurityHeadersMiddleware
+from .routes import agents, analytics, health, opportunities, ventures
 
 # Configure structured logging
 configure_logging()
@@ -31,6 +31,9 @@ async def lifespan(app: FastAPI):
     """Application lifespan management"""
     # Startup
     logger.info("Starting WealthMachine Enterprise API")
+    validate_auth_configuration()
+    if not signing_key().strip():
+        raise RuntimeError("WEALTHMACHINE_SIGNING_KEY is required")
     
     # Initialize database
     try:
@@ -40,10 +43,7 @@ async def lifespan(app: FastAPI):
         logger.error("Failed to initialize database", error=str(e))
         raise
     
-    # Start Prometheus metrics server
-    metrics_port = int(os.getenv('METRICS_PORT', '9090'))
-    start_http_server(metrics_port)
-    logger.info("Prometheus metrics server started", port=metrics_port)
+    # Metrics use the authenticated app route, not a second unauthenticated port.
     
     yield
     
@@ -77,21 +77,6 @@ app.add_middleware(
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(LoggingMiddleware)
 
-# Authentication
-security = HTTPBearer()
-
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify JWT token and return user info"""
-    token = credentials.credentials
-    user = verify_token(token)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
-
 # Global error handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -118,7 +103,7 @@ async def health_check():
     return {"status": "ok" if db_healthy else "degraded"}
 
 # Metrics endpoint
-@app.get("/metrics")
+@app.get("/metrics", dependencies=[Depends(get_current_user)])
 async def metrics():
     """Prometheus metrics endpoint"""
     return generate_latest()

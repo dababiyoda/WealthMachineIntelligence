@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.fixtures.auth import configure, SyntheticBridgeClient
 
 from src.services.opportunity_intake import (
     OpportunityIntakeService,
@@ -187,9 +188,10 @@ def test_assessment_wire_rejects_self_executing_assessment(service):
 # ---------------------------------------------------------------------- #
 @pytest.fixture()
 def client(service, monkeypatch):
+    configure(monkeypatch)
     monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
     from src.api.main import app
-    return TestClient(app)
+    return SyntheticBridgeClient(app)
 
 
 def test_intake_endpoint_round_trip(client):
@@ -224,7 +226,8 @@ def test_intake_endpoint_missing_assessment_404s(client):
     assert client.get("/api/ventures/unknown-id/assessment").status_code == 404
 
 
-def test_intake_token_enforced_when_configured(service, monkeypatch):
+def test_static_intake_token_cannot_replace_jwt(service, monkeypatch):
+    configure(monkeypatch)
     monkeypatch.setenv("WEALTHMACHINE_INTAKE_TOKEN", "sekrit")
     from src.api.main import app
     client = TestClient(app)
@@ -237,4 +240,8 @@ def test_intake_token_enforced_when_configured(service, monkeypatch):
         json=fire_packet(id="packet-auth"),
         headers={"Authorization": "Bearer sekrit"},
     )
-    assert allowed.status_code == 200
+    assert allowed.status_code == 401
+    # A real synthetic signed principal plus signed body still works.
+    assert SyntheticBridgeClient(app).post(
+        "/api/opportunities/intake", json=fire_packet(id="packet-signed")
+    ).status_code == 200

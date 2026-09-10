@@ -14,10 +14,12 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . .
+COPY src ./src
+COPY contracts ./contracts
+COPY main.py ./main.py
 
 # Expose API port
 EXPOSE 5000
 
 # Default command
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "5000"]

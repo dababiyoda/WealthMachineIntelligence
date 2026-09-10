@@ -1,0 +1,28 @@
+................................                                         [100%]
+=============================== warnings summary ===============================
+../../wmi-test-deps/fastapi/testclient.py:1
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../wmi-test-deps/starlette/testclient.py:53
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/database/models.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/ventures.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VentureResponse(VentureBase):
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/agents.py:20: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AgentResponse(BaseModel):
+
+tests/test_auth_boundary.py::test_protected_routes_reject_literals[/api/opportunities/intake]
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/analytics.py:249: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    metric: str = Query("revenue", regex="^(revenue|growth|roi|automation)$"),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+32 passed, 6 warnings in 1.16s

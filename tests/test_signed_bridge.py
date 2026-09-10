@@ -7,6 +7,7 @@ import time
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.fixtures.auth import configure, token
 
 from src.services.bridge_security import (
     H_IDEMPOTENCY, H_IDENTITY, H_NONCE, H_SCHEMA, H_SIGNATURE, H_TIMESTAMP,
@@ -21,11 +22,12 @@ KEY = "test-signing-key"
 
 @pytest.fixture()
 def client(monkeypatch):
+    configure(monkeypatch)
     monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
     monkeypatch.setenv("WEALTHMACHINE_SIGNING_KEY", KEY)
     set_intake_service(OpportunityIntakeService())
     from src.api.main import app
-    yield TestClient(app)
+    yield TestClient(app, headers={"Authorization": f"Bearer {token()}"})
     set_intake_service(None)
 
 
@@ -116,14 +118,15 @@ def test_unsigned_request_rejected_when_key_configured(client):
                        headers={"Content-Type": "application/json"}).status_code == 401
 
 
-def test_unsigned_allowed_in_local_mode(monkeypatch):
+def test_unsigned_rejected_even_in_local_mode(monkeypatch):
+    configure(monkeypatch)
     monkeypatch.delenv("WEALTHMACHINE_SIGNING_KEY", raising=False)
     monkeypatch.delenv("WEALTHMACHINE_INTAKE_TOKEN", raising=False)
     set_intake_service(OpportunityIntakeService())
     from src.api.main import app
-    client = TestClient(app)
+    client = TestClient(app, headers={"Authorization": f"Bearer {token()}"})
     response = client.post("/api/opportunities/intake", json=fire_packet(id="sb-local"))
-    assert response.status_code == 200
+    assert response.status_code == 401
     set_intake_service(None)
 
 

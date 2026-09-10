@@ -5,9 +5,11 @@ protection, idempotency keys, and schema-version negotiation.
 Mirrored from DALEOBANKS (services/bridge_security.py) —
 keep the two files field-for-field compatible.
 
-Local-first: with no ``WEALTHMACHINE_SIGNING_KEY`` configured, transport
-runs unsigned (mock/dev mode). The moment a key exists, signing is
-required in both directions and verification failures fail closed.
+Missing-key refusal and non-isolated-identity primitives adapted from #31/#32.
+Owner: WMI bridge; canonical semantics: Kernel bridge transport. Supports the
+existing v1.0/v1.1 wire format. Expiry: canonical durable adapter available.
+Removal: consumer parity/restart gates pass. Failure: refuse, never downgrade.
+Shared-secret holders can impersonate one another: identity_isolated is false.
 
 A valid signature proves sender authenticity ONLY. It never carries
 authorization: a perfectly signed assessment still has no execution
@@ -21,7 +23,6 @@ import hmac
 import os
 import secrets
 import time
-from typing import Dict, Optional, Tuple
 
 SIGNING_KEY_ENV = "WEALTHMACHINE_SIGNING_KEY"
 MAX_SKEW_SECONDS = 300
@@ -66,12 +67,10 @@ def build_headers(
     *,
     identity: str,
     schema_version: str,
-    idempotency_key: Optional[str] = None,
+    idempotency_key: str | None = None,
     trace_id: str = "",
-) -> Dict[str, str]:
-    """Signed transport headers for an outbound request/response. With no
-    key configured, identity headers still travel (debuggability) but no
-    signature is attached."""
+) -> dict[str, str]:
+    """Sign outbound headers; missing signing configuration is an error."""
     timestamp = str(int(time.time()))
     nonce = secrets.token_hex(16)
     idempotency = idempotency_key or secrets.token_hex(16)
@@ -85,9 +84,10 @@ def build_headers(
     if trace_id:
         headers[H_TRACE] = trace_id
     key = signing_key()
-    if key:
-        headers[H_SIGNATURE] = sign(key, identity, timestamp, nonce,
-                                    idempotency, schema_version, body)
+    if not key.strip():
+        raise BridgeSecurityError("WEALTHMACHINE_SIGNING_KEY is required")
+    headers[H_SIGNATURE] = sign(key, identity, timestamp, nonce,
+                                idempotency, schema_version, body)
     return headers
 
 
@@ -97,7 +97,7 @@ class NonceCache:
 
     def __init__(self, ttl_seconds: int = MAX_SKEW_SECONDS * 2) -> None:
         self.ttl = ttl_seconds
-        self._seen: Dict[str, float] = {}
+        self._seen: dict[str, float] = {}
 
     def check_and_store(self, nonce: str) -> bool:
         now = time.time()
@@ -110,7 +110,7 @@ class NonceCache:
         return True
 
 
-def _version_tuple(version: str) -> Tuple[int, ...]:
+def _version_tuple(version: str) -> tuple[int, ...]:
     try:
         return tuple(int(p) for p in version.split("."))
     except ValueError:
@@ -118,12 +118,12 @@ def _version_tuple(version: str) -> Tuple[int, ...]:
 
 
 def verify_headers(
-    headers: Dict[str, str],
+    headers: dict[str, str],
     body: bytes,
     *,
     nonce_cache: NonceCache,
-    require_signature: Optional[bool] = None,
-) -> Dict[str, str]:
+    require_signature: bool | None = None,
+) -> dict[str, str]:
     """Verify inbound transport headers. Raises BridgeSecurityError on any
     failure — fail closed, never degrade. Returns the normalized header
     set for provenance recording."""
@@ -133,7 +133,8 @@ def verify_headers(
         return getter.get(name.lower(), "")
 
     key = signing_key()
-    must_sign = require_signature if require_signature is not None else bool(key)
+    if not key.strip() or require_signature is False:
+        raise BridgeSecurityError("Configured signing key and signed transport required")
 
     identity = get(H_IDENTITY)
     schema_version = get(H_SCHEMA) or MIN_SCHEMA_VERSION
@@ -142,10 +143,6 @@ def verify_headers(
             f"schema version {schema_version} below minimum {MIN_SCHEMA_VERSION} — "
             "downgrade rejected"
         )
-
-    if not must_sign:
-        return {"identity": identity or "unsigned-local", "schema_version": schema_version,
-                "signed": "false", "trace_id": get(H_TRACE)}
 
     if identity not in KNOWN_IDENTITIES:
         raise BridgeSecurityError(f"unknown service identity '{identity}'")
@@ -170,14 +167,26 @@ def verify_headers(
         raise BridgeSecurityError("signature verification failed")
 
     return {"identity": identity, "schema_version": schema_version,
-            "signed": "true", "idempotency_key": idempotency,
+            "signed": "true", "identity_isolated": "false", "idempotency_key": idempotency,
             "trace_id": get(H_TRACE)}
 
 
 __all__ = [
-    "BridgeSecurityError", "NonceCache", "build_headers", "verify_headers",
-    "sign", "signing_key", "SIGNING_KEY_ENV", "MAX_SKEW_SECONDS",
-    "MIN_SCHEMA_VERSION", "KNOWN_IDENTITIES",
-    "H_IDENTITY", "H_TIMESTAMP", "H_NONCE", "H_IDEMPOTENCY",
-    "H_SCHEMA", "H_SIGNATURE", "H_TRACE",
+    "H_IDEMPOTENCY",
+    "H_IDENTITY",
+    "H_NONCE",
+    "H_SCHEMA",
+    "H_SIGNATURE",
+    "H_TIMESTAMP",
+    "H_TRACE",
+    "KNOWN_IDENTITIES",
+    "MAX_SKEW_SECONDS",
+    "MIN_SCHEMA_VERSION",
+    "SIGNING_KEY_ENV",
+    "BridgeSecurityError",
+    "NonceCache",
+    "build_headers",
+    "sign",
+    "signing_key",
+    "verify_headers",
 ]

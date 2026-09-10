@@ -5,57 +5,46 @@ VentureAssessment in the response body. These endpoints only score and
 recommend — nothing here launches, posts, sells, or moves money, and every
 assessment carries ``requires_human_approval: true``.
 
-Transport security (zero-trust, local-first):
-- With ``WEALTHMACHINE_SIGNING_KEY`` unset, transport is unsigned (mock/
-  dev mode) and the optional ``WEALTHMACHINE_INTAKE_TOKEN`` bearer check
-  still applies.
-- With the key set, every request must carry a valid service identity,
+Transport security (fail-closed admission):
+- Every route requires verified JWT claims; there is no demo or static-token
+  alternative. Missing JWT or transport signing configuration refuses startup.
+- Every POST must also carry a recognized service identity,
   fresh timestamp, unused nonce, and HMAC signature; failures fail closed
   (401). Schema-version downgrades are rejected. Responses are signed
   with the same key.
 - Idempotency: resending a request with a known idempotency key returns
   the previously computed assessment without re-running the engine.
 
-A valid signature proves sender authenticity only. It never carries
-authorization — the assessment still has no execution authority anywhere.
+A symmetric signature proves shared-key possession, not isolated workload or
+founder identity. It never grants execution authority. Durable restart replay,
+idempotency, complete schema validation and response-byte signing remain the
+next shared-primitive evidence gate; current caches are process-local.
 """
 
 from __future__ import annotations
 
 import json
-import os
-from typing import Any, Dict
+from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
+from src.api.auth import get_current_user
 from src.services.bridge_security import (
     BridgeSecurityError,
     NonceCache,
     build_headers,
-    signing_key,
     verify_headers,
 )
 from src.services.opportunity_intake import get_intake_service
 from src.services.venture_protocol import SCHEMA_VERSION
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 _nonce_cache = NonceCache()
 
 
-def _check_token(authorization: str | None) -> None:
-    expected = os.getenv("WEALTHMACHINE_INTAKE_TOKEN", "")
-    if not expected:
-        return
-    if authorization != f"Bearer {expected}":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid intake token",
-        )
-
-
-def _signed_response(payload: Dict[str, Any], idempotency_key: str = "") -> JSONResponse:
+def _signed_response(payload: dict[str, Any], idempotency_key: str = "") -> JSONResponse:
     body = json.dumps(payload).encode()
     headers = build_headers(
         body, identity="wealthmachine", schema_version=SCHEMA_VERSION,
@@ -64,13 +53,12 @@ def _signed_response(payload: Dict[str, Any], idempotency_key: str = "") -> JSON
     return JSONResponse(content=payload, headers=headers)
 
 
-async def _verified_payload(request: Request) -> tuple[Dict[str, Any], Dict[str, str]]:
+async def _verified_payload(request: Request) -> tuple[dict[str, Any], dict[str, str]]:
     """Token check, transport verification, and JSON parse — fail closed."""
-    _check_token(request.headers.get("authorization"))
     body = await request.body()
     try:
         transport = verify_headers(dict(request.headers), body,
-                                   nonce_cache=_nonce_cache)
+                                   nonce_cache=_nonce_cache, require_signature=True)
     except BridgeSecurityError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc))
     try:
@@ -125,7 +113,6 @@ async def evaluate_venture(request: Request) -> JSONResponse:
 @router.get("/ventures/{assessment_id}/assessment")
 async def get_assessment(assessment_id: str, request: Request) -> JSONResponse:
     """Fetch a stored assessment by its id (or by opportunity packet id)."""
-    _check_token(request.headers.get("authorization"))
     assessment = get_intake_service().get_assessment(assessment_id)
     if assessment is None:
         raise HTTPException(
