@@ -22,8 +22,7 @@ from tests.test_signed_bridge import _signed_headers
 ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.fixture
-def package(tmp_path):
+def build_package(tmp_path):
     docker = (ROOT / "Dockerfile").read_text().splitlines()
     for line in docker:
         if line.startswith("COPY "):
@@ -52,6 +51,10 @@ def package(tmp_path):
     assert not (tmp_path / "WealthMachineIntelligenceEnhanced").exists()
     return tmp_path, command, environment
 
+
+@pytest.fixture
+def package(tmp_path):
+    return build_package(tmp_path)
 
 @pytest.mark.parametrize("missing", ["JWT_SECRET_KEY", "JWT_ISSUER", "JWT_AUDIENCE",
                                      "WEALTHMACHINE_SIGNING_KEY"])

@@ -1,5 +1,7 @@
 # Implementation Instructions
 
+> **Before using this work order, read `AGENTS.md`.** WMI inherits UNIIMENTE `INTENT-0030`: **Preserve the intended effect. Do not literalize the metaphor. Search/adapt real mechanisms before inventing architecture.** This rule outranks stale architectural assumptions in this document. WMI does not own founder-intent interpretation or authority.
+
 ## SR-001 shared consumer recovery — 2026-09-08
 
 This separate draft is stacked on authentication/startup PR #33 at

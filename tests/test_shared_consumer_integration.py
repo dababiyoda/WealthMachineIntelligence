@@ -18,7 +18,12 @@ import pytest
 from adapters.bridge_transport import build_headers, H_SIGNATURE, H_PROTOCOL
 from tests.fixtures.auth import token, BRIDGE_KEY
 from tests.test_opportunity_intake import fire_packet
-from tests.test_packaged_startup import package
+from tests.test_packaged_startup import build_package
+
+
+@pytest.fixture
+def package(tmp_path):
+    return build_package(tmp_path)
 
 PRODUCER = """
 import json
