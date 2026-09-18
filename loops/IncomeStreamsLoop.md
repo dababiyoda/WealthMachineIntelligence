@@ -3,6 +3,25 @@
 ## Overview
 Systematic process for identifying, validating, and scaling digital income streams through AI-driven automation and market validation.
 
+## Regenerative infrastructure discovery lens
+
+For the infrastructure ventures Alfonso wants GREG and him to build, begin with
+recurring transactions damaged by broken proof, eligibility, routing, or
+settlement, rather than starting with a preferred product category.
+Use the [Regenerative Transaction Infrastructure doctrine](../docs/REGENERATIVE_TRANSACTION_INFRASTRUCTURE.md)
+as the single strategy reference for this lens; it does not replace the steps below.
+
+During identification, name the trapped value, buyer, authoritative external
+acceptor, broken state, routing decision, settlement event, and smallest proof
+wedge. During validation, complete the doctrine's transaction dossier, preserve
+unknowns and dissent, and obtain evidence of consequential external acceptance.
+Model output and market-size arithmetic do not satisfy this gate.
+
+MVP and expansion proposals must earn each next layer separately. Owning all
+layers is not required; use existing rails and partners where they suffice.
+These are review instructions, not a new automated evaluator. No launch, outreach,
+payment, deployment, or authority expansion is authorized by this document.
+
 ## Process Steps
 
 ### 1. Opportunity Identification

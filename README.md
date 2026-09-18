@@ -11,6 +11,17 @@ external consequences. These tests establish no founder authentication or CMC.
 ## Purpose
 A unified ontological backbone for digital business ventures that emphasizes AI integration and multi-agent orchestration. This framework provides a structured approach to identifying, launching, and scaling digital business opportunities through AI-driven processes and human expertise.
 
+## Regenerative transaction infrastructure
+
+For GREG's infrastructure-venture discovery, use the
+[Regenerative Transaction Infrastructure doctrine](docs/REGENERATIVE_TRANSACTION_INFRASTRUCTURE.md)
+through the existing [Income Streams Loop](loops/IncomeStreamsLoop.md).
+It preserves four distinct nodes: Proof / Truth, Eligibility, Default Routing,
+and Cashflow / Settlement. Start with one externally accepted proof wedge;
+expand only when participant outcomes, economics, and authority justify it.
+This is a proposal-only strategy addition, not executable screening, a new
+runtime, permission to launch, or evidence of market acceptance.
+
 ## Core Principles
 
 ### Digital-First Approach
