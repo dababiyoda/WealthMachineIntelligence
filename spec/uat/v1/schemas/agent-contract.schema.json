@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://networkmynetworth.example/spec/uat/v1/agent-contract.schema.json",
+  "title": "UAT Agent Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "agent_id",
+    "agent_class",
+    "version",
+    "owner_id",
+    "mission",
+    "venture_scope",
+    "allowed_inputs",
+    "allowed_outputs",
+    "capabilities",
+    "prohibited_actions",
+    "data_access",
+    "resource_budget",
+    "approval_rules",
+    "escalation_rules",
+    "evidence_requirements",
+    "metrics",
+    "logging_requirements",
+    "failure_policy",
+    "valid_from",
+    "expires_at",
+    "status"
+  ],
+  "properties": {
+    "contract_id": {"type": "string", "minLength": 1},
+    "agent_id": {"type": "string", "minLength": 1},
+    "agent_class": {"enum": ["parent", "venture", "worker"]},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$"},
+    "owner_id": {"type": "string", "minLength": 1},
+    "parent_agent_id": {"type": ["string", "null"]},
+    "venture_scope": {"type": ["string", "null"]},
+    "mission": {"type": "string", "minLength": 1},
+    "allowed_inputs": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "allowed_outputs": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability_id", "resource", "actions", "environment", "expires_at"],
+        "properties": {
+          "capability_id": {"type": "string"},
+          "resource": {"type": "string"},
+          "actions": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+          "environment": {"enum": ["analysis", "sandbox", "staging", "production"]},
+          "conditions": {"type": "array", "items": {"type": "string"}},
+          "expires_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "prohibited_actions": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "data_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classifications", "ventures", "fields", "egress_destinations"],
+      "properties": {
+        "classifications": {"type": "array", "items": {"enum": ["public", "internal", "confidential", "restricted", "regulated"]}, "uniqueItems": true},
+        "ventures": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "fields": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "egress_destinations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "resource_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currency_limit_minor", "token_limit", "tool_call_limit", "compute_seconds", "worker_limit", "hierarchy_depth"],
+      "properties": {
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$", "default": "USD"},
+        "currency_limit_minor": {"type": "integer", "minimum": 0},
+        "token_limit": {"type": "integer", "minimum": 0},
+        "tool_call_limit": {"type": "integer", "minimum": 0},
+        "compute_seconds": {"type": "integer", "minimum": 0},
+        "worker_limit": {"type": "integer", "minimum": 0},
+        "hierarchy_depth": {"type": "integer", "minimum": 0}
+      }
+    },
+    "approval_rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action_pattern", "risk_class", "required_approver_roles"],
+        "properties": {
+          "action_pattern": {"type": "string"},
+          "risk_class": {"enum": ["R0", "R1", "R2", "R3", "R4"]},
+          "required_approver_roles": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "minimum_approvals": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "escalation_rules": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "evidence_requirements": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "metrics": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "logging_requirements": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "failure_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["retry_limit", "on_policy_denial", "on_repeated_error", "on_security_signal", "on_budget_exhaustion"],
+      "properties": {
+        "retry_limit": {"type": "integer", "minimum": 0},
+        "on_policy_denial": {"enum": ["stop", "escalate"]},
+        "on_repeated_error": {"enum": ["pause", "quarantine", "terminate"]},
+        "on_security_signal": {"enum": ["quarantine", "terminate"]},
+        "on_budget_exhaustion": {"enum": ["stop", "escalate"]}
+      }
+    },
+    "valid_from": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["draft", "approved", "active", "paused", "revoked", "expired", "terminated"]},
+    "contract_signature_ref": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"agent_class": {"const": "worker"}}},
+      "then": {"required": ["parent_agent_id"], "properties": {"parent_agent_id": {"type": "string", "minLength": 1}}}
+    },
+    {
+      "if": {"properties": {"agent_class": {"enum": ["venture", "worker"]}}},
+      "then": {"properties": {"venture_scope": {"type": "string", "minLength": 1}}}
+    }
+  ]
+}

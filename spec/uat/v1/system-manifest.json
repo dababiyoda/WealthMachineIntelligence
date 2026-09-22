@@ -1,0 +1,27 @@
+{
+  "spec_id": "uat-enterprise-operating-system",
+  "title": "UAT Enterprise System Specification",
+  "version": "1.0.0-draft",
+  "status": "normative-design-draft",
+  "effective_date": "2026-07-18",
+  "runtime_enforced": false,
+  "authority": "The machine-readable files in this manifest and docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md define the target contract. Repository tests enforce specification integrity only until the corresponding runtime acceptance gate is passed.",
+  "files": {
+    "normative_document": "docs/UAT_ENTERPRISE_SYSTEM_SPECIFICATION.md",
+    "venture_lifecycle": "spec/uat/v1/venture-lifecycle.json",
+    "agent_charters": "spec/uat/v1/agent-charters.json",
+    "approval_matrix": "spec/uat/v1/approval-matrix.json",
+    "threat_model": "spec/uat/v1/threat-model.json",
+    "evaluation_suite": "spec/uat/v1/evaluation-suite.json",
+    "production_acceptance_gates": "spec/uat/v1/production-acceptance-gates.json",
+    "agent_contract_schema": "spec/uat/v1/schemas/agent-contract.schema.json",
+    "evidence_record_schema": "spec/uat/v1/schemas/evidence-record.schema.json",
+    "action_request_schema": "spec/uat/v1/schemas/action-request.schema.json"
+  },
+  "non_claims": [
+    "This specification does not establish that the current repository is production-grade.",
+    "This specification does not establish a venture success probability.",
+    "This specification does not authorize autonomous spending, contracting, publication, incorporation, hiring, regulated activity, or production deployment.",
+    "Passing specification-integrity tests does not prove runtime security, reliability, legal compliance, or commercial viability."
+  ]
+}
