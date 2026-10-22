@@ -95,7 +95,26 @@ No new orchestration, agent hierarchy or ML layer is warranted until the metric 
 
 Loss cap per experiment (recommended, Alfonso to set): small fixed cash ceiling and 30-day time box, so that ten failed experiments are survivable and one success pays for them.
 
-## 8. Decisions reserved to Alfonso
+## 8. All-agent workflow
+
+The eight roles run as agents in one Claude Code workflow, [`.claude/workflows/uat-income-loop.js`](../.claude/workflows/uat-income-loop.js). One run is one cycle of the Income Streams Loop and the Team Loop. Agents research, argue and draft. A deterministic governor, [`src/services/uat_governor.py`](../src/services/uat_governor.py) (tested in `tests/test_uat_governor.py`), decides. Alfonso authorizes every consequence.
+
+| Stage | Agent(s) | Output |
+|---|---|---|
+| Scout | Networking Specialist (network wedges), Venture Scout (brick-and-mortar pain), Emerging Tech Specialist (newly cheap delivery), run in parallel | Opportunities with access edge and ≥2 sources, deduplicated, network-edge first |
+| Validate | Strategic Market Trend Analyst | Fact-check, demand evidence, competitors, price anchor |
+| Red team | Three independent refuters: market, legal, people | Refutations with severity; ideas with ≥2 refutations or one critical refutation stop here |
+| Design | Product Development + Business Model + Tech Innovator | Smallest refundable priced offer, delivered manually first with existing tools |
+| Bound | Financial Strategist and Legal Counsel, in parallel | Worst-case loss, Fermi estimate, kill rules; lawfulness flags and contribution-to-ownership note |
+| Go-to-market | Brand Strategist + Networking Specialist | Draft outreach, buyer script, reciprocal partner terms, proposed actions |
+| Govern | `uat_governor.py` (no model judgment) | KILL / REWORK / HOLD_FOR_COUNSEL / GO, ranked by projected SBM per dollar of worst-case loss, plus the human decision queue |
+| Team Loop | Whole team | Decision brief: ranked GOs, decision queue, 30-day backcast, weekly SMART goal per role traced to the SBM, contribution ledger, next scouting focus |
+
+To run it in Claude Code, say "run the uat-income-loop workflow" with optional args: `{focus, network, loss_cap_usd, timebox_days, min_gross_margin, max_opportunities, out_dir, run_label}`. The richer `network` is (who you know, where they work, what they can see), the stronger the wedges. Outputs go to `runs/uat/` (git-ignored, because drafts may name real people).
+
+Authority envelope for every agent: research and drafts only. Agents never send, post, contact, purchase, sign or spend. Every real-world step comes back as a queued action requiring approval, and the governor hardcodes `execution_authority: false`.
+
+## 9. Decisions reserved to Alfonso
 
 - Whether to proceed with §7, and the loss cap per experiment.
 - Who the first two or three members are, and the contribution-to-ownership rule.
