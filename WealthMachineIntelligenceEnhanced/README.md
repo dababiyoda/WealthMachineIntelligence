@@ -1,5 +1,11 @@
 # WealthMachineIntelligence – Enhanced Edition
 
+> Experimental application generation. Owner: WMI maintainers. The root package's
+> canonical API is `../src/api/main.py`; this generation is excluded from the
+> root Docker composition. Its Keycloak adapter is benchmark evidence, not an
+> enrolled identity provider. Reconsider only after separately verified parity,
+> custody and deployment gates. Source/history remains preserved.
+
 This fork takes the original **WealthMachineIntelligence** repository and
 transforms it into production‑grade, enterprise‑ready infrastructure.  It
 introduces high‑performance caching, vector search, strong identity

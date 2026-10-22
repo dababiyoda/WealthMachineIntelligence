@@ -4,6 +4,7 @@ version = "1.0.0"
 description = "Enterprise-grade AI-driven digital business opportunity identification and scaling system"
 requires-python = ">=3.11"
 dependencies = [
+    "uniimente-kernel-boundaries @ https://github.com/dababiyoda/uniimente-kernel/archive/4999acff1a69502c05af455fbccfca380cad18ee.tar.gz",
     "alembic>=1.16.4",
     "celery>=5.5.3",
     "fastapi>=0.116.1",

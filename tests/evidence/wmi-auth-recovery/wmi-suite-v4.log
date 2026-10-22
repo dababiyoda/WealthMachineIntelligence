@@ -1,0 +1,53 @@
+........................................................................ [ 60%]
+................................................                         [100%]
+=============================== warnings summary ===============================
+../../wmi-test-deps/fastapi/testclient.py:1
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../wmi-test-deps/starlette/testclient.py:53
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+src/database/models.py:13
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/database/models.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+src/api/routes/agents.py:20
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/agents.py:20: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AgentResponse(BaseModel):
+
+src/api/routes/analytics.py:249
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/analytics.py:249: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    metric: str = Query("revenue", regex="^(revenue|growth|roi|automation)$"),
+
+src/api/routes/ventures.py:39
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/ventures.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VentureResponse(VentureBase):
+
+tests/test_adversarial_underwriting.py: 24 warnings
+tests/test_network_my_networth.py: 16 warnings
+tests/test_opportunity_intake.py: 104 warnings
+tests/test_orchestrator_loops.py: 16 warnings
+tests/test_signed_bridge.py: 80 warnings
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/services/orchestrator.py:73: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    time_bound=datetime.utcnow() + timedelta(days=90),
+
+tests/test_adversarial_underwriting.py: 24 warnings
+tests/test_network_my_networth.py: 24 warnings
+tests/test_opportunity_intake.py: 88 warnings
+tests/test_orchestrator_loops.py: 16 warnings
+tests/test_signed_bridge.py: 24 warnings
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/core/performance.py:123: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "timestamp": datetime.utcnow().isoformat(),
+
+tests/test_opportunity_intake.py::test_intake_endpoint_rejects_bad_packet
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/opportunities.py:103: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return await _evaluate(request)
+
+tests/test_signed_bridge.py::test_malformed_body_is_422_not_500
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/opportunities.py:79: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    payload, transport = await _verified_payload(request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+120 passed, 424 warnings in 5.25s

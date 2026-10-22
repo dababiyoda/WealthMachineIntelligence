@@ -72,6 +72,8 @@ def validate_packet_wire(payload: Dict[str, Any]) -> Dict[str, Any]:
     and echoed back in drafts for human review — never interpreted as an
     instruction to this system.
     """
+    from adapters.contract_validation import validate_contract
+    validate_contract(payload, 'wire-opportunity-packet')
     if not isinstance(payload, dict):
         raise ValueError("opportunity packet payload must be an object")
 
@@ -126,6 +128,8 @@ def validate_packet_wire(payload: Dict[str, Any]) -> Dict[str, Any]:
 def validate_assessment_wire(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Validate an outbound VentureAssessment payload (mirror of the check
     DALEOBANKS runs on receipt, so contract breaks surface here first)."""
+    from adapters.contract_validation import validate_contract
+    validate_contract(payload, 'wire-venture-assessment')
     if not isinstance(payload, dict):
         raise ValueError("assessment payload must be an object")
     if payload.get("go_no_go") not in ALLOWED_GO_NO_GO:

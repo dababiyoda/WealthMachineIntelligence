@@ -1,0 +1,26 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_real_producer_consumer_restart_and_negative_controls ___________
+tests/test_shared_consumer_integration.py:85: in test_real_producer_consumer_restart_and_negative_controls
+    process = start()
+              ^^^^^^^
+tests/test_shared_consumer_integration.py:83: in start
+    pytest.fail('packaged consumer startup timeout')
+E   Failed: packaged consumer startup timeout
+=============================== warnings summary ===============================
+../../wmi-test-deps/fastapi/testclient.py:1
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../wmi-test-deps/starlette/testclient.py:53
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+src/database/models.py:13
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-shared-recovery/src/database/models.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_shared_consumer_integration.py::test_real_producer_consumer_restart_and_negative_controls
+1 failed, 3 warnings in 6.27s

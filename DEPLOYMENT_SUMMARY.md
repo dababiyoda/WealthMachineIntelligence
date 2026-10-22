@@ -1,5 +1,11 @@
 # WealthMachine Enterprise - Deployment Summary
 
+> HISTORICAL / UNVERIFIED GENERATION. Claims and demo commands below are retained
+> as negative evidence, not current readiness or working instructions.
+> The 2026-09-07 repair disables demo login, selects `src.api.main:app`, and is
+> draft-only. Current evidence: [Instructions.md](Instructions.md).
+> Owner: WMI maintainers. No deployment or real-world result is established here.
+
 ## 🚀 **SYSTEM STATUS: PRODUCTION READY**
 
 Your enterprise-grade WealthMachine system is now **FULLY OPERATIONAL** with all core components deployed and running.

@@ -1,0 +1,112 @@
+........................................................................ [ 62%]
+..........FFFFF...........F...FF..FF.......                              [100%]
+=================================== FAILURES ===================================
+_______________________ test_intake_endpoint_round_trip ________________________
+tests/test_opportunity_intake.py:197: in test_intake_endpoint_round_trip
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________________ test_evaluate_endpoint_alias _________________________
+tests/test_opportunity_intake.py:212: in test_evaluate_endpoint_alias
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+___________________ test_intake_endpoint_rejects_bad_packet ____________________
+tests/test_opportunity_intake.py:220: in test_intake_endpoint_rejects_bad_packet
+    assert response.status_code == 422
+E   assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_________________ test_intake_endpoint_missing_assessment_404s _________________
+tests/test_opportunity_intake.py:224: in test_intake_endpoint_missing_assessment_404s
+    assert client.get("/api/ventures/unknown-id/assessment").status_code == 404
+E   AssertionError: assert 401 == 404
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+E    +    where <Response [401 Unauthorized]> = get('/api/ventures/unknown-id/assessment')
+E    +      where get = <starlette.testclient.TestClient object at 0x7fdf8f1439b0>.get
+__________________ test_intake_token_enforced_when_configured __________________
+tests/test_opportunity_intake.py:240: in test_intake_token_enforced_when_configured
+    assert allowed.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+__________ test_valid_signed_request_succeeds_and_response_is_signed ___________
+tests/test_signed_bridge.py:57: in test_valid_signed_request_succeeds_and_response_is_signed
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ test_reused_nonce_is_replay_rejected _____________________
+tests/test_signed_bridge.py:89: in test_reused_nonce_is_replay_rejected
+    assert client.post("/api/opportunities/intake", content=body,
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+E    +    where <Response [401 Unauthorized]> = post('/api/opportunities/intake', content=b'{"id": "sb-replay", "source": "daleobanks", "source_ref": "idea-1", "signal_type": "operator_thought", "observed_pai..., "confidence": 0.55, "created_at": "2026-09-07T09:53:47.210072+00:00", "status": "approved", "schema_version": "1.0"}', headers={'X-Service-Identity': 'daleobanks', 'X-Timestamp': '1788774827', 'X-Nonce': 'nonce-fixed', 'X-Idempotency-Key': 'idem-r1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdf8f082660>.post
+____________ test_duplicate_idempotency_key_returns_same_assessment ____________
+tests/test_signed_bridge.py:102: in test_duplicate_idempotency_key_returns_same_assessment
+    assert first.status_code == second.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+_____________________ test_unsigned_allowed_in_local_mode ______________________
+tests/test_signed_bridge.py:126: in test_unsigned_allowed_in_local_mode
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+______________________ test_malformed_body_is_422_not_500 ______________________
+tests/test_signed_bridge.py:133: in test_malformed_body_is_422_not_500
+    assert client.post("/api/opportunities/intake", content=body,
+E   AssertionError: assert 401 == 422
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+E    +    where <Response [401 Unauthorized]> = post('/api/opportunities/intake', content=b'not json at all', headers={'X-Service-Identity': 'daleobanks', 'X-Timestamp': '1788774827', 'X-Nonce': 'nonce-1788774827311343610', 'X-Idempotency-Key': 'idem-1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdf92e0a0c0>.post
+=============================== warnings summary ===============================
+../../wmi-test-deps/fastapi/testclient.py:1
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../wmi-test-deps/starlette/testclient.py:53
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+src/database/models.py:13
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/database/models.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+src/api/routes/ventures.py:39
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/ventures.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VentureResponse(VentureBase):
+
+src/api/routes/agents.py:20
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/agents.py:20: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AgentResponse(BaseModel):
+
+src/api/routes/analytics.py:249
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/api/routes/analytics.py:249: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    metric: str = Query("revenue", regex="^(revenue|growth|roi|automation)$"),
+
+tests/test_adversarial_underwriting.py: 24 warnings
+tests/test_network_my_networth.py: 16 warnings
+tests/test_opportunity_intake.py: 104 warnings
+tests/test_orchestrator_loops.py: 16 warnings
+tests/test_signed_bridge.py: 80 warnings
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/services/orchestrator.py:73: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    time_bound=datetime.utcnow() + timedelta(days=90),
+
+tests/test_adversarial_underwriting.py: 24 warnings
+tests/test_network_my_networth.py: 24 warnings
+tests/test_opportunity_intake.py: 64 warnings
+tests/test_orchestrator_loops.py: 16 warnings
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-integration-recovery/src/core/performance.py:123: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "timestamp": datetime.utcnow().isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_opportunity_intake.py::test_intake_endpoint_round_trip - as...
+FAILED tests/test_opportunity_intake.py::test_evaluate_endpoint_alias - asser...
+FAILED tests/test_opportunity_intake.py::test_intake_endpoint_rejects_bad_packet
+FAILED tests/test_opportunity_intake.py::test_intake_endpoint_missing_assessment_404s
+FAILED tests/test_opportunity_intake.py::test_intake_token_enforced_when_configured
+FAILED tests/test_signed_bridge.py::test_valid_signed_request_succeeds_and_response_is_signed
+FAILED tests/test_signed_bridge.py::test_reused_nonce_is_replay_rejected - as...
+FAILED tests/test_signed_bridge.py::test_duplicate_idempotency_key_returns_same_assessment
+FAILED tests/test_signed_bridge.py::test_unsigned_allowed_in_local_mode - ass...
+FAILED tests/test_signed_bridge.py::test_malformed_body_is_422_not_500 - Asse...
+10 failed, 105 passed, 374 warnings in 1.72s

@@ -1,5 +1,13 @@
 # WealthMachineOntology_DigitalAI
 
+## Current integration boundary
+
+Draft development candidate, not production authorization. Canonical ASGI owner:
+`src.api.main:app`; `main:app` is only a compatibility re-export.
+See [Instructions.md](Instructions.md) for ownership, inspected PRs, negative
+evidence, rollback and handoff. Kernel alone owns institutional authority and
+external consequences. These tests establish no founder authentication or CMC.
+
 ## Purpose
 A unified ontological backbone for digital business ventures that emphasizes AI integration and multi-agent orchestration. This framework provides a structured approach to identifying, launching, and scaling digital business opportunities through AI-driven processes and human expertise.
 
@@ -112,7 +120,7 @@ python main.py
 Or start it with Uvicorn:
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 5000
+uvicorn src.api.main:app --host 0.0.0.0 --port 5000
 ```
 
 ### Run the test suite
@@ -150,10 +158,16 @@ Hardcoded guardrails: every assessment carries
 `requires_human_approval: true`; packets with legal risk flags are killed
 and escalated to the operator; finance-flagged packets always require legal
 review and stay educational (no revenue promises, no personalized advice).
-The endpoints run locally with zero credentials; set
-`WEALTHMACHINE_INTAKE_TOKEN` to require a shared bearer token in
-deployment. On the DALEOBANKS side, point `WEALTHMACHINE_URL` at this
-server to switch its bridge from mock to HTTP mode.
+Every bridge route requires a JWT verified with explicit `JWT_SECRET_KEY`
+(32+ characters), `JWT_ISSUER`, and `JWT_AUDIENCE`. POST also requires existing
+HMAC body headers and `WEALTHMACHINE_SIGNING_KEY`. Missing configuration prevents
+startup; flags cannot enable unsigned or demo HTTP admission.
+`WEALTHMACHINE_INTAKE_TOKEN` no longer substitutes for JWT authentication.
+This intentionally breaks permissive callers: DALEOBANKS migration must pass the
+shared-interface gate before activation. No real credentials, login endpoint or
+token issuer are provided. Synthetic fixtures are excluded from the image.
+Symmetric signatures prove key possession, not isolated workload identity,
+founder authentication, or permission to produce consequences.
 
 ## Future Development
 - Expansion of ontology with domain-specific extensions

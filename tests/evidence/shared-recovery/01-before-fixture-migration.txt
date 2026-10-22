@@ -1,0 +1,251 @@
+........................................................................ [ 57%]
+.FF...........F.FFFFF..FFFFF.........FFFFFFFFFF.......                   [100%]
+=================================== FAILURES ===================================
+________ TestAdapter.test_wire_to_kernel_roundtrip_preserves_semantics _________
+../../kernel-boundary-deps/adapters/daleobanks_opportunity.py:109: in _validate_wire
+    validate_contract(wire, 'wire-opportunity-packet')
+../../kernel-boundary-deps/adapters/contract_validation.py:45: in validate_contract
+    raise ValueError(f'{name}: {errors[0].message}')
+E   ValueError: wire-opportunity-packet: 'schema_version' is a required property
+
+The above exception was the direct cause of the following exception:
+tests/test_kernel_contract_parity.py:136: in test_wire_to_kernel_roundtrip_preserves_semantics
+    kernel = kc.wire_packet_to_kernel(wire, enrichment=enrichment)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../kernel-boundary-deps/adapters/daleobanks_opportunity.py:204: in enrich
+    _validate_wire(wire)
+../../kernel-boundary-deps/adapters/daleobanks_opportunity.py:111: in _validate_wire
+    raise AdapterError(str(exc)) from exc
+E   adapters.daleobanks_opportunity.AdapterError: wire-opportunity-packet: 'schema_version' is a required property
+________ TestAdapter.test_assessment_translation_preserves_constitution ________
+tests/test_kernel_contract_parity.py:145: in test_assessment_translation_preserves_constitution
+    wire = kc.kernel_assessment_to_wire(_kernel_assessment(verdict="go"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../kernel-boundary-deps/adapters/wealthmachine_assessment.py:142: in to_wire
+    raise AdapterError('canonical-to-wire assessment lacks original stance/severity metadata')
+E   adapters.daleobanks_opportunity.AdapterError: canonical-to-wire assessment lacks original stance/severity metadata
+_______________ test_requires_human_approval_cannot_be_disabled ________________
+tests/test_opportunity_intake.py:175: in test_requires_human_approval_cannot_be_disabled
+    assessment = service.evaluate_packet(sneaky)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/services/opportunity_intake.py:101: in evaluate_packet
+    packet = validate_packet_wire(payload)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/services/venture_protocol.py:76: in validate_packet_wire
+    validate_contract(payload, 'wire-opportunity-packet')
+../../kernel-boundary-deps/adapters/contract_validation.py:45: in validate_contract
+    raise ValueError(f'{name}: {errors[0].message}')
+E   ValueError: wire-opportunity-packet: Additional properties are not allowed ('requires_human_approval' was unexpected)
+_______________________ test_intake_endpoint_round_trip ________________________
+tests/test_opportunity_intake.py:199: in test_intake_endpoint_round_trip
+    assert response.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+_________________________ test_evaluate_endpoint_alias _________________________
+tests/test_opportunity_intake.py:214: in test_evaluate_endpoint_alias
+    assert response.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+___________________ test_intake_endpoint_rejects_bad_packet ____________________
+tests/test_opportunity_intake.py:222: in test_intake_endpoint_rejects_bad_packet
+    assert response.status_code == 422
+E   assert 503 == 422
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+_________________ test_intake_endpoint_missing_assessment_404s _________________
+tests/test_opportunity_intake.py:226: in test_intake_endpoint_missing_assessment_404s
+    assert client.get("/api/ventures/unknown-id/assessment").status_code == 404
+E   AssertionError: assert 503 == 404
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = get('/api/ventures/unknown-id/assessment')
+E    +      where get = <tests.fixtures.auth.SyntheticBridgeClient object at 0x7fdd5e4b7200>.get
+_________________ test_static_intake_token_cannot_replace_jwt __________________
+tests/test_opportunity_intake.py:245: in test_static_intake_token_cannot_replace_jwt
+    assert SyntheticBridgeClient(app).post(
+E   AssertionError: assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', json={'id': 'packet-signed', 'source': 'daleobanks', 'source_ref': 'idea-1', 'signal_type': 'operator_thought', ...})
+E    +      where post = <tests.fixtures.auth.SyntheticBridgeClient object at 0x7fdd5e44fd10>.post
+E    +        where <tests.fixtures.auth.SyntheticBridgeClient object at 0x7fdd5e44fd10> = SyntheticBridgeClient(<fastapi.applications.FastAPI object at 0x7fdd5f109940>)
+E    +      and   {'id': 'packet-signed', 'source': 'daleobanks', 'source_ref': 'idea-1', 'signal_type': 'operator_thought', ...} = fire_packet(id='packet-signed')
+_________ test_packaged_startup_refuses_missing_config[JWT_SECRET_KEY] _________
+tests/test_packaged_startup.py:59: in test_packaged_startup_refuses_missing_config
+    result = subprocess.run(command, cwd=directory, env=environment,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1955: in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+E   FileNotFoundError: [Errno 2] No such file or directory: 'uvicorn'
+___________ test_packaged_startup_refuses_missing_config[JWT_ISSUER] ___________
+tests/test_packaged_startup.py:59: in test_packaged_startup_refuses_missing_config
+    result = subprocess.run(command, cwd=directory, env=environment,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1955: in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+E   FileNotFoundError: [Errno 2] No such file or directory: 'uvicorn'
+__________ test_packaged_startup_refuses_missing_config[JWT_AUDIENCE] __________
+tests/test_packaged_startup.py:59: in test_packaged_startup_refuses_missing_config
+    result = subprocess.run(command, cwd=directory, env=environment,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1955: in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+E   FileNotFoundError: [Errno 2] No such file or directory: 'uvicorn'
+___ test_packaged_startup_refuses_missing_config[WEALTHMACHINE_SIGNING_KEY] ____
+tests/test_packaged_startup.py:59: in test_packaged_startup_refuses_missing_config
+    result = subprocess.run(command, cwd=directory, env=environment,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1955: in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+E   FileNotFoundError: [Errno 2] No such file or directory: 'uvicorn'
+_________________ test_exact_packaged_command_protected_bridge _________________
+tests/test_packaged_startup.py:72: in test_exact_packaged_command_protected_bridge
+    process = subprocess.Popen(command, cwd=directory, env=environment,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1955: in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+E   FileNotFoundError: [Errno 2] No such file or directory: 'uvicorn'
+__________ test_valid_signed_request_succeeds_and_response_is_signed ___________
+tests/test_signed_bridge.py:59: in test_valid_signed_request_succeeds_and_response_is_signed
+    assert response.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+_____________________ test_invalid_signature_fails_closed ______________________
+tests/test_signed_bridge.py:69: in test_invalid_signature_fails_closed
+    assert client.post("/api/opportunities/intake", content=body,
+E   assert 503 == 401
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', content=b'{"id": "sb-badsig", "source": "daleobanks", "source_ref": "idea-1", "signal_type": "operator_thought", "observed_pai..., "confidence": 0.55, "created_at": "2026-09-08T02:26:00.174167+00:00", "status": "approved", "schema_version": "1.0"}', headers={'X-Service-Identity': 'daleobanks', 'X-Timestamp': '1788834360', 'X-Nonce': 'nonce-1788834360174190723', 'X-Idempotency-Key': 'idem-1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdd5e44dc10>.post
+__________________ test_unknown_service_identity_fails_closed __________________
+tests/test_signed_bridge.py:76: in test_unknown_service_identity_fails_closed
+    assert client.post("/api/opportunities/intake", content=body,
+E   assert 503 == 401
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', content=b'{"id": "sb-unknown", "source": "daleobanks", "source_ref": "idea-1", "signal_type": "operator_thought", "observed_pa..., "confidence": 0.55, "created_at": "2026-09-08T02:26:00.178675+00:00", "status": "approved", "schema_version": "1.0"}', headers={'X-Service-Identity': 'mallory', 'X-Timestamp': '1788834360', 'X-Nonce': 'nonce-1788834360178696036', 'X-Idempotency-Key': 'idem-1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdd5e44fbc0>.post
+_____________________ test_expired_timestamp_fails_closed ______________________
+tests/test_signed_bridge.py:84: in test_expired_timestamp_fails_closed
+    assert client.post("/api/opportunities/intake", content=body,
+E   assert 503 == 401
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', content=b'{"id": "sb-stale", "source": "daleobanks", "source_ref": "idea-1", "signal_type": "operator_thought", "observed_pain..., "confidence": 0.55, "created_at": "2026-09-08T02:26:00.183588+00:00", "status": "approved", "schema_version": "1.0"}', headers={'X-Service-Identity': 'daleobanks', 'X-Timestamp': '1788830760', 'X-Nonce': 'nonce-1788834360183609014', 'X-Idempotency-Key': 'idem-1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdd5e4debd0>.post
+_____________________ test_reused_nonce_is_replay_rejected _____________________
+tests/test_signed_bridge.py:91: in test_reused_nonce_is_replay_rejected
+    assert client.post("/api/opportunities/intake", content=body,
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', content=b'{"id": "sb-replay", "source": "daleobanks", "source_ref": "idea-1", "signal_type": "operator_thought", "observed_pai..., "confidence": 0.55, "created_at": "2026-09-08T02:26:00.188247+00:00", "status": "approved", "schema_version": "1.0"}', headers={'X-Service-Identity': 'daleobanks', 'X-Timestamp': '1788834360', 'X-Nonce': 'nonce-fixed', 'X-Idempotency-Key': 'idem-r1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdd5e4dc530>.post
+____________ test_duplicate_idempotency_key_returns_same_assessment ____________
+tests/test_signed_bridge.py:104: in test_duplicate_idempotency_key_returns_same_assessment
+    assert first.status_code == second.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+______________________ test_schema_downgrade_is_rejected _______________________
+tests/test_signed_bridge.py:111: in test_schema_downgrade_is_rejected
+    assert client.post("/api/opportunities/intake", content=body,
+E   assert 503 == 401
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', content=b'{"id": "sb-downgrade", "source": "daleobanks", "source_ref": "idea-1", "signal_type": "operator_thought", "observed_..., "confidence": 0.55, "created_at": "2026-09-08T02:26:00.199144+00:00", "status": "approved", "schema_version": "1.0"}', headers={'X-Service-Identity': 'daleobanks', 'X-Timestamp': '1788834360', 'X-Nonce': 'nonce-1788834360199163710', 'X-Idempotency-Key': 'idem-1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdd5e332720>.post
+______________ test_unsigned_request_rejected_when_key_configured ______________
+tests/test_signed_bridge.py:117: in test_unsigned_request_rejected_when_key_configured
+    assert client.post("/api/opportunities/intake", content=body,
+E   assert 503 == 401
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', content=b'{"id": "sb-unsigned", "source": "daleobanks", "source_ref": "idea-1", "signal_type": "operator_thought", "observed_p..., "confidence": 0.55, "created_at": "2026-09-08T02:26:00.203700+00:00", "status": "approved", "schema_version": "1.0"}', headers={'Content-Type': 'application/json'})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdd5e3328d0>.post
+__________________ test_unsigned_rejected_even_in_local_mode ___________________
+tests/test_signed_bridge.py:129: in test_unsigned_rejected_even_in_local_mode
+    assert response.status_code == 401
+E   assert 503 == 401
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+______________________ test_malformed_body_is_422_not_500 ______________________
+tests/test_signed_bridge.py:136: in test_malformed_body_is_422_not_500
+    assert client.post("/api/opportunities/intake", content=body,
+E   AssertionError: assert 503 == 422
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+E    +    where <Response [503 Service Unavailable]> = post('/api/opportunities/intake', content=b'not json at all', headers={'X-Service-Identity': 'daleobanks', 'X-Timestamp': '1788834360', 'X-Nonce': 'nonce-1788834360212198301', 'X-Idempotency-Key': 'idem-1', ...})
+E    +      where post = <starlette.testclient.TestClient object at 0x7fdd5e59d8b0>.post
+=============================== warnings summary ===============================
+../../wmi-test-deps/fastapi/testclient.py:1
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../wmi-test-deps/starlette/testclient.py:53
+  /workspace/scratch/c1c408c41c36/tmp/wmi-test-deps/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+src/database/models.py:13
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-shared-recovery/src/database/models.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+src/api/routes/agents.py:20
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-shared-recovery/src/api/routes/agents.py:20: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AgentResponse(BaseModel):
+
+src/api/routes/analytics.py:249
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-shared-recovery/src/api/routes/analytics.py:249: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    metric: str = Query("revenue", regex="^(revenue|growth|roi|automation)$"),
+
+src/api/routes/ventures.py:39
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-shared-recovery/src/api/routes/ventures.py:39: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VentureResponse(VentureBase):
+
+tests/test_adversarial_underwriting.py: 24 warnings
+tests/test_network_my_networth.py: 16 warnings
+tests/test_opportunity_intake.py: 104 warnings
+tests/test_orchestrator_loops.py: 16 warnings
+tests/test_signed_bridge.py: 80 warnings
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-shared-recovery/src/services/orchestrator.py:73: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    time_bound=datetime.utcnow() + timedelta(days=90),
+
+tests/test_adversarial_underwriting.py: 24 warnings
+tests/test_network_my_networth.py: 24 warnings
+tests/test_opportunity_intake.py: 56 warnings
+tests/test_orchestrator_loops.py: 16 warnings
+  /workspace/scratch/c1c408c41c36/tmp/repos/wmi-shared-recovery/src/core/performance.py:123: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "timestamp": datetime.utcnow().isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_kernel_contract_parity.py::TestAdapter::test_wire_to_kernel_roundtrip_preserves_semantics
+FAILED tests/test_kernel_contract_parity.py::TestAdapter::test_assessment_translation_preserves_constitution
+FAILED tests/test_opportunity_intake.py::test_requires_human_approval_cannot_be_disabled
+FAILED tests/test_opportunity_intake.py::test_intake_endpoint_round_trip - as...
+FAILED tests/test_opportunity_intake.py::test_evaluate_endpoint_alias - asser...
+FAILED tests/test_opportunity_intake.py::test_intake_endpoint_rejects_bad_packet
+FAILED tests/test_opportunity_intake.py::test_intake_endpoint_missing_assessment_404s
+FAILED tests/test_opportunity_intake.py::test_static_intake_token_cannot_replace_jwt
+FAILED tests/test_packaged_startup.py::test_packaged_startup_refuses_missing_config[JWT_SECRET_KEY]
+FAILED tests/test_packaged_startup.py::test_packaged_startup_refuses_missing_config[JWT_ISSUER]
+FAILED tests/test_packaged_startup.py::test_packaged_startup_refuses_missing_config[JWT_AUDIENCE]
+FAILED tests/test_packaged_startup.py::test_packaged_startup_refuses_missing_config[WEALTHMACHINE_SIGNING_KEY]
+FAILED tests/test_packaged_startup.py::test_exact_packaged_command_protected_bridge
+FAILED tests/test_signed_bridge.py::test_valid_signed_request_succeeds_and_response_is_signed
+FAILED tests/test_signed_bridge.py::test_invalid_signature_fails_closed - ass...
+FAILED tests/test_signed_bridge.py::test_unknown_service_identity_fails_closed
+FAILED tests/test_signed_bridge.py::test_expired_timestamp_fails_closed - ass...
+FAILED tests/test_signed_bridge.py::test_reused_nonce_is_replay_rejected - as...
+FAILED tests/test_signed_bridge.py::test_duplicate_idempotency_key_returns_same_assessment
+FAILED tests/test_signed_bridge.py::test_schema_downgrade_is_rejected - asser...
+FAILED tests/test_signed_bridge.py::test_unsigned_request_rejected_when_key_configured
+FAILED tests/test_signed_bridge.py::test_unsigned_rejected_even_in_local_mode
+FAILED tests/test_signed_bridge.py::test_malformed_body_is_422_not_500 - Asse...
+23 failed, 103 passed, 366 warnings in 1.66s
