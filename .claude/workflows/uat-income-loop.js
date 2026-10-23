@@ -124,10 +124,11 @@ const LEGAL_SCHEMA = {
         properties: {
           issue: { type: 'string' },
           blocking: { type: 'boolean', description: 'true if the first sale cannot lawfully happen until resolved' },
+          scope: { type: 'string', enum: ['venture', 'institution'], description: "'institution' = company-level setup Alfonso does once for every venture (business licence/DBA, CAN-SPAM sender identity, payment account); 'venture' = specific to this offer" },
           requires_counsel: { type: 'boolean' },
           source_url: { type: 'string' },
         },
-        required: ['issue', 'blocking', 'requires_counsel'],
+        required: ['issue', 'blocking', 'requires_counsel', 'scope'],
       },
     },
     member_terms_note: { type: 'string', description: 'how contribution becomes ownership for this venture' },
@@ -164,6 +165,7 @@ const brief = o => `Opportunity "${o.name}": ${o.one_liner}\nBuyer: ${o.buyer}\n
 
 // ---------------------------------------------------------------- Scout
 phase('Scout')
+const SEEDS = Array.isArray(A.opportunities) ? A.opportunities : null
 const LENSES = [
   { key: 'network', role: 'Concord (Customer Access, Sales and Partnerships), scouting with Prometheus',
     ask: `Mine the network for wedges. Network description: ${NETWORK}. Find recurring paid problems that people in this network can see from the inside (their employers, trades, customers, communities), where their trusted access is the edge.` },
@@ -172,7 +174,7 @@ const LENSES = [
   { key: 'tech', role: 'Prometheus (Opportunity Discovery), emerging-technology lens',
     ask: 'Find tasks that recently became cheap to deliver because of AI or new tools, where buyers still pay incumbent prices. The tool is commodity; the edge must be access, trust or execution.' },
 ]
-const scouted = await parallel(LENSES.map(l => () => agent(
+const scouted = SEEDS ? [{ opportunities: SEEDS }] : await parallel(LENSES.map(l => () => agent(
   `${AUTHORITY}\n\nROLE: ${l.role}.\nFOCUS: ${FOCUS}\nTASK: ${l.ask}\nReturn 3-5 opportunities, each with at least 2 independent source URLs. Mark network_edge true only when the access is real and stated.`,
   { label: `scout:${l.key}`, phase: 'Scout', schema: SCOUT_SCHEMA })))
 
@@ -226,7 +228,7 @@ const dossiers = await pipeline(
       `${AUTHORITY}\n\nROLE: Aurelius (Economic Truth and Capital Continuity). Bound the downside. Loss cap per experiment: $${POLICY.loss_cap_usd}. Estimate worst-case cash loss and paid commitments from 10 buyer conversations (Fermi, with anchors). Write kill rules. Phase 1 needs no outside capital.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nAnalyst: ${JSON.stringify(s.analyst)}`,
       { label: `finance:${s.o.name}`, phase: 'Validate', schema: FINANCE_SCHEMA }),
     () => agent(
-      `${AUTHORITY}\n\nROLE: Aegis (Permissions, Risk and Resilience); issue-spotter, not a lawyer. List what must be true for the first sale to be lawful, and how member contribution should become ownership. Mark blocking only when the first sale cannot lawfully happen until resolved.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nRed team legal: ${JSON.stringify(s.red.filter(r => r.lens === 'legal'))}`,
+      `${AUTHORITY}\n\nROLE: Aegis (Permissions, Risk and Resilience); issue-spotter, not a lawyer. List what must be true for the first sale to be lawful, and how member contribution should become ownership. Mark blocking only when the first sale cannot lawfully happen until resolved. Set scope 'institution' for company-level setup owed once across all ventures (business licence/DBA, CAN-SPAM sender identity, payment account); 'venture' for anything specific to this offer.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nRed team legal: ${JSON.stringify(s.red.filter(r => r.lens === 'legal'))}`,
       { label: `legal:${s.o.name}`, phase: 'Validate', schema: LEGAL_SCHEMA }),
   ]).then(([finance, legal]) => ({ ...s, finance, legal })),
   // Brand Strategist + Networking Specialist: drafts and proposed actions.

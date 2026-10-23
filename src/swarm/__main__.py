@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from src.services.uat_governor import govern
 from src.services.uat_store import UATStore
 
+from .railscout import handoff
 from .runtime import BudgetExceeded, RuntimeConfig, SwarmPaused, SwarmRuntime, _slug
 
 
@@ -53,7 +54,9 @@ def _write_brief(run: str, gov: dict, full: list, out_dir: str) -> str:
                   + (f" at ${offer['price_usd']:,.0f}, margin {d['gross_margin']:.0%}" if offer else ""),
                   f"- Projected net 30d: ${d['projected_net_30d_usd']:,.0f}",
                   "- Reasons:"] + [f"  - {r}" for r in d["reasons"]] + [""]
-    lines += ["## Human decision queue", ""]
+    lines += ["## Founder prerequisites (once, before any send or charge)", ""]
+    lines += [f"- {p}" for p in gov.get("founder_prerequisites", [])] or ["- (none flagged)"]
+    lines += ["", "## Human decision queue", ""]
     lines += [f"- [{q['type']}] {q['opportunity']}: {q['description']}"
               for q in gov["human_decision_queue"]] or ["- (empty)"]
     path = os.path.join(out_dir, f"{run}-brief.md")
@@ -94,7 +97,10 @@ def _ingest(store: UATStore, path: str, out_dir: str = "runs/uat") -> dict:
                       "rationale": "; ".join(verdict["reasons"])})
         added.append({"mission_id": mission_id, "decision": verdict["decision_verb"]})
     brief = _write_brief(run, gov, full, out_dir)
+    kept = handoff(run, gov, dossier, full, out_dir, now)      # keep every non-GO idea
     return {"ingested": added, "counts": gov["counts"], "brief_path": brief,
+            "railscout_outbox": kept["outbox"], "kept_ideas": len(kept["kept"]),
+            "founder_prerequisites": gov.get("founder_prerequisites", []),
             "execution_authority": False}
 
 

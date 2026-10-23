@@ -124,9 +124,26 @@ def test_ingest_workflow_dossier(tmp_path):
     out = _ingest(store, str(path), str(tmp_path / "out"))
     assert out["ingested"] == [{"mission_id": "live-run:x", "decision": "VALIDATE"}]
     assert "VALIDATE" in open(out["brief_path"]).read()
+    assert out["kept_ideas"] == 0                               # GO ideas are not handed off
     assert _ingest(store, str(path), str(tmp_path / "out"))["ingested"] == []   # idempotent
     handoff = tmp_path / "wf-output.json"                      # workflow output file shape
     handoff.write_text(json.dumps({"summary": "s", "result": {"run_label": "wf", "dossier": dossier,
                                                                 "full": []}}))
     assert _ingest(store, str(handoff), str(tmp_path / "out"))["ingested"][0]["mission_id"] == "wf:x"
     assert _slug("A b!") == "a-b"
+
+
+def test_non_go_ideas_kept_for_railscout(tmp_path):
+    from src.swarm.railscout import handoff
+    dossier = {"opportunities": [{"name": "dead", "evidence": SRC}]}
+    gov = {"decisions": [{"name": "dead", "decision": "KILL", "decision_verb": "KILL",
+                          "reasons": ["red team refuted 2 lenses"]}]}
+    full = [{"name": "dead", "scout": {"buyer": "clinics", "recurring_paid_problem": "p"},
+             "red": [{"refuted": True, "argument": "cheap substitutes"}]}]
+    out = handoff("r1", gov, dossier, full, str(tmp_path))
+    assert len(out["kept"]) == 1
+    req = json.loads(open(out["kept"][0]["path"]).read())
+    assert req["packet"]["created_by"].startswith("spiffe://uniimente.internal/")
+    assert req["packet"]["evidence_refs"][0].startswith("sha256:")
+    again = handoff("r1", gov, dossier, full, str(tmp_path))
+    assert again["kept"][0]["packet_id"] == out["kept"][0]["packet_id"]   # idempotent

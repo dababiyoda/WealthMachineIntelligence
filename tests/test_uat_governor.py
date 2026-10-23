@@ -77,6 +77,13 @@ class TestGates:
         legal = {"flags": [{"issue": "contractor license required", "blocking": True}]}
         assert _decide(legal=legal)["decision"] == HOLD
 
+    def test_institution_prerequisite_listed_once_not_held(self):
+        legal = {"flags": [{"issue": "local business licence", "blocking": True,
+                            "scope": "institution"}]}
+        out = govern({"opportunities": [_opp(name="a", legal=legal), _opp(name="b", legal=legal)]})
+        assert [d["decision"] for d in out["decisions"]] == [GO, GO]
+        assert out["founder_prerequisites"] == ["local business licence"]
+
     def test_passive_capital_always_holds(self):
         acts = [{"type": "raise_capital", "description": "friends and family round"}]
         d = _decide(actions=acts)

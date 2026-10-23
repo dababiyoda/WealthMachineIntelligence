@@ -52,7 +52,8 @@ FINANCE = _obj({"max_loss_usd": _NUM, "expected_paid_commitments_14d": _NUM, "fe
                 "kill_rules": {"type": "array", "items": _STR}})
 
 LEGAL = _obj({"flags": {"type": "array", "items": _obj({
-    "issue": _STR, "blocking": _BOOL, "requires_counsel": _BOOL, "source_url": _STR})},
+    "issue": _STR, "blocking": _BOOL, "requires_counsel": _BOOL, "source_url": _STR,
+    "scope": {"type": "string", "enum": ["venture", "institution"]}})},
     "notes": _STR})
 
 GTM = _obj({"buyer_profile": _STR, "positioning": _STR,
@@ -92,7 +93,10 @@ STAGES = {
                 "expected from 10 buyer conversations (Fermi, anchored), kill rules.", FINANCE, False),
     "legal": ("Aegis", "Permissions, Risk and Resilience",
               "List what must be true for the first sale to be lawful. blocking=true only when the "
-              "first sale cannot lawfully happen until resolved. Use source_url '' if none.",
+              "first sale cannot lawfully happen until resolved. Use source_url '' if none. "
+              "scope='institution' for company-level setup owed once across all ventures "
+              "(business licence/DBA, CAN-SPAM sender identity, payment account); "
+              "'venture' for anything specific to this offer.",
               LEGAL, True),
     "gtm": ("Concord", "Customer Access, Sales and Partnerships",
             "Write DRAFT outreach for 10 buyer conversations and a script that ends in a paid "

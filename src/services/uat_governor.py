@@ -13,6 +13,9 @@ agents produce, with rules fixed in advance
     delivery longer than the time box     -> REWORK
     gross margin below the floor          -> REWORK
     blocking legal flag / passive capital -> HOLD_FOR_COUNSEL
+    institution-scope prerequisite        -> listed once for Alfonso, not a
+                                             per-venture hold (e.g. business
+                                             licence, CAN-SPAM sender identity)
     otherwise                             -> GO (to Alfonso's decision queue)
 
 Single Bottleneck Metric: verified net cash collected from paying customers
@@ -118,8 +121,13 @@ def assess(opp: dict, policy: Policy) -> dict:
     if delivery > policy.timebox_days:
         rework.append(f"first delivery {delivery:g}d exceeds {policy.timebox_days}d time box")
 
+    prerequisites = []
     for flag in opp.get("legal", {}).get("flags", []):
-        if flag.get("blocking"):
+        if not flag.get("blocking"):
+            continue
+        if flag.get("scope") == "institution":
+            prerequisites.append(str(flag.get("issue")))
+        else:
             hold.append(f"legal: {flag.get('issue')}")
 
     queue = []
@@ -153,7 +161,8 @@ def assess(opp: dict, policy: Policy) -> dict:
             "max_loss_usd": max_loss if max_loss != float("inf") else None,
             "network_edge": bool(opp.get("network_edge")),
             "leverage": round(leverage, 3),
-            "human_queue": queue if decision in (GO, HOLD) else []}
+            "human_queue": queue if decision in (GO, HOLD) else [],
+            "founder_prerequisites": prerequisites}
 
 
 def govern(dossier: dict) -> dict:
@@ -174,6 +183,8 @@ def govern(dossier: dict) -> dict:
         "ranked_go": [r["name"] for r in ranked],
         "decisions": results,
         "human_decision_queue": [q for r in results for q in r["human_queue"]],
+        # company-level setup owed once by Alfonso before any send or charge
+        "founder_prerequisites": sorted({p for r in results for p in r["founder_prerequisites"]}),
         "counts": {d: sum(r["decision"] == d for r in results)
                    for d in (GO, REWORK, KILL, HOLD)},
         "requires_human_approval": True,   # hardcoded
