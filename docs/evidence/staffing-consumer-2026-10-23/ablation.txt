@@ -1,0 +1,29 @@
+ABLATION: replace only the new reader with an empty reader in a separate process.
+Production source SHA-256 unchanged: 1263fdc4f2b861974f440afc17a7117ca7e3ee177404836ab37c7be5156fbc41
+
+Database modules not available: DATABASE_URL environment variable not set
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___ test_reported_shortage_changes_the_verdict_with_the_same_evidence_count ____
+tests/test_staffing_evidence.py:46: in test_reported_shortage_changes_the_verdict_with_the_same_evidence_count
+    assert short["go_no_go"] == "needs_more_evidence"
+E   AssertionError: assert 'go' == 'needs_more_evidence'
+E     
+E     - needs_more_evidence
+E     + go
+_____ test_different_figures_change_reasons_and_the_first_validation_step ______
+tests/test_staffing_evidence.py:54: in test_different_figures_change_reasons_and_the_first_validation_step
+    assert large["reasons"] != small["reasons"]
+E   AssertionError: assert ['opportunity score 0.814 meets the 0.5 threshold', 'engine risk level: Ultra Low', '[bear] willingness to pay is unte... audience interest does not imply workflow change; the smallest validation action must measure behavior, not applause'] != ['opportunity score 0.814 meets the 0.5 threshold', 'engine risk level: Ultra Low', '[bear] willingness to pay is unte... audience interest does not imply workflow change; the smallest validation action must measure behavior, not applause']
+______ test_inconsistent_assignment_is_not_rescued_by_the_heuristic_score ______
+tests/test_staffing_evidence.py:65: in test_inconsistent_assignment_is_not_rescued_by_the_heuristic_score
+    assert result["go_no_go"] == "needs_more_evidence"
+E   AssertionError: assert 'go' == 'needs_more_evidence'
+E     
+E     - needs_more_evidence
+E     + go
+=========================== short test summary info ============================
+FAILED tests/test_staffing_evidence.py::test_reported_shortage_changes_the_verdict_with_the_same_evidence_count
+FAILED tests/test_staffing_evidence.py::test_different_figures_change_reasons_and_the_first_validation_step
+FAILED tests/test_staffing_evidence.py::test_inconsistent_assignment_is_not_rescued_by_the_heuristic_score
+3 failed in 0.31s

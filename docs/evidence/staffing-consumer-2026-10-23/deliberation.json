@@ -1,0 +1,344 @@
+{
+  "decision_id": "ADR-20261023-WMI-STAFFING-EVIDENCE",
+  "title": "WMI consumes the staffing figures already carried by the organ bridge",
+  "problem": "At WMI 7a45d223, evidence with different staffing results receives the same count-based reasons and validation priorities. A reported shortage or arithmetically impossible assignment can retain go. This breaks the intended founder-intent-to-verified-outcome transaction at its domain-consumption seam.",
+  "founder_intent_refs": [
+    "https://github.com/dababiyoda/uniimente-kernel/blob/a1c6dbcb2d5b4f1647b0f3569dbbbdf0aae558d3/docs/intent/INTENT-20261001-FULL-MACHINE-COMPLETION.json",
+    "https://github.com/dababiyoda/uniimente-kernel/blob/a1c6dbcb2d5b4f1647b0f3569dbbbdf0aae558d3/docs/intent/INTENT-0030-effect-not-metaphor.md",
+    "https://github.com/dababiyoda/uniimente-kernel/discussions/89",
+    "https://github.com/dababiyoda/uniimente-kernel/issues/96#issuecomment-6364527789",
+    "https://github.com/dababiyoda/uniimente-kernel/issues/96#issuecomment-6366173923",
+    "Alfonso's current instruction: Do it. Be collaborative,communicative, and use @install-recursive-founder-intent-collaboration-protocol systems and SOPs"
+  ],
+  "baseline": "WMI #44 at 7a45d223b74d6eea3b9ed5bdaeb12a3625b525de; real DALEOBANKS #96 at 664ac98c553759ce754bb684cb248225343edd7e; Kernel integration #196 at a1c6dbcb2d5b4f1647b0f3569dbbbdf0aae558d3. Exact boundary package e7dc0cbc9c9a9491da253deee018d471af5a77df. Existing transport, canonical contracts, legal and human-approval gates remain the owners of their present responsibilities.",
+  "alternatives": [
+    {
+      "name": "Echo the JSON",
+      "description": "Append received figures to reasons without checking arithmetic or affecting validation.",
+      "advantages": [
+        "Very small implementation."
+      ],
+      "disadvantages": [
+        "Impossible assignments and shortages can still retain go.",
+        "Echoing certified can launder a claim into apparent evidence."
+      ],
+      "revival_evidence": "Only for a clearly labeled raw-data viewer, not this assessment consumer."
+    },
+    {
+      "name": "Bounded domain reader",
+      "description": "Read the existing labeled JSON; check internal arithmetic; prioritize original-input validation; only tighten go on shortage, ambiguity or inconsistency.",
+      "advantages": [
+        "No new dependency, shared contract, authority or scoring model.",
+        "Makes figure differences observable in reasons and next actions."
+      ],
+      "disadvantages": [
+        "Knows only one existing report shape.",
+        "Cannot independently verify original demand, feasibility or optimality."
+      ],
+      "revival_evidence": "Selected as a reversible draft experiment; retain only if consumer effects and existing gates pass."
+    },
+    {
+      "name": "Typed problem-and-witness contract with independent recertification",
+      "description": "Extend the canonical wire with original problem, witness, provenance and verifier references; independently recertify at consumption.",
+      "advantages": [
+        "Strongest competing architecture for verifiable domain conclusions.",
+        "Can establish feasibility and optimality relative to supplied original inputs."
+      ],
+      "disadvantages": [
+        "Cross-repository contract and trust change requires owner coordination and separate review.",
+        "Original inputs and independent provenance are absent from this packet."
+      ],
+      "revival_evidence": "A separately owned canonical contract proposal carrying complete original inputs and independently reviewable verification obligations."
+    }
+  ],
+  "do_nothing_option": {
+    "expected_outcome": "Keep figure-blind assessments and rely on a later human to notice staffing deficiencies.",
+    "advantages": [
+      "No code or integration cost."
+    ],
+    "disadvantages": [
+      "Known 3-test consumer failure persists.",
+      "The existing 15-step transport proof still does not prove figure-sensitive domain consumption."
+    ]
+  },
+  "roles": [
+    {
+      "role": "Founder-Intent Steward",
+      "position": "Single Codex implementer's explicit self-review perspective; preserve BODY + ORGANS + MIND. This component cannot close the parent machine.",
+      "material_concerns": [
+        "Do not substitute transported bytes for useful consumption.",
+        "Resume the full-machine parent after integration."
+      ],
+      "evidence_refs": [
+        "before.txt",
+        "https://github.com/dababiyoda/uniimente-kernel/issues/96#issuecomment-6364527789"
+      ],
+      "recommendation": "EXPERIMENT"
+    },
+    {
+      "role": "Systems Architect",
+      "position": "Keep domain interpretation in WMI and canonical authority and contracts in Kernel; use the existing reasons and validation_plan seam.",
+      "material_concerns": [
+        "No schema fork, parallel authority, new transport or dependency pins.",
+        "Stronger original-input recertification remains a separate capability deficit."
+      ],
+      "evidence_refs": [
+        "../../../src/services/staffing_evidence.py",
+        "../../../src/services/opportunity_intake.py"
+      ],
+      "recommendation": "EXPERIMENT"
+    },
+    {
+      "role": "Adversarial Reviewer",
+      "position": "A certified boolean and a signed transport do not prove a staffing result. Attack quantities, ambiguity and authority claims.",
+      "material_concerns": [
+        "Duplicate JSON keys, booleans, nonfinite values, malformed/truncated data, conflicting alternatives and misleading certificates.",
+        "A broken recognized report must not silently disappear."
+      ],
+      "evidence_refs": [
+        "../../../tests/test_staffing_evidence.py",
+        "ablation.txt"
+      ],
+      "recommendation": "EXPERIMENT"
+    },
+    {
+      "role": "Operator and Maintainer",
+      "position": "Keep the implementation small, bounded, independently revertible and compatible with the pinned real producer.",
+      "material_concerns": [
+        "Bound parsing and output work.",
+        "Do not overwrite the integrator's organ branches or claims.",
+        "Fixed-port tests must allow TIME_WAIT while refusing a live listener."
+      ],
+      "evidence_refs": [
+        "after-first-packaging-run.txt",
+        "after.txt",
+        "../../../tests/test_staffing_producer_consumer.py"
+      ],
+      "recommendation": "EXPERIMENT"
+    },
+    {
+      "role": "Evidence and Welfare Guardian",
+      "position": "Internal consistency is the ceiling of this reader's evidence. A shortage calls for validation, not a claim that the business or people are deficient.",
+      "material_concerns": [
+        "No real demand, buyer acceptance, commercial result or optimality verification is claimed.",
+        "Independent review is unassigned and pending; these are five perspectives from one worker."
+      ],
+      "evidence_refs": [
+        "after.txt",
+        "README.md"
+      ],
+      "recommendation": "EXPERIMENT"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "Baseline fails figure-sensitive consumer behavior.",
+      "tier": "unit_test",
+      "reference": "before.txt",
+      "finding": "Before the source change: 3 failed, 1 passed. Failures are behavioral assertions, not dependency or collection errors."
+    },
+    {
+      "claim": "The reader causes the measured consumer change.",
+      "tier": "unit_test",
+      "reference": "ablation.txt",
+      "finding": "Replacing only the reader with an empty reader in a separate process restores all 3 behavioral failures. Production source SHA-256 stays unchanged."
+    },
+    {
+      "claim": "Current WMI tests pass with the pinned real producer.",
+      "tier": "sandbox_execution",
+      "reference": "after.txt",
+      "finding": "167 passed in 12.66s on Python 3.12.14. Includes actual DALEOBANKS stated_evidence and HTTP client, packaged uvicorn command, signed response checking, startup refusal and restart/replay controls. No route, JWT or evaluation overrides in the producer-consumer test."
+    },
+    {
+      "claim": "New code adds no lint diagnostics.",
+      "tier": "other",
+      "reference": "README.md#validation",
+      "finding": "Ruff passed the 3 new Python files. Edited intake has exactly the baseline's 27 inherited diagnostics and no additional diagnostic code/message occurrences."
+    }
+  ],
+  "counterevidence": [
+    {
+      "claim": "The complete machine is finished.",
+      "tier": "primary_source",
+      "reference": "https://github.com/dababiyoda/uniimente-kernel/blob/a1c6dbcb2d5b4f1647b0f3569dbbbdf0aae558d3/docs/intent/INTENT-20261001-FULL-MACHINE-COMPLETION.json",
+      "finding": "False: parent completion remains open. Kernel pin adoption, integrated mission assertions, independent review, other machine gaps and real-use evidence remain separate."
+    },
+    {
+      "claim": "Transport or internal arithmetic verifies the original staffing problem or real outcome.",
+      "tier": "primary_source",
+      "reference": "https://github.com/dababiyoda/uniimente-kernel/blob/a1c6dbcb2d5b4f1647b0f3569dbbbdf0aae558d3/greg/recombine.py",
+      "finding": "The original certifier requires the original normalized problem. The received packet lacks it. This reader therefore never claims capacity feasibility, optimality, real demand or independent verification."
+    },
+    {
+      "claim": "All validation attempts passed.",
+      "tier": "sandbox_execution",
+      "reference": "after-first-packaging-run.txt",
+      "finding": "False: initial full run had 6 executable-path failures (160 passed), fixed by putting the installed venv on PATH. The next run had a TIME_WAIT bind failure (166 passed); the new test now mirrors uvicorn SO_REUSEADDR. Full final run passes."
+    }
+  ],
+  "pass_1": {
+    "intended_outcome": "Reported staffing figures materially affect WMI reasons and validation priorities while no report can create authority or override stronger holds.",
+    "advantages": [
+      {
+        "id": "A1",
+        "statement": "Consume existing evidence without changing its contract.",
+        "amplified_value": "Reuse canonical validation and signed transport; preserve ordinary-evidence compatibility."
+      },
+      {
+        "id": "A2",
+        "statement": "Shortfalls cannot hide behind the evidence-count heuristic.",
+        "amplified_value": "Check reported totals against assignment and unfilled sums; make unresolved validation the first step."
+      }
+    ],
+    "disadvantages": [
+      {
+        "id": "D1",
+        "statement": "A plausible forged report can satisfy arithmetic.",
+        "severity": "high",
+        "response_type": "evidence",
+        "redesigned_response": "Label every result unverified; explicitly request original demand/capacity and independent acceptance; ignore certificates and approval claims."
+      },
+      {
+        "id": "D2",
+        "statement": "Brittle text recognition or bounded input can miss or truncate a plan.",
+        "severity": "medium",
+        "response_type": "modularity",
+        "redesigned_response": "Interpret only the existing producer label and whole JSON; recognized truncation remains unresolved; ordinary prose remains compatible; document scope and limits."
+      },
+      {
+        "id": "D3",
+        "statement": "A local patch can drift from the live integration owners.",
+        "severity": "medium",
+        "response_type": "governance",
+        "redesigned_response": "Claim the consumer seam on #96, refresh source heads, use a new child branch and draft PR, and leave integration acknowledgment pending."
+      }
+    ],
+    "comparisons": {
+      "baseline": "Count-based heuristic remains as context; the new reader adds domain reasons and a conservative hold rather than replacing the scorer.",
+      "do_nothing": "Rejected because the three direct consumer assertions fail.",
+      "simplest_viable_alternative": "Echoing data is smaller but cannot identify inconsistent totals or prioritize a shortage.",
+      "strongest_competing_architecture": "Canonical original-problem/witness recertification is stronger but depends on absent inputs and a separately reviewed shared-contract change.",
+      "reversible_experiment": "Selected: isolated WMI reader with existing schema fields, fail-before/pass-after tests, reader-only ablation, real pinned producer check and a draft child PR."
+    },
+    "rejected_alternatives": [
+      {
+        "name": "New staffing case enum or assessment field",
+        "rejection_reason": "Would fork the strict canonical assessment contract for a local domain feature.",
+        "revival_evidence": "Canonical contract owner accepts a use case not expressible in existing reasons/validation_plan."
+      },
+      {
+        "name": "Increase opportunity score for certified reports",
+        "rejection_reason": "Would reward an unverified self-description and mask evidence quality.",
+        "revival_evidence": "Independent verified outcomes plus calibrated evidence-quality model and separate review."
+      }
+    ]
+  },
+  "pass_2": {
+    "attack_summary": "Attack the strengthened design for data/authority confusion, duplicate keys and noninteger quantities, truncation, conflicting scenarios, ordering, limits, and tautological tests. Verify consumer causality by ablation and the real signed producer path.",
+    "new_weaknesses": [
+      {
+        "id": "W1",
+        "category": "gaming",
+        "statement": "JSON booleans, duplicate keys, nonfinite numbers and nested approval claims can look valid.",
+        "strengthening_response": "Exact integer checks, duplicate-key and nonfinite-number rejection, bounded complete parsing, human-approval assertions and ignored certificate/instruction text."
+      },
+      {
+        "id": "W2",
+        "category": "overfit",
+        "statement": "Different reports may be alternatives rather than contradictions; a clean earlier report can bury an invalid later report.",
+        "strengthening_response": "Ask to distinguish alternatives from contradictions against original inputs; prioritize unresolved reports regardless of wire order."
+      },
+      {
+        "id": "W3",
+        "category": "dependency",
+        "statement": "A unit-only demonstration can miss actual packaging, signed transport and producer truncation.",
+        "strengthening_response": "Run the pinned real producer's stated_evidence and HTTP client against Docker COPY/CMD composition; retain existing restart and security controls. Docker image build and integrated Kernel repin remain separate."
+      }
+    ],
+    "pass_1_disadvantage_dispositions": [
+      {
+        "disadvantage_id": "D1",
+        "outcome": "accepted",
+        "rationale": "A claim-only wire cannot supply independent truth. Conservative holds and explicit unverified wording prevent false upgrade, but coherent fabrication remains possible.",
+        "owner": "WMI maintainer; canonical contract owner for future original-input verification",
+        "review_trigger": "Before treating these figures as verified input or allowing action on them."
+      },
+      {
+        "disadvantage_id": "D2",
+        "outcome": "experiment",
+        "rationale": "Current actual label and shape are exercised; malformed recognized reports stay visible. Other report forms are outside this feature.",
+        "owner": "WMI maintainer",
+        "review_trigger": "Producer label/format changes or a real mission needs a different evidence type."
+      },
+      {
+        "disadvantage_id": "D3",
+        "outcome": "resolved",
+        "rationale": "A separate branch stacks on the unchanged #44 head; the shared consumer claim was rechecked and no conflicting claim was observed. Review and receiver acknowledgment remain pending.",
+        "owner": "Codex task a60f90b8f5e5/wmi-staffing-evidence",
+        "review_trigger": "Before publication, any owner update, and handoff intake."
+      }
+    ],
+    "final_design": "A bounded domain reader feeds the existing assessment reasons and validation_plan. It can only change go to needs_more_evidence, never promote another verdict. Existing legal and human-approval floors remain. This is ordinary domain integration, not a novel cognition or commercial-performance claim.",
+    "residual_risks": [
+      {
+        "risk": "Consistent fabricated numbers remain consistent fabricated numbers.",
+        "mitigation": "Unverified label, original-input validation and independent acceptance; no score, authority or proof promotion.",
+        "owner": "WMI maintainer and mission operator",
+        "review_trigger": "Before relying on a staffing report for an external effect."
+      },
+      {
+        "risk": "Heuristic score is still count-based for other evidence and for context.",
+        "mitigation": "Keep the deficit explicit; this patch does not generalize evidence comprehension.",
+        "owner": "WMI maintainer",
+        "review_trigger": "Next real mission with a non-staffing domain deficit."
+      },
+      {
+        "risk": "Hosted Python 3.11 CI, independent review, receiver acknowledgment and Kernel pin adoption are not established by a local Python 3.12 run.",
+        "mitigation": "Keep PR draft, await hosted checks and exact-head review, then request integrator repin and full 15-step consumer assertions.",
+        "owner": "Integration session_01FBS4KNJR59nSbdGbxo8Mbx; independent reviewer unassigned",
+        "review_trigger": "PR CI completion and intake of this exact commit."
+      }
+    ],
+    "recommendation": "EXPERIMENT"
+  },
+  "dissent": {
+    "present": true,
+    "handling": "Preserved self-review dissent, not a claim of independent opposition or consensus. No independent reviewer or receiving session has acknowledged this head.",
+    "entries": [
+      {
+        "role": "Evidence and Welfare Guardian",
+        "position": "Do not mark staffing independently verified or claim that this closes the machine.",
+        "rationale": "No original inputs, independent acceptance or real staffing/buyer outcome is supplied.",
+        "evidence_threshold": "A separately reviewed original-input verifier plus provenance and relevant real-use evidence.",
+        "owner": "Canonical contract owner and mission operator",
+        "review_trigger": "Any proposed verified label, autonomous use, or parent-completion claim."
+      }
+    ]
+  },
+  "authority_impact": {
+    "level": "standard",
+    "changes_authority": false,
+    "requires_authorized_human": false,
+    "approval_status": "not_required",
+    "approver": null
+  },
+  "migration_plan": "Authorized reversible development only. Stack an independent child draft on WMI #44's existing branch without editing it. After exact-head review and integrator intake, the integrator may adopt this commit, repin the WMI organ in Kernel and strengthen the 15-step mission's figure-sensitive assertions. Protected merge and live activation remain subject to their existing separate authority; this record grants neither.",
+  "rollback_plan": {
+    "possible": true,
+    "steps": [
+      "Revert only this component commit or drop its child branch before integration.",
+      "Preserve tests, logs and deliberation in Git history.",
+      "If adopted into Kernel, restore the previous WMI content pin and rerun the corresponding integrated mission/security checks."
+    ],
+    "reason_impossible": null
+  },
+  "kill_criteria": [
+    "Any path can promote kill/defer or remove human/legal review.",
+    "A received certificate or instruction becomes authority or independent truth.",
+    "Canonical schema/transport changes are required without owner agreement.",
+    "The real producer or existing suite regresses, or an overlapping file claim appears."
+  ],
+  "decision": "EXPERIMENT",
+  "decision_owner": "Codex /root task a60f90b8f5e5/wmi-staffing-evidence (implementation); existing session_01FBS4KNJR59nSbdGbxo8Mbx (integration); independent review unassigned",
+  "review_trigger": "Before draft publication and exact-head integration; on relevant source-head/producer-format changes; when a real staffing outcome supplies stronger evidence."
+}

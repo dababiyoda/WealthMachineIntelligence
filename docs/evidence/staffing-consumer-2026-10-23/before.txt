@@ -1,0 +1,623 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+___ test_reported_shortage_changes_the_verdict_with_the_same_evidence_count ____
+
+    def test_reported_shortage_changes_the_verdict_with_the_same_evidence_count():
+        complete, short = assess(plan()), assess(plan(4, 8))
+        assert complete["opportunity_score"] == short["opportunity_score"]
+        assert complete["go_no_go"] == "go"
+>       assert short["go_no_go"] == "needs_more_evidence"
+E       AssertionError: assert 'go' == 'needs_more_evidence'
+E         
+E         - needs_more_evidence
+E         + go
+
+tests/test_staffing_evidence.py:45: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.830311Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:105 Skipping database metric update
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 97, in update_venture_metrics
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.836989Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:237 Skipping risk assessment DB persistence
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 231, in store_risk_assessment
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.847544Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:105 Skipping database metric update
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 97, in update_venture_metrics
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.849430Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:237 Skipping risk assessment DB persistence
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 231, in store_risk_assessment
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+_____ test_different_figures_change_reasons_and_the_first_validation_step ______
+
+    def test_different_figures_change_reasons_and_the_first_validation_step():
+        large, small = assess(plan()), assess(plan(3, 3))
+        assert large["opportunity_score"] == small["opportunity_score"]
+>       assert large["reasons"] != small["reasons"]
+E       AssertionError: assert ['opportunity score 0.814 meets the 0.5 threshold', 'engine risk level: Ultra Low', '[bear] willingness to pay is unte... audience interest does not imply workflow change; the smallest validation action must measure behavior, not applause'] != ['opportunity score 0.814 meets the 0.5 threshold', 'engine risk level: Ultra Low', '[bear] willingness to pay is unte... audience interest does not imply workflow change; the smallest validation action must measure behavior, not applause']
+
+tests/test_staffing_evidence.py:53: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.881290Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:105 Skipping database metric update
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 97, in update_venture_metrics
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.884099Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:237 Skipping risk assessment DB persistence
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 231, in store_risk_assessment
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.887398Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:105 Skipping database metric update
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 97, in update_venture_metrics
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.888763Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:237 Skipping risk assessment DB persistence
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 231, in store_risk_assessment
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+______ test_inconsistent_assignment_is_not_rescued_by_the_heuristic_score ______
+
+    def test_inconsistent_assignment_is_not_rescued_by_the_heuristic_score():
+        value = plan()
+        value["assignment"][0][2] = 7
+        result = assess(value)
+>       assert result["go_no_go"] == "needs_more_evidence"
+E       AssertionError: assert 'go' == 'needs_more_evidence'
+E         
+E         - needs_more_evidence
+E         + go
+
+tests/test_staffing_evidence.py:64: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.894866Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:105 Skipping database metric update
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 97, in update_venture_metrics
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+ERROR    src.database.connection:connection.py:119 {"error": "(sqlite3.OperationalError) no such table: digital_ventures\n[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at \nFROM digital_ventures \nWHERE digital_ventures.id = ?\n LIMIT ? OFFSET ?]\n[parameters: ('opp-packet-fire-1', 1, 0)]\n(Background on this error at: https://sqlalche.me/e/21/e3q8)", "event": "Database session error", "timestamp": "2026-10-23T13:40:35.896401Z", "level": "error"}
+WARNING  src.core.knowledge_graph_connector:knowledge_graph_connector.py:237 Skipping risk assessment DB persistence
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such table: digital_ventures
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/knowledge_graph_connector.py", line 231, in store_risk_assessment
+    venture = session.query(DigitalVenture).filter(DigitalVenture.id == venture_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2823, in first
+    return self.limit(1)._iter().first()  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2921, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2473, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2363, in _execute_internal
+    compile_state_cls.orm_execute_statement(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 320, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: digital_ventures
+[SQL: SELECT digital_ventures.id AS digital_ventures_id, digital_ventures.name AS digital_ventures_name, digital_ventures.description AS digital_ventures_description, digital_ventures.venture_type AS digital_ventures_venture_type, digital_ventures.status AS digital_ventures_status, digital_ventures.initial_investment AS digital_ventures_initial_investment, digital_ventures.current_valuation AS digital_ventures_current_valuation, digital_ventures.monthly_revenue AS digital_ventures_monthly_revenue, digital_ventures.monthly_expenses AS digital_ventures_monthly_expenses, digital_ventures.profit_margin AS digital_ventures_profit_margin, digital_ventures.risk_level AS digital_ventures_risk_level, digital_ventures.risk_score AS digital_ventures_risk_score, digital_ventures.failure_probability AS digital_ventures_failure_probability, digital_ventures.customer_count AS digital_ventures_customer_count, digital_ventures.churn_rate AS digital_ventures_churn_rate, digital_ventures.growth_rate AS digital_ventures_growth_rate, digital_ventures.market_share AS digital_ventures_market_share, digital_ventures.ai_enabled AS digital_ventures_ai_enabled, digital_ventures.automation_level AS digital_ventures_automation_level, digital_ventures.created_at AS digital_ventures_created_at, digital_ventures.updated_at AS digital_ventures_updated_at, digital_ventures.launched_at AS digital_ventures_launched_at, digital_ventures.discontinued_at AS digital_ventures_discontinued_at 
+FROM digital_ventures 
+WHERE digital_ventures.id = ?
+ LIMIT ? OFFSET ?]
+[parameters: ('opp-packet-fire-1', 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+=============================== warnings summary ===============================
+src/database/models.py:13
+  /workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/database/models.py:13: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+../../.venv-wmi/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /workspace/scratch/a60f90b8f5e5/.venv-wmi/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_staffing_evidence.py: 48 warnings
+  /workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/services/orchestrator.py:73: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    time_bound=datetime.utcnow() + timedelta(days=90),
+
+tests/test_staffing_evidence.py: 48 warnings
+  /workspace/scratch/a60f90b8f5e5/repos/wealthmachine/src/core/performance.py:123: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "timestamp": datetime.utcnow().isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_staffing_evidence.py::test_reported_shortage_changes_the_verdict_with_the_same_evidence_count
+FAILED tests/test_staffing_evidence.py::test_different_figures_change_reasons_and_the_first_validation_step
+FAILED tests/test_staffing_evidence.py::test_inconsistent_assignment_is_not_rescued_by_the_heuristic_score
+3 failed, 1 passed, 98 warnings in 0.64s
