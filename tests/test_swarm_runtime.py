@@ -121,7 +121,12 @@ def test_ingest_workflow_dossier(tmp_path):
     path = tmp_path / "live-run-dossier.json"
     path.write_text(json.dumps(dossier))
     store = UATStore(str(tmp_path / "ledger.jsonl"))
-    out = _ingest(store, str(path))
+    out = _ingest(store, str(path), str(tmp_path / "out"))
     assert out["ingested"] == [{"mission_id": "live-run:x", "decision": "VALIDATE"}]
-    assert _ingest(store, str(path))["ingested"] == []        # idempotent
+    assert "VALIDATE" in open(out["brief_path"]).read()
+    assert _ingest(store, str(path), str(tmp_path / "out"))["ingested"] == []   # idempotent
+    handoff = tmp_path / "wf-output.json"                      # workflow output file shape
+    handoff.write_text(json.dumps({"summary": "s", "result": {"run_label": "wf", "dossier": dossier,
+                                                                "full": []}}))
+    assert _ingest(store, str(handoff), str(tmp_path / "out"))["ingested"][0]["mission_id"] == "wf:x"
     assert _slug("A b!") == "a-b"

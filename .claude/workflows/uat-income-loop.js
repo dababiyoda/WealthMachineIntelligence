@@ -5,8 +5,6 @@ export const meta = {
   phases: [
     { title: 'Scout', detail: 'Venture Scout + Networking Specialist sweep three lenses' },
     { title: 'Validate', detail: 'Analyst, red team, product/model/tech, finance, legal, brand/network per opportunity' },
-    { title: 'Govern', detail: 'Deterministic gate: src/services/uat_governor.py' },
-    { title: 'Team Loop', detail: 'Portfolio brief, SMART goals traced to the SBM, decision queue' },
   ],
 }
 
@@ -238,8 +236,13 @@ const dossiers = await pipeline(
     .then(gtm => ({ ...s, gtm })),
 )
 
-// ---------------------------------------------------------------- Govern
-phase('Govern')
+// ---------------------------------------------------------------- Hand-off
+// The governor and the founder brief run host-side, in Python, on the exact
+// data below: an agent cannot copy a large dossier into a file reliably.
+//   1. save this workflow's output (or its `result`) to a JSON file
+//   2. python -m src.swarm ingest <that file>
+// ingest writes the dossier, runs src/services/uat_governor.py, records every
+// mission and decision in the durable ledger and writes the founder brief.
 const valid = dossiers.filter(Boolean)
 const dossier = {
   policy: POLICY,
@@ -256,34 +259,7 @@ const dossier = {
     actions: s.gtm?.actions || [],
   })),
 }
-const path = `${OUT}/${LABEL}-dossier.json`
-const govRaw = await agent(
-  `Write the JSON below to ${path} exactly as given (create the directory if needed; change nothing), then run:\n  python -m src.services.uat_governor ${path}\nReturn ONLY the command's stdout, unmodified.\n\n${JSON.stringify(dossier)}`,
-  { label: 'governor', phase: 'Govern', effort: 'low' })
-let gov
-try {
-  gov = JSON.parse(String(govRaw).slice(String(govRaw).indexOf('{'), String(govRaw).lastIndexOf('}') + 1))
-} catch (e) {
-  log('Governor output did not parse; returning the raw output and no decisions')
-  return { error: 'governor_unparsed', governor_raw: govRaw, dossier_path: path }
-}
-log(`Governor: ${JSON.stringify(gov.counts)}; ranked GO: ${(gov.ranked_go || []).join(', ') || 'none'}`)
-
-// ---------------------------------------------------------------- Team Loop
-phase('Team Loop')
-const full = valid.map(s => ({ name: s.o.name, scout: s.o, analyst: s.analyst, red: s.red, offer: s.offer, finance: s.finance, legal: s.legal, gtm: s.gtm }))
-const report = `${OUT}/${LABEL}-brief.md`
-const synthesis = await agent(
-  `${AUTHORITY}\n\nROLE: Strategos writing the founder digest, with Hegemony framing each decision and Mnemosyne recording reuse. Write a decision brief for Alfonso to ${report} (markdown) and return a 10-line summary.\nThe governor's decisions are final for this cycle; do not overturn them. Include, in this order:\n1. The ranked GO list (decision verb VALIDATE: a bounded buyer test, never COMMIT) with each one's offer, price, worst-case loss, kill rules, and the governor's reasons.\n2. The human decision queue verbatim: every contact, spend, sign, publish, collect or capital action awaiting approval.\n3. For each GO: a filled standard mission contract (mission_id, venture_id, origin_group Opportunity Foundry, destination_group Revenue & Partnerships, bounded_outcome, active_bottleneck, owner Concord, reviewer Veritas, acceptance_criteria, cash_cap 0, deadline; mark unknown fields missing), a 30-day backcast, and one weekly SMART goal for each bot whose group touches it, each traced to the Single Bottleneck Metric.\n4. RECONFIGURE (REWORK) items with exactly what must change to pass; KILL and PARK (HOLD) items with reasons (counsel questions for PARK).\n5. Contribution ledger entries: which bot produced which evidence or draft.\n6. What this cycle learned and what the next cycle should scout.\nCite sources from the dossiers. Do not add claims they do not support.\n\nGovernor: ${JSON.stringify(gov)}\nDossiers: ${JSON.stringify(full)}`,
-  { label: 'team-loop', phase: 'Team Loop' })
-
-return {
-  sbm: gov.sbm,
-  ranked_go: gov.ranked_go,
-  counts: gov.counts,
-  human_decision_queue: gov.human_decision_queue,
-  execution_authority: gov.execution_authority,
-  dossier_path: path,
-  brief_path: report,
-  summary: synthesis,
-}
+const full = valid.map(s => ({ name: s.o.name, scout: s.o, analyst: s.analyst, red: s.red,
+  offer: s.offer || null, finance: s.finance || null, legal: s.legal || null, gtm: s.gtm || null }))
+log(`Validated ${valid.length} opportunities; hand-off ready for host-side governor`)
+return { run_label: LABEL, out_dir: OUT, dossier, full, execution_authority: false }
