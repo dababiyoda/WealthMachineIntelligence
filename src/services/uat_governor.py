@@ -43,6 +43,11 @@ CONSEQUENTIAL_ACTIONS = frozenset({
 
 GO, REWORK, KILL, HOLD = "GO", "REWORK", "KILL", "HOLD_FOR_COUNSEL"
 
+# Direction & Capital's decision vocabulary (uat_missions.DECISIONS). A gate
+# pass earns only VALIDATE — the cheapest buyer test — never COMMIT, which
+# needs accepted external evidence.
+DECISION_VERB = {GO: "VALIDATE", REWORK: "RECONFIGURE", KILL: "KILL", HOLD: "PARK"}
+
 
 class GovernorRefusal(ValueError):
     """The dossier or policy is inadmissible. Fails closed."""
@@ -142,7 +147,8 @@ def assess(opp: dict, policy: Policy) -> dict:
     if opp.get("network_edge"):
         leverage *= 1.5                    # trusted access is the wedge the plan rests on
 
-    return {"name": name, "decision": decision, "reasons": reasons,
+    return {"name": name, "decision": decision, "decision_verb": DECISION_VERB[decision],
+            "reasons": reasons,
             "gross_margin": round(margin, 3), "projected_net_30d_usd": projected_net,
             "max_loss_usd": max_loss if max_loss != float("inf") else None,
             "network_edge": bool(opp.get("network_edge")),

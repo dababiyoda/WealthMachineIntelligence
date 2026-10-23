@@ -1,6 +1,6 @@
 export const meta = {
   name: 'uat-income-loop',
-  description: 'Universally Adaptive Team as agents: scout, validate, red-team, design, govern and plan network-sourced income streams (proposals only)',
+  description: 'UAT Opportunity Foundry run by the named bots (Prometheus, Logos, Veritas, Aegis, Daedalus, Aurelius, Mythos, Concord, Strategos): scout, diligence, red-team, design, govern and hand off income-stream proposals (no external effects)',
   whenToUse: 'Run one Income Streams Loop + Team Loop cycle of the master plan. Args: {focus, network, loss_cap_usd, timebox_days, min_gross_margin, max_opportunities, out_dir, run_label}',
   phases: [
     { title: 'Scout', detail: 'Venture Scout + Networking Specialist sweep three lenses' },
@@ -167,11 +167,11 @@ const brief = o => `Opportunity "${o.name}": ${o.one_liner}\nBuyer: ${o.buyer}\n
 // ---------------------------------------------------------------- Scout
 phase('Scout')
 const LENSES = [
-  { key: 'network', role: 'Networking Specialist',
+  { key: 'network', role: 'Concord (Customer Access, Sales and Partnerships), scouting with Prometheus',
     ask: `Mine the network for wedges. Network description: ${NETWORK}. Find recurring paid problems that people in this network can see from the inside (their employers, trades, customers, communities), where their trusted access is the edge.` },
-  { key: 'street', role: 'Venture Scout (brick-and-mortar)',
+  { key: 'street', role: 'Prometheus (Opportunity Discovery), brick-and-mortar lens',
     ask: 'Find recurring, paid, physical-world problems local businesses already spend money on and complain about (reviews, trade forums, public procurement, licensing boards). Favor little capital, low overhead, and a service that can be delivered manually first.' },
-  { key: 'tech', role: 'Emerging Tech Specialist',
+  { key: 'tech', role: 'Prometheus (Opportunity Discovery), emerging-technology lens',
     ask: 'Find tasks that recently became cheap to deliver because of AI or new tools, where buyers still pay incumbent prices. The tool is commodity; the edge must be access, trust or execution.' },
 ]
 const scouted = await parallel(LENSES.map(l => () => agent(
@@ -193,21 +193,21 @@ if (pool.length > opps.length) log(`Not validated this run (cap ${MAX_OPPS}): ${
 
 // ---------------------------------------------------------------- Validate
 const RED_LENSES = [
-  { lens: 'market', ask: 'Refute demand: is the problem really paid for, recurring, and not already solved cheaply? Is the "low competition" claim false?' },
-  { lens: 'legal', ask: 'Refute lawfulness: licensing, consumer protection, privacy, platform terms, securities (Howey) if members or others invest money.' },
-  { lens: 'people', ask: 'Refute execution: incentive conflicts inside a friends-and-family team, who does the unglamorous delivery, what happens when a member quits.' },
+  { lens: 'market', bot: 'Veritas (Evidence, Falsification and Acceptance)', ask: 'Refute demand: is the problem really paid for, recurring, and not already solved cheaply? Is the "low competition" claim false?' },
+  { lens: 'legal', bot: 'Aegis (Permissions, Risk and Resilience)', ask: 'Refute lawfulness: licensing, consumer protection, privacy, platform terms, securities (Howey) if members or others invest money.' },
+  { lens: 'people', bot: 'Strategos (Mission Operations and Production Coordination)', ask: 'Refute execution: incentive conflicts inside a friends-and-family team, who does the unglamorous delivery, what happens when a member quits.' },
 ]
 
 const dossiers = await pipeline(
   opps,
   // Strategic Market Trend Analyst: validate and fact-check the scout.
   o => agent(
-    `${AUTHORITY}\n\nROLE: Strategic Market Trend Analyst. Validate and fact-check the scout's claims; independently find demand evidence, competitors and their prices.\n${brief(o)}`,
+    `${AUTHORITY}\n\nROLE: Logos (Market Diligence and Decision Analysis). Validate and fact-check the scout's claims; independently find demand evidence, competitors and their prices.\n${brief(o)}`,
     { label: `analyst:${o.name}`, phase: 'Validate', schema: ANALYST_SCHEMA })
     .then(analyst => ({ o, analyst })),
   // Red team: three independent refuters.
   s => parallel(RED_LENSES.map(r => () => agent(
-    `${AUTHORITY}\n\nROLE: adversarial reviewer, ${r.lens} lens. Try to REFUTE this opportunity. ${r.ask}\nSet refuted=true only with a concrete, sourced reason; severity "critical" means it cannot lawfully or economically work at all.\n${brief(s.o)}\nAnalyst: ${JSON.stringify(s.analyst)}`,
+    `${AUTHORITY}\n\nROLE: ${r.bot}, adversarial reviewer on the ${r.lens} lens. Try to REFUTE this opportunity. ${r.ask}\nSet refuted=true only with a concrete, sourced reason; severity "critical" means it cannot lawfully or economically work at all.\n${brief(s.o)}\nAnalyst: ${JSON.stringify(s.analyst)}`,
     { label: `red:${r.lens}:${s.o.name}`, phase: 'Validate', schema: RED_SCHEMA })))
     .then(red => ({ ...s, red: red.filter(Boolean) })),
   // Product Development Specialist + Business Model / Tech Innovator.
@@ -218,22 +218,22 @@ const dossiers = await pipeline(
       return { ...s, stopped: true }
     }
     return agent(
-      `${AUTHORITY}\n\nROLES: Product Development Specialist + Business Model Innovator + Tech Innovator.\nDesign the smallest refundable, priced offer that a real buyer can pay for within ${POLICY.timebox_days} days, delivered manually first with existing tools (build no new software for the first sale). Answer the red team's live objections in the design. Include expansion paths for after paid demand is proven.\n${brief(s.o)}\nAnalyst: ${JSON.stringify(s.analyst)}\nRed team: ${JSON.stringify(s.red)}`,
+      `${AUTHORITY}\n\nROLES: Daedalus (Business Architecture and Mechanism Invention) with Vulcan (Product Engineering) on minimum tooling.\nDesign the smallest refundable, priced offer that a real buyer can pay for within ${POLICY.timebox_days} days, delivered manually first with existing tools (build no new software for the first sale). Answer the red team's live objections in the design. Include expansion paths for after paid demand is proven.\n${brief(s.o)}\nAnalyst: ${JSON.stringify(s.analyst)}\nRed team: ${JSON.stringify(s.red)}`,
       { label: `offer:${s.o.name}`, phase: 'Validate', schema: OFFER_SCHEMA })
       .then(offer => ({ ...s, offer }))
   },
   // Financial Strategist + Regulatory Expert/Legal Counsel, side by side.
   s => s.stopped ? s : parallel([
     () => agent(
-      `${AUTHORITY}\n\nROLE: Early-Stage Investor and Financial Strategist. Bound the downside. Loss cap per experiment: $${POLICY.loss_cap_usd}. Estimate worst-case cash loss and paid commitments from 10 buyer conversations (Fermi, with anchors). Write kill rules. Phase 1 needs no outside capital.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nAnalyst: ${JSON.stringify(s.analyst)}`,
+      `${AUTHORITY}\n\nROLE: Aurelius (Economic Truth and Capital Continuity). Bound the downside. Loss cap per experiment: $${POLICY.loss_cap_usd}. Estimate worst-case cash loss and paid commitments from 10 buyer conversations (Fermi, with anchors). Write kill rules. Phase 1 needs no outside capital.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nAnalyst: ${JSON.stringify(s.analyst)}`,
       { label: `finance:${s.o.name}`, phase: 'Validate', schema: FINANCE_SCHEMA }),
     () => agent(
-      `${AUTHORITY}\n\nROLE: Regulatory Expert and Legal Counsel (issue-spotter, not a lawyer). List what must be true for the first sale to be lawful, and how member contribution should become ownership. Mark blocking only when the first sale cannot lawfully happen until resolved.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nRed team legal: ${JSON.stringify(s.red.filter(r => r.lens === 'legal'))}`,
+      `${AUTHORITY}\n\nROLE: Aegis (Permissions, Risk and Resilience); issue-spotter, not a lawyer. List what must be true for the first sale to be lawful, and how member contribution should become ownership. Mark blocking only when the first sale cannot lawfully happen until resolved.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nRed team legal: ${JSON.stringify(s.red.filter(r => r.lens === 'legal'))}`,
       { label: `legal:${s.o.name}`, phase: 'Validate', schema: LEGAL_SCHEMA }),
   ]).then(([finance, legal]) => ({ ...s, finance, legal })),
   // Brand Strategist + Networking Specialist: drafts and proposed actions.
   s => s.stopped ? s : agent(
-    `${AUTHORITY}\n\nROLES: Brand/Marketing Strategist + Networking Specialist. Write DRAFT outreach for 10 buyer conversations, a short discovery-and-ask script that ends in a paid commitment, and reciprocal partner/referral terms (no unpaid favors). List every real-world step as an action for Alfonso to approve.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nFinance: ${JSON.stringify(s.finance)}`,
+    `${AUTHORITY}\n\nROLES: Mythos (Positioning, Brand and Owned Distribution) + Concord (Customer Access, Sales and Partnerships). Write DRAFT outreach for 10 buyer conversations, a short discovery-and-ask script that ends in a paid commitment, and reciprocal partner/referral terms (no unpaid favors). List every real-world step as an action for Alfonso to approve.\n${brief(s.o)}\nOffer: ${JSON.stringify(s.offer)}\nFinance: ${JSON.stringify(s.finance)}`,
     { label: `gtm:${s.o.name}`, phase: 'Validate', schema: GTM_SCHEMA })
     .then(gtm => ({ ...s, gtm })),
 )
@@ -274,7 +274,7 @@ phase('Team Loop')
 const full = valid.map(s => ({ name: s.o.name, scout: s.o, analyst: s.analyst, red: s.red, offer: s.offer, finance: s.finance, legal: s.legal, gtm: s.gtm }))
 const report = `${OUT}/${LABEL}-brief.md`
 const synthesis = await agent(
-  `${AUTHORITY}\n\nROLE: the whole team in its weekly Team Loop. Write a decision brief for Alfonso to ${report} (markdown) and return a 10-line summary.\nThe governor's decisions are final for this cycle; do not overturn them. Include, in this order:\n1. The ranked GO list with each one's offer, price, worst-case loss, kill rules, and the governor's reasons.\n2. The human decision queue verbatim: every contact, spend, sign, publish, collect or capital action awaiting approval.\n3. For each GO: a 30-day backcast and one weekly SMART goal per role (8 roles), each traced to the Single Bottleneck Metric.\n4. REWORK items with exactly what must change to pass; KILL and HOLD items with reasons (counsel questions for HOLD).\n5. Contribution ledger entries: which role produced which evidence or draft.\n6. What this cycle learned and what the next cycle should scout.\nCite sources from the dossiers. Do not add claims they do not support.\n\nGovernor: ${JSON.stringify(gov)}\nDossiers: ${JSON.stringify(full)}`,
+  `${AUTHORITY}\n\nROLE: Strategos writing the founder digest, with Hegemony framing each decision and Mnemosyne recording reuse. Write a decision brief for Alfonso to ${report} (markdown) and return a 10-line summary.\nThe governor's decisions are final for this cycle; do not overturn them. Include, in this order:\n1. The ranked GO list (decision verb VALIDATE: a bounded buyer test, never COMMIT) with each one's offer, price, worst-case loss, kill rules, and the governor's reasons.\n2. The human decision queue verbatim: every contact, spend, sign, publish, collect or capital action awaiting approval.\n3. For each GO: a filled standard mission contract (mission_id, venture_id, origin_group Opportunity Foundry, destination_group Revenue & Partnerships, bounded_outcome, active_bottleneck, owner Concord, reviewer Veritas, acceptance_criteria, cash_cap 0, deadline; mark unknown fields missing), a 30-day backcast, and one weekly SMART goal for each bot whose group touches it, each traced to the Single Bottleneck Metric.\n4. RECONFIGURE (REWORK) items with exactly what must change to pass; KILL and PARK (HOLD) items with reasons (counsel questions for PARK).\n5. Contribution ledger entries: which bot produced which evidence or draft.\n6. What this cycle learned and what the next cycle should scout.\nCite sources from the dossiers. Do not add claims they do not support.\n\nGovernor: ${JSON.stringify(gov)}\nDossiers: ${JSON.stringify(full)}`,
   { label: 'team-loop', phase: 'Team Loop' })
 
 return {

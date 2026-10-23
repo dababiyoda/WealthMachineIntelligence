@@ -114,7 +114,49 @@ To run it in Claude Code, say "run the uat-income-loop workflow" with optional a
 
 Authority envelope for every agent: research and drafts only. Agents never send, post, contact, purchase, sign or spend. Every real-world step comes back as a queued action requiring approval, and the governor hardcodes `execution_authority: false`.
 
-## 9. Decisions reserved to Alfonso
+## 9. The thirteen-bot institution (Grok group chats)
+
+Source: Alfonso's *UAT Group-Chat Operating System* and *Grok Bot Builder Answers* (both dated 2026-10-22). They are held outside this repository: the repository is public, and both files name founder mailboxes and pilot counterparties. They turn the eight roles into thirteen named bots in five mission groups of at most six bots each. Each group has a coordinator, and work moves between groups through written handoffs.
+
+**Mapping to the workflow.** `.claude/workflows/uat-income-loop.js` is the Opportunity Foundry run as one cycle, with stages named after the bots:
+
+| Workflow stage | Bot | Group |
+|---|---|---|
+| Scout (network / street / tech) | Concord with Prometheus; Prometheus | Opportunity Foundry / Revenue |
+| Diligence | Logos | Opportunity Foundry |
+| Red team: market / legal / people | Veritas / Aegis / Strategos | Foundry / Direction |
+| Offer design | Daedalus with Vulcan | Foundry / Delivery |
+| Bound downside | Aurelius and Aegis | Foundry / Direction |
+| Go-to-market drafts | Mythos and Concord | Revenue & Partnerships |
+| Govern (code) | `uat_governor.py`: GO→VALIDATE, REWORK→RECONFIGURE, HOLD→PARK, KILL→KILL | Direction & Capital decides |
+| Team Loop brief | Strategos, Hegemony, Mnemosyne | Direction / Compounding |
+
+A gate pass earns VALIDATE, a bounded buyer test, and never COMMIT. COMMIT requires accepted external evidence.
+
+**Enforced vs. instructed.** The design itself warns that chat cannot enforce its rules ("never pretend textual claims are locks"). [`src/services/uat_missions.py`](../src/services/uat_missions.py) is the canonical record those rules point to, made checkable (tests in `tests/test_uat_missions.py`):
+
+| Rule from the design | Where it holds |
+|---|---|
+| Five groups, ≤6 bots each, all 13 roles covered | Enforced (`validate_roster`) |
+| Mission contract fields present; unknown fields named | Enforced (`open`) |
+| One owner per mission; stale artifact versions refused | Enforced (`claim`, `save_artifact`) |
+| Handoff needs current artifact and written accept/reject with reason | Enforced (`handoff`, `respond_handoff`) |
+| Reviewer ≠ producer; unsupported claims rejected with repair path | Enforced (`review`) |
+| External effect needs an unexpired grant naming that action, within cap | Enforced (`authorize_effect`) |
+| Uncertain external result → reconcile, never blind retry | Enforced (`record_effect_result`) |
+| No collection without evidence; synthetic never counted as real | Enforced (`record_collection`, `totals`) |
+| COMMIT only after accepted evidence | Enforced (`decide`) |
+| Connector scope, mailbox identity, profile isolation, group approvals, timers | **Instruction only.** Grok profiles do not provide technical isolation. Verify each one on the live platform. |
+
+The record never acts (`execution_authority = False`). It is WMI's reference implementation. Where the live record sits (Notion, Airtable or the Kernel ledger) is Alfonso's choice. Institutional authority stays with the Kernel.
+
+**Assessment.**
+- **Strengths.** The design is unusually self-skeptical. It already embodies this compilation: $0 new spend, one active mission, no fabricated acceptance, and a review after 14 days against a single bot with simple tools.
+- **Main risk: coordination cost before the first dollar.** Thirteen bots and five rooms carry overhead. Anthropic's own multi-agent report shows that coordination cost is high and that tightly dependent tasks fit multi-agent setups poorly ([Anthropic, 2025](https://www.anthropic.com/research/multi-agent-research-system)).
+- **Recommendation.** Activate only Opportunity Foundry and Revenue & Partnerships until the first paid commitment exists. Alfonso and Strategos can carry Direction & Capital.
+- **Platform facts checked.** Grok groups hold two to six bots, and @-mentions target a specific bot ([xAI docs](https://docs.x.ai/grok-bot/chat-and-collaboration)). The approvals and privacy page could not be reached from this environment, so the group-approval limits in the design remain unverified here.
+
+## 10. Decisions reserved to Alfonso
 
 - Whether to proceed with §7, and the loss cap per experiment.
 - Who the first two or three members are, and the contribution-to-ownership rule.

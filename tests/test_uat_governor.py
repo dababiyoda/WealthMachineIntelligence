@@ -93,6 +93,11 @@ class TestRankingAndAuthority:
                                         _opp(name="warm", network_edge=True)]})
         assert out["ranked_go"] == ["warm", "cold"]
 
+    def test_decision_verbs_never_commit(self):
+        out = govern({"opportunities": [_opp(name="go"), _opp(name="dead", evidence=[])]})
+        verbs = {d["name"]: d["decision_verb"] for d in out["decisions"]}
+        assert verbs == {"go": "VALIDATE", "dead": "KILL"}
+
     def test_authority_is_never_granted(self):
         out = govern({"opportunities": [_opp()]})
         assert out["execution_authority"] is False
