@@ -27,6 +27,7 @@ from uuid import uuid4
 
 from src.network_my_networth.system import NetworkWealthEngine
 from src.services.adversarial import build_cases, severe_unresolved
+from src.services.staffing_evidence import review_staffing_evidence
 from src.services.venture_protocol import (
     FINANCE_EDUCATION_FLAG,
     LEGAL_RISK_FLAGS,
@@ -160,6 +161,7 @@ class OpportunityIntakeService:
         # The committee argues with itself before any verdict is written.
         cases = build_cases(packet, score, alignment)
         severe = severe_unresolved(cases)
+        staffing = review_staffing_evidence(packet["evidence"])
 
         reasons = []
         if legal_flags:
@@ -189,7 +191,22 @@ class OpportunityIntakeService:
         if finance:
             reasons.append("finance content must remain educational; no personalized advice")
 
+        reasons.extend(review.reason for review in staffing)
+        figures = {(review.staffed, review.demand, review.shortage, review.unfilled)
+                   for review in staffing if review.error is None}
+        divergent_staffing = len(figures) > 1
+        if divergent_staffing:
+            reasons.append("staffing reports differ; distinguish alternatives from contradictions against their original inputs")
+        if go_no_go == "go" and (divergent_staffing or any(review.prevents_go for review in staffing)):
+            go_no_go = "needs_more_evidence"
+            reasons.append("reported staffing shortfall or inconsistent evidence requires validation before proceeding")
+
+        # Unresolved reports take priority over clean reports, irrespective of wire order.
+        staffing_steps = [review.next_action for review in sorted(staffing, key=lambda review: not review.prevents_go)]
+        if divergent_staffing:
+            staffing_steps.insert(0, "Reconcile differing staffing reports with exact original inputs and receipts; identify alternatives or contradictions")
         validation_plan = [step for step in [
+            *staffing_steps,
             packet["smallest_validation_action"],
             "Draft landing-page copy and collect waitlist interest (no payment yet)",
             "Run 3-5 buyer interviews from engaged repliers",
