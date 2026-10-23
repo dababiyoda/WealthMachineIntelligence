@@ -1,5 +1,5 @@
 # Runtime dependencies
-uniimente-kernel-boundaries @ https://github.com/dababiyoda/uniimente-kernel/archive/4999acff1a69502c05af455fbccfca380cad18ee.tar.gz
+uniimente-kernel-boundaries @ https://github.com/dababiyoda/uniimente-kernel/archive/e7dc0cbc9c9a9491da253deee018d471af5a77df.tar.gz
 alembic>=1.16.4
 celery>=5.5.3
 fastapi>=0.116.1
