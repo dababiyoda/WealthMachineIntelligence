@@ -1,4 +1,5 @@
-# Runtime dependencies
+# Generated from pyproject.toml; do not edit.
+# Refresh: python scripts/export_requirements.py
 uniimente-kernel-boundaries @ https://github.com/dababiyoda/uniimente-kernel/archive/e7dc0cbc9c9a9491da253deee018d471af5a77df.tar.gz
 alembic>=1.16.4
 celery>=5.5.3
@@ -19,23 +20,3 @@ structlog>=25.4.0
 tensorflow>=2.14.0
 transformers>=4.48.1
 uvicorn>=0.35.0
-uvicorn
-alembic
-celery
-fastapi
-numpy
-pandas
-passlib
-prometheus-client
-psycopg2-binary
-pydantic
-python-dotenv
-python-jose
-python-multipart
-redis
-scikit-learn
-sqlalchemy
-structlog
-tensorflow
-transformers
-uvicorn
