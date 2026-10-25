@@ -1,0 +1,453 @@
+{
+  "kernel": {
+    "head": "583e5f3156b7ae941a3ec8cf381b3fef572f9748",
+    "inventory_complete": true,
+    "entries": 2409,
+    "provisional_categories": {
+      "unknown": 155,
+      "runtime state": 31,
+      "documentation": 367,
+      "canonical authored source": 848,
+      "shared contract": 28,
+      "evidence artifact": 954,
+      "archive": 5,
+      "organ-specific authored source": 10,
+      "compatibility shim": 8,
+      "fixture": 3
+    },
+    "duplicate_scan_complete": true,
+    "errors": [],
+    "groups": [
+      {
+        "copy_count": 2,
+        "paths": [
+          "cortex/evaluation/learned_routing/suite-v3.json",
+          "docs/collaboration/lineage-archive/pr158-a832c73/cortex/evaluation/learned_routing/suite-v3.json"
+        ],
+        "reclaimable_bytes_if_one_retained": 2434063,
+        "sha256": "8146dc72e231acd584c56c26a035a0a653f54e2579a20efa8da9e453523b4b6e",
+        "size_bytes": 2434063
+      },
+      {
+        "copy_count": 3,
+        "paths": [
+          "docs/evidence/greg-composition/2026-10-07/browser/step-02.png",
+          "docs/evidence/greg-composition/2026-10-07/browser/step-03.png",
+          "docs/evidence/greg-hands/2026-10-02/browser/step-06.png"
+        ],
+        "reclaimable_bytes_if_one_retained": 136182,
+        "sha256": "69b55016f5f2a5b984498a7cd24ab8dbac7f232b0ce6283c604284d7e6a2ae82",
+        "size_bytes": 68091
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "tests/evidence/adoption-20260909/dale-candidate.patch",
+          "tests/evidence/adoption-20260909/dale-current-main-composition.patch"
+        ],
+        "reclaimable_bytes_if_one_retained": 82717,
+        "sha256": "ef920c58a08a5d958a5a18a998c9972b9e9e45b059a14f940ea3d28e15ffb152",
+        "size_bytes": 82717
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "docs/evidence/greg-composition/2026-10-07/browser/step-00.png",
+          "docs/evidence/greg-composition/2026-10-07/browser/step-01.png"
+        ],
+        "reclaimable_bytes_if_one_retained": 76686,
+        "sha256": "3ceab4f8087f7cd8c2d3bae145dfbaf207b5d68c2ef4780591ce2e339cf07758",
+        "size_bytes": 76686
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "cortex/evaluation/composition_lift/run_v2.py",
+          "docs/collaboration/lineage-archive/pr158-a832c73/cortex/evaluation/composition_lift/run_v2.py"
+        ],
+        "reclaimable_bytes_if_one_retained": 30536,
+        "sha256": "5f89a32f4607bbc567a328a346176ec48dc2182226290e8ac022d39666e650e3",
+        "size_bytes": 30536
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "cortex/evaluation/composition_lift/run_v3.py",
+          "docs/collaboration/lineage-archive/pr158-a832c73/cortex/evaluation/composition_lift/run_v3.py"
+        ],
+        "reclaimable_bytes_if_one_retained": 23395,
+        "sha256": "2053a30ab4d6e60d658a33cc4d1ad66585840ab9def5db7a3f645116b22b4058",
+        "size_bytes": 23395
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "evolution/repair/continuity/objects/1c189be5af884932ed2115557b5a285883a2c6045af183c7f6f65a0815a06f2e",
+          "policy/consequence_gate.py"
+        ],
+        "reclaimable_bytes_if_one_retained": 19934,
+        "sha256": "1c189be5af884932ed2115557b5a285883a2c6045af183c7f6f65a0815a06f2e",
+        "size_bytes": 19934
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "cortex/evaluation/learned_routing/run_v3.py",
+          "docs/collaboration/lineage-archive/pr158-a832c73/cortex/evaluation/learned_routing/run_v3.py"
+        ],
+        "reclaimable_bytes_if_one_retained": 15493,
+        "sha256": "f5493f5a8d29e62ec77f62fbc755c27029eca31a169cdfc2d39ce9e37794bea2",
+        "size_bytes": 15493
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "cortex/evaluation/composition_lift/freeze-v3.json",
+          "docs/collaboration/lineage-archive/pr158-a832c73/cortex/evaluation/composition_lift/freeze-v3.json"
+        ],
+        "reclaimable_bytes_if_one_retained": 15320,
+        "sha256": "af90173537c84af31e1619dcc2c90660597cf3192611b22be28108d65fb80f58",
+        "size_bytes": 15320
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "docs/collaboration/goal-chase-v0-evidence/begin.json",
+          "docs/collaboration/goal-chase-v0-evidence/inspect.json"
+        ],
+        "reclaimable_bytes_if_one_retained": 12675,
+        "sha256": "224bb36e6f874532d80c12999aed0d6eff5c11d367658e75bf9363d5d8a0d5b1",
+        "size_bytes": 12675
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "docs/collaboration/goal-chase-attention-evidence/inspect.json",
+          "docs/collaboration/goal-chase-attention-evidence/reconfirm.json"
+        ],
+        "reclaimable_bytes_if_one_retained": 12675,
+        "sha256": "85ee72a2d9f6c444073627af66054466db2c456b5dad8fbae89090ddcd797d30",
+        "size_bytes": 12675
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "cortex/evaluation/composition_lift/freeze-v2.json",
+          "docs/collaboration/lineage-archive/pr158-a832c73/cortex/evaluation/composition_lift/freeze-v2.json"
+        ],
+        "reclaimable_bytes_if_one_retained": 6977,
+        "sha256": "d05105c6dd3cf429e4083fa2d5d6a395c387ac444c6816f173435a1df746a067",
+        "size_bytes": 6977
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "constitution/constitution.ucl",
+          "evolution/repair/continuity/objects/5c269850d8da799db66030103c52a175596d9c5f3bb61d25f54d7da9dde2ecd0"
+        ],
+        "reclaimable_bytes_if_one_retained": 4536,
+        "sha256": "5c269850d8da799db66030103c52a175596d9c5f3bb61d25f54d7da9dde2ecd0",
+        "size_bytes": 4536
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "examples/cognition/seed-freeze-v2-pre-boundary-fix.json",
+          "examples/cognition/seed-freeze-v2.json"
+        ],
+        "reclaimable_bytes_if_one_retained": 3714,
+        "sha256": "6d2de986ea00b202b4c3521f29f172e167572d132951a951c324a4a4d921d8f5",
+        "size_bytes": 3714
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "docs/collaboration/lineage-archive/pr158-a832c73/docs/evidence/greg-protected-evolution/2026-10-14/README.md",
+          "docs/evidence/greg-protected-evolution/2026-10-14/README.md"
+        ],
+        "reclaimable_bytes_if_one_retained": 3281,
+        "sha256": "f6759fb4b1bef9b6bcf99f8c7c8d8744df05a39b95fbbd643d42faefaa248f7c",
+        "size_bytes": 3281
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "evolution/repair/continuity/objects/995810a39c21f7e8da811598fdd83e2fe07127c51656c9652d2283d98c3f1085",
+          "identity/organ-registry.yaml"
+        ],
+        "reclaimable_bytes_if_one_retained": 2738,
+        "sha256": "995810a39c21f7e8da811598fdd83e2fe07127c51656c9652d2283d98c3f1085",
+        "size_bytes": 2738
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "docs/evidence/greg-genome-admission/2026-10-21-operations/make_readme_tables.py",
+          "docs/evidence/greg-genome-admission/2026-10-22-joined-operations/make_readme_tables.py"
+        ],
+        "reclaimable_bytes_if_one_retained": 2662,
+        "sha256": "a9aac87eac15a36178ef18a9fe0f5a49f9e08bf7ed9652813d7b3afc6634b8c0",
+        "size_bytes": 2662
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "authority/authority-matrix.yaml",
+          "evolution/repair/continuity/objects/bd763098ecbbfd6ea7e8c9d80b83ed329fefd4766e53ed9b11006719fc671a45"
+        ],
+        "reclaimable_bytes_if_one_retained": 2546,
+        "sha256": "bd763098ecbbfd6ea7e8c9d80b83ed329fefd4766e53ed9b11006719fc671a45",
+        "size_bytes": 2546
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "constitution/shutdown-policy.ucl",
+          "evolution/repair/continuity/objects/e3b443663cc5ed81a8b8827d8feb49962f82f262e85c282113f534c2afab2e54"
+        ],
+        "reclaimable_bytes_if_one_retained": 2533,
+        "sha256": "e3b443663cc5ed81a8b8827d8feb49962f82f262e85c282113f534c2afab2e54",
+        "size_bytes": 2533
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "constitution/sovereignty.ucl",
+          "evolution/repair/continuity/objects/dc44c1f4304d42791a9db634796584531d40ba6b46191f2cba3877e48ee7fbcc"
+        ],
+        "reclaimable_bytes_if_one_retained": 2455,
+        "sha256": "dc44c1f4304d42791a9db634796584531d40ba6b46191f2cba3877e48ee7fbcc",
+        "size_bytes": 2455
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "cortex/evaluation/learned_routing/freeze-v3.json",
+          "docs/collaboration/lineage-archive/pr158-a832c73/cortex/evaluation/learned_routing/freeze-v3.json"
+        ],
+        "reclaimable_bytes_if_one_retained": 2441,
+        "sha256": "2edd3d1aba9bd9d27ace126081885b6b3cf7c0df1c5961e12e0484214af366c1",
+        "size_bytes": 2441
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "constitution/participant-rights.ucl",
+          "evolution/repair/continuity/objects/feba5d83800cd5d04702087473eea4d38290950097072efc578cfd498d631687"
+        ],
+        "reclaimable_bytes_if_one_retained": 2214,
+        "sha256": "feba5d83800cd5d04702087473eea4d38290950097072efc578cfd498d631687",
+        "size_bytes": 2214
+      },
+      {
+        "copy_count": 6,
+        "paths": [
+          "docs/collaboration/goal-chase-attention-evidence/authority.log",
+          "docs/cortex/evidence/seed-genome/authority.log",
+          "docs/evidence/full-machine-convergence-20261007/authority.log",
+          "tests/evidence/cognition-2026-09-30/authority.log",
+          "tests/evidence/goal-gravity-20261013/ci-check-authority-singleton-increment-2.log",
+          "tests/evidence/greg-usable/authority.log"
+        ],
+        "reclaimable_bytes_if_one_retained": 2205,
+        "sha256": "16c96796f9e6e6df11cc9f2ded8de13c4a367ea0ec077aad206419d8ecf85026",
+        "size_bytes": 441
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "authority/reserved-matters.yaml",
+          "evolution/repair/continuity/objects/f185e0d11dec25e2bc3dbb73ce92bbb5d276358d1ac8abcaca7526a2805eb924"
+        ],
+        "reclaimable_bytes_if_one_retained": 2112,
+        "sha256": "f185e0d11dec25e2bc3dbb73ce92bbb5d276358d1ac8abcaca7526a2805eb924",
+        "size_bytes": 2112
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "evolution/repair/continuity/objects/533e919e6c1cb918cfd249765f35ab24efc24729d79af804d09d96d65d45d20e",
+          "identity/agent-registry.yaml"
+        ],
+        "reclaimable_bytes_if_one_retained": 2019,
+        "sha256": "533e919e6c1cb918cfd249765f35ab24efc24729d79af804d09d96d65d45d20e",
+        "size_bytes": 2019
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "constitution/amendment-policy.ucl",
+          "evolution/repair/continuity/objects/0132d53ec1e770a526f0e57888235a0b0bac4ed14b443782da537fb70b2ac01f"
+        ],
+        "reclaimable_bytes_if_one_retained": 1780,
+        "sha256": "0132d53ec1e770a526f0e57888235a0b0bac4ed14b443782da537fb70b2ac01f",
+        "size_bytes": 1780
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "evolution/repair/continuity/objects/cd8c2c493b22a25926bbcedb049ebe28d86bd6e087ab920c0bbe2bae08cceac0",
+          "identity/service-identities.yaml"
+        ],
+        "reclaimable_bytes_if_one_retained": 1694,
+        "sha256": "cd8c2c493b22a25926bbcedb049ebe28d86bd6e087ab920c0bbe2bae08cceac0",
+        "size_bytes": 1694
+      },
+      {
+        "copy_count": 5,
+        "paths": [
+          "docs/collaboration/goal-chase-attention-evidence/sealed.log",
+          "docs/collaboration/goal-chase-v0-evidence/goal-chase-sealed.log",
+          "docs/cortex/evidence/seed-genome/sealed.log",
+          "tests/evidence/cognition-2026-09-30/sealed.log",
+          "tests/evidence/greg-usable/sealed.log"
+        ],
+        "reclaimable_bytes_if_one_retained": 1556,
+        "sha256": "c6f5311fc4ae782a4051fa2a38b05044996e015a41f3d3acc2f0e92e94e5a2f1",
+        "size_bytes": 389
+      },
+      {
+        "copy_count": 3,
+        "paths": [
+          "tests/evidence/adoption-20260909/kernel-check_authority_singleton.log",
+          "tests/evidence/greg-proof/authority.log",
+          "tests/evidence/opus-reconciliation/authority.log"
+        ],
+        "reclaimable_bytes_if_one_retained": 1458,
+        "sha256": "eb927c68b9d03fbf460b333b67bd938c076fbde9e32a3b453f40e5889a92ad56",
+        "size_bytes": 729
+      },
+      {
+        "copy_count": 3,
+        "paths": [
+          "tests/evidence/adoption-20260909/kernel-check_sealed_developmental.log",
+          "tests/evidence/greg-proof/sealed.log",
+          "tests/evidence/opus-reconciliation/sealed.log"
+        ],
+        "reclaimable_bytes_if_one_retained": 1356,
+        "sha256": "bff5a679e432c7595d305e94379a2e621ffd408dd543aa4934014811fa13632d",
+        "size_bytes": 678
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "docs/collaboration/goal-chase-attention-evidence/begin.txt",
+          "docs/collaboration/goal-chase-v0-evidence/begin.txt"
+        ],
+        "reclaimable_bytes_if_one_retained": 1302,
+        "sha256": "897beb8012bb69ea7ffb6ad885f6ff890d9a004a14817f3065189ba5e456a71d",
+        "size_bytes": 1302
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "authority/legal-principals.yaml",
+          "evolution/repair/continuity/objects/bff91ae68dcf54aed7e4021c30d5230a25b35a2167928ddd70842702a2bd732b"
+        ],
+        "reclaimable_bytes_if_one_retained": 939,
+        "sha256": "bff91ae68dcf54aed7e4021c30d5230a25b35a2167928ddd70842702a2bd732b",
+        "size_bytes": 939
+      },
+      {
+        "copy_count": 3,
+        "paths": [
+          "tests/evidence/adoption-20260909/kernel-check_schema_refs.log",
+          "tests/evidence/greg-proof/schemas.log",
+          "tests/evidence/opus-reconciliation/schema.log"
+        ],
+        "reclaimable_bytes_if_one_retained": 738,
+        "sha256": "f82388da71099715c57b44fcf8583e2819302786bc2a252e0d54bd960d95a5c6",
+        "size_bytes": 369
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "docs/cortex/evidence/seed-genome/schema.log",
+          "docs/evidence/full-machine-convergence-20261007/contracts.log"
+        ],
+        "reclaimable_bytes_if_one_retained": 89,
+        "sha256": "e1a4d5e9e7e49a2d8e5a9031f8684835706815bd9498a7df17ee1f68edf52a8a",
+        "size_bytes": 89
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "tests/evidence/greg-proof/ruff-correctness.log",
+          "tests/evidence/opus-reconciliation/ruff.log"
+        ],
+        "reclaimable_bytes_if_one_retained": 19,
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "size_bytes": 19
+      }
+    ]
+  },
+  "daleobanks": {
+    "head": "664ac98c553759ce754bb684cb248225343edd7e",
+    "inventory_complete": true,
+    "entries": 274,
+    "provisional_categories": {
+      "unknown": 14,
+      "runtime state": 1,
+      "documentation": 23,
+      "canonical authored source": 164,
+      "shared contract": 2,
+      "generated output": 1,
+      "organ-specific authored source": 59,
+      "evidence artifact": 10
+    },
+    "duplicate_scan_complete": true,
+    "errors": [],
+    "groups": [
+      {
+        "copy_count": 2,
+        "paths": [
+          "attached_assets/Pasted-ROLE-You-are-a-principal-engineer-Build-a-production-grade-low-cost-Replit-friendly-repo-that-in-1753848575746_1753848575746.txt",
+          "attached_assets/Pasted-ROLE-You-are-a-principal-engineer-Build-a-production-grade-low-cost-Replit-friendly-repo-that-in-1753849348921_1753849348922.txt"
+        ],
+        "reclaimable_bytes_if_one_retained": 18891,
+        "sha256": "48559eb30501125a0718ecb19d913f9954d400af53d8d335ba5226c2a057f58e",
+        "size_bytes": 18891
+      },
+      {
+        "copy_count": 2,
+        "paths": [
+          "attached_assets/Pasted-Below-is-a-gap-map-of-what-you-re-missing-or-should-harden-to-turn-the-agent-from-powerful-to-un-1753852171266_1753852171266.txt",
+          "attached_assets/Pasted-Below-is-a-gap-map-of-what-you-re-missing-or-should-harden-to-turn-the-agent-from-powerful-to-un-1753852687738_1753852687738.txt"
+        ],
+        "reclaimable_bytes_if_one_retained": 5814,
+        "sha256": "925f743b75fcacfc8995a149ac4af3bc7e90532958dc55a242702749c1d537be",
+        "size_bytes": 5814
+      }
+    ]
+  },
+  "wealthmachine": {
+    "head": "b2c7f2347771e78ee5a6b250a4d2c0ca5b6abd50",
+    "inventory_complete": true,
+    "entries": 209,
+    "provisional_categories": {
+      "unknown": 20,
+      "runtime state": 15,
+      "documentation": 56,
+      "canonical authored source": 69,
+      "shared contract": 2,
+      "evidence artifact": 25,
+      "historical snapshot": 2,
+      "organ-specific authored source": 18,
+      "fixture": 2
+    },
+    "duplicate_scan_complete": true,
+    "errors": [],
+    "groups": [
+      {
+        "copy_count": 2,
+        "paths": [
+          "attached_assets/Pasted--Great-work-Replit-Agent-Before-introducing-additional-features-let-s-review-the-key-integ-1738208777576.txt",
+          "attached_assets/Pasted--Great-work-Replit-Agent-Before-introducing-additional-features-let-s-review-the-key-integ-1738208914495.txt"
+        ],
+        "reclaimable_bytes_if_one_retained": 2151,
+        "sha256": "97b98d90ad59118b2a078cdc1f57f78a442df32dca7a811c444121509d8a8f10",
+        "size_bytes": 2151
+      }
+    ]
+  }
+}

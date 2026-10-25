@@ -30,6 +30,16 @@ A unified ontological backbone for digital business ventures that emphasizes AI 
 
 ## Directory Structure
 
+Runtime code is under `src/`; `src/api/main.py` owns the ASGI application.
+`main.py` is a compatibility import. `WealthMachineIntelligenceEnhanced/` is
+experimental and excluded from the root image; `historical/` retains earlier
+implementations. Design folders below are documentation, not additional runtimes.
+See [the structural audit](docs/audits/structural-clarity-2026-10-25.md).
+
+Author runtime dependencies only in `pyproject.toml`. Refresh the Docker/pip
+export with `python scripts/export_requirements.py`; check it with
+`python scripts/export_requirements.py --check`.
+
 ### /ontology
 Contains the core ontological framework defining relationships between business entities, roles, and processes.
 
