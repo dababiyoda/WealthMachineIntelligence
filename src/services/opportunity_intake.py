@@ -27,7 +27,7 @@ from uuid import uuid4
 
 from src.network_my_networth.system import NetworkWealthEngine
 from src.services.adversarial import build_cases, severe_unresolved
-from src.services.staffing_evidence import review_staffing_evidence
+from src.services.staffing_evidence import review_staffing_evidence, staffing_indices
 from src.services.venture_protocol import (
     FINANCE_EDUCATION_FLAG,
     LEGAL_RISK_FLAGS,
@@ -45,6 +45,13 @@ _URGENCY_MIN_SCORE = {"high": 0.5, "medium": 0.55, "low": 0.65}
 _MAX_SIGNALS = 5
 
 
+def demand_evidence(evidence: list) -> list:
+    """The packet's evidence without staffing reports: those describe capacity, not demand, so they never
+    become demand signals or count toward the adversarial evidence tests (staffing_evidence reads them)."""
+    staffing = staffing_indices(evidence)
+    return [item for index, item in enumerate(evidence) if index not in staffing]
+
+
 def packet_to_engine_payload(packet: Dict[str, Any]) -> Dict[str, Any]:
     """Adapt a validated OpportunityPacket into the venture-loop payload."""
     urgency = packet["urgency"]
@@ -60,7 +67,7 @@ def packet_to_engine_payload(packet: Dict[str, Any]) -> Dict[str, Any]:
             "theme": packet["signal_type"],
             "evidence": evidence_item,
         }
-        for evidence_item in packet["evidence"][:_MAX_SIGNALS]
+        for evidence_item in demand_evidence(packet["evidence"])[:_MAX_SIGNALS]
     ]
 
     finance = FINANCE_EDUCATION_FLAG in packet["risk_flags"]
@@ -158,8 +165,9 @@ class OpportunityIntakeService:
         legal_flags = sorted(LEGAL_RISK_FLAGS & set(packet["risk_flags"]))
         finance = FINANCE_EDUCATION_FLAG in packet["risk_flags"]
 
-        # The committee argues with itself before any verdict is written.
-        cases = build_cases(packet, score, alignment)
+        # The committee argues with itself before any verdict is written, over the demand evidence only.
+        demand = demand_evidence(packet["evidence"])
+        cases = build_cases({**packet, "evidence": demand}, score, alignment)
         severe = severe_unresolved(cases)
         staffing = review_staffing_evidence(packet["evidence"])
 
@@ -170,6 +178,9 @@ class OpportunityIntakeService:
         elif not packet["evidence"]:
             go_no_go = "needs_more_evidence"
             reasons.append("no evidence attached to the packet")
+        elif not demand:
+            go_no_go = "needs_more_evidence"
+            reasons.append("only staffing reports attached; they describe capacity, not demand")
         elif legal_hold:
             go_no_go = "defer"
             reasons.append("legal counsel readiness is on hold")
@@ -192,7 +203,8 @@ class OpportunityIntakeService:
             reasons.append("finance content must remain educational; no personalized advice")
 
         reasons.extend(review.reason for review in staffing)
-        figures = {(review.staffed, review.demand, review.shortage, review.unfilled)
+        # Same figures with a different plan are two plans, not corroboration.
+        figures = {(review.staffed, review.demand, review.shortage, review.unfilled, review.assignment)
                    for review in staffing if review.error is None}
         divergent_staffing = len(figures) > 1
         if divergent_staffing:
@@ -201,16 +213,16 @@ class OpportunityIntakeService:
             go_no_go = "needs_more_evidence"
             reasons.append("reported staffing shortfall or inconsistent evidence requires validation before proceeding")
 
-        # Unresolved reports take priority over clean reports, irrespective of wire order.
-        staffing_steps = [review.next_action for review in sorted(staffing, key=lambda review: not review.prevents_go)]
+        # Unresolved reports first, then shortages, then complete reports, irrespective of wire order.
+        staffing_steps = [review.next_action for review in sorted(staffing, key=lambda review: review.priority)]
         if divergent_staffing:
             staffing_steps.insert(0, "Reconcile differing staffing reports with exact original inputs and receipts; identify alternatives or contradictions")
-        validation_plan = [step for step in [
+        validation_plan = list(dict.fromkeys(step for step in [
             *staffing_steps,
             packet["smallest_validation_action"],
             "Draft landing-page copy and collect waitlist interest (no payment yet)",
             "Run 3-5 buyer interviews from engaged repliers",
-        ] if step]
+        ] if step))
 
         legal_readiness = "review_required" if (legal_flags or finance or legal_hold) else "standard"
 
