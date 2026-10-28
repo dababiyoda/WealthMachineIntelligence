@@ -12,6 +12,8 @@ LABEL = "Evidence from GREG's certified staffing plan for the docks and the line
 
 
 def plan(staffed=8, demand=8):
+    """One worker A of capacity ``staffed`` on one order "docks" of demand ``demand``, shaped as the Kernel's
+    certify_staffing emits it: a shortage names its bottleneck (docks, served only by A)."""
     shortage = demand - staffed
     return {
         "certified": True,
@@ -20,7 +22,9 @@ def plan(staffed=8, demand=8):
         "shortage": shortage,
         "assignment": [["A", "docks", staffed]] if staffed else [],
         "unfilled": {"docks": shortage} if shortage else {},
-        "bottleneck": None,
+        "bottleneck": None if not shortage else {
+            "orders": ["docks"], "eligible_workers": ["A"], "demand": demand, "capacity": staffed,
+            "why": "these orders can only be served by these workers"},
         "certificate": {"checked_by": "GREG, from the original problem"},
     }
 

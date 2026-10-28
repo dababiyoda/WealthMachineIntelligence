@@ -1,0 +1,340 @@
+{
+ "decision_id": "WMI-STAFFING-READER-HARDENING-2026-10-28",
+ "title": "Harden WMI #45's staffing reader before Kernel adoption: capacity is not demand, the report's own arithmetic is checked, recognition matches the real producer",
+ "problem": "Independent five-lens review of WMI #45 (b2c7f234) plus reproduction found that a recognised staffing report still counted as a market-demand signal (an 8/8 report turned defer into go at low urgency, 0.638 -> 0.667), that bottleneck, certified and certificate fields were never checked (a fully staffed report whose own bottleneck says capacity is short read as 'arithmetic agrees' and stayed go), that a report not at the start of an evidence item, or two reports DALEOBANKS merges into one sentence, were silently dropped or misread, that replays were counted as corroboration, and that classification text depended on interpreter recursion and digit limits.",
+ "founder_intent_refs": [
+  "INTENT-20261001-FULL-MACHINE-COMPLETION",
+  "INTENT-20261019-UPWARD-ASCENT",
+  "INTENT-20261023-ORGAN-PINS-UPGRADED",
+  "founder directive 2026-10-28 (TRUE ABSOLUTE OPUS MAXIMUS, section 4 conditions 1-8)",
+  "https://github.com/dababiyoda/uniimente-kernel/issues/96#issuecomment-6473380596"
+ ],
+ "baseline": "WMI #45 at b2c7f234: a staffing reader that checks totals, assignment and unfilled sums and caps go on a shortage, adopted as-is.",
+ "alternatives": [
+  {
+   "name": "Adopt #45 unchanged",
+   "description": "Repin the Kernel to b2c7f234 and strengthen step 9 only.",
+   "advantages": [
+    "Smallest change; #45's own tests and hosted CI already pass.",
+    "On the 15-step mission's one report, #45 already caps the verdict correctly."
+   ],
+   "disadvantages": [
+    "A report raises the opportunity score and can promote defer to go (condition 3).",
+    "Self-contradictory reports read as 'internal arithmetic agrees' (condition 5).",
+    "Real-producer merges and mid-item labels silently drop a report (condition 4)."
+   ],
+   "revival_evidence": "A demonstration that no realistic producer path can reach the reproduced cases."
+  },
+  {
+   "name": "Recognise reports structurally only (any staffing-shaped JSON)",
+   "description": "Drop the label and read every evidence item whose JSON has the staffing keys.",
+   "advantages": [
+    "Survives template wording changes."
+   ],
+   "disadvantages": [
+    "Turns unrelated JSON into reports; widens the trusted surface for a claim-only wire."
+   ],
+   "revival_evidence": "A canonical wire marker or contract field for staffing reports agreed by the Kernel contract owner."
+  },
+  {
+   "name": "Recertify from the original problem in WMI",
+   "description": "Carry the original staffing problem and re-run certification in WMI.",
+   "advantages": [
+    "Would verify optimality and feasibility, not only internal arithmetic."
+   ],
+   "disadvantages": [
+    "The packet does not carry the original problem; needs a shared-contract change and a second solver in the venture organ."
+   ],
+   "revival_evidence": "Kernel contract owner adds an original-input artifact reference to OpportunityPacket evidence."
+  }
+ ],
+ "do_nothing_option": {
+  "expected_outcome": "The Kernel stays pinned to WMI #44 (7a45d223), which returns byte-identical assessments for 8/8 and 4/8 (both go).",
+  "advantages": [
+   "No integration risk."
+  ],
+  "disadvantages": [
+   "The founder's first acceptance condition stays unmet: the shortage changes nothing.",
+   "Step 9 keeps its recorded gap."
+  ]
+ },
+ "roles": [
+  {
+   "role": "Founder-Intent Steward",
+   "position": "Self-review perspective. The destination is figure-sensitive consumption through the real machine without false verification; a reader that can promote a verdict or launder a contradiction does not meet it.",
+   "material_concerns": [
+    "Do not stop at adopting #45 if it fails conditions 3-5.",
+    "Resume the parent machine (step 9, then construction outcome, learning) after integration."
+   ],
+   "evidence_refs": [
+    "before.txt",
+    "after.txt",
+    "Kernel child: docs/evidence/organ-staffing-figures-2026-10-28/"
+   ],
+   "recommendation": "EXPERIMENT"
+  },
+  {
+   "role": "Systems Architect",
+   "position": "Keep the change inside WMI's domain reader and intake; no shared contract, transport or Kernel authority change. Capacity evidence leaves the demand window through one helper used by both the engine payload and the adversarial committee.",
+   "material_concerns": [
+    "Two consumers of the evidence list (engine payload, build_cases) must see the same demand view.",
+    "Multi-report items need stable identifiers (evidence[i.j])."
+   ],
+   "evidence_refs": [
+    "src/services/opportunity_intake.py demand_evidence",
+    "src/services/staffing_evidence.py staffing_indices"
+   ],
+   "recommendation": "EXPERIMENT"
+  },
+  {
+   "role": "Adversarial Reviewer",
+   "position": "Five independent review lenses (separate agents, not this implementer) reported the defects; this implementer reproduced each before fixing. 28 guard-removal mutants are all caught.",
+   "material_concerns": [
+    "A consistent fabrication still reads as consistent; only internal arithmetic is checked.",
+    "Label-anywhere recognition turns prose that names the label into an unresolved report (accepted, recorded as dissent)."
+   ],
+   "evidence_refs": [
+    "wmi-mutants.txt",
+    "review findings (workflow wf_c6f4f375-e60)"
+   ],
+   "recommendation": "EXPERIMENT"
+  },
+  {
+   "role": "Operator and Maintainer",
+   "position": "Deterministic classification (bounded depth and digit runs scanned before parsing) keeps the Kernel's two-process REPRODUCIBLE check stable across Python versions; fixtures are captured from the Kernel's own certify_staffing.",
+   "material_concerns": [
+    "Fixture drift if the Kernel's answer shape changes: the fixture records its Kernel revision.",
+    "Two port-5000 tests fail while TIME_WAIT sockets linger (pre-existing; they pass in isolation)."
+   ],
+   "evidence_refs": [
+    "tests/fixtures/staffing/kernel_certified_answers.json",
+    "suite.txt"
+   ],
+   "recommendation": "EXPERIMENT"
+  },
+  {
+   "role": "Evidence and Welfare Guardian",
+   "position": "Every reading stays an unverified report; nothing here verifies demand, capacity, optimality or the world, and requires_human_approval stays true. The change only lowers or keeps verdicts.",
+   "material_concerns": [
+    "Do not describe the hardened reader as verification.",
+    "#45's own evidence records describe an earlier test draft; preserve them and record the errata here rather than rewriting them."
+   ],
+   "evidence_refs": [
+    "README.md errata section"
+   ],
+   "recommendation": "EXPERIMENT"
+  }
+ ],
+ "evidence": [
+  {
+   "claim": "On WMI #44 (the current Kernel pin) an 8/8 and a 4/8 report give byte-identical assessments, both go, through the real organ exchange.",
+   "tier": "sandbox_execution",
+   "reference": "contrast-wmi44.json (Kernel child branch test, real DALEOBANKS 664ac98c and WMI 7a45d223 processes)",
+   "finding": "The seam was open: the figures changed nothing."
+  },
+  {
+   "claim": "35 of the 46 new hardening tests fail on #45's reader (b2c7f234) and all 46 pass on this branch; the other 11 are guards of #45's correct behaviour that pass on both.",
+   "tier": "unit_test",
+   "reference": "before.txt, after.txt",
+   "finding": "Each fixed defect has a failing-first test."
+  },
+  {
+   "claim": "28 of 28 guard-removal mutants are caught by the staffing and intake tests.",
+   "tier": "unit_test",
+   "reference": "wmi-mutants.txt",
+   "finding": "No guard can be removed without a failing test."
+  },
+  {
+   "claim": "The full WMI suite passes on this branch: 211 plus the 2 port-5000 tests run alone after TIME_WAIT clears (213 of 213).",
+   "tier": "unit_test",
+   "reference": "suite.txt",
+   "finding": "No regression in existing WMI behaviour."
+  }
+ ],
+ "counterevidence": [
+  {
+   "claim": "On the 15-step mission's single, well-placed report, #45 already gave the correct verdict and first step.",
+   "tier": "sandbox_execution",
+   "reference": "tests lens notes; Kernel step 9 run",
+   "finding": "The live path was not wrong today; the defects are reachable through realistic variants (urgency, merged sentences, replays, contradictory fields), not through that one mission."
+  }
+ ],
+ "pass_1": {
+  "intended_outcome": "Equal-count reports with different staffing realities change WMI's reasons, evidence requests and first validation step, and nothing else; no report can raise a score or a verdict or pass a contradiction as agreement.",
+  "advantages": [
+   {
+    "id": "A1",
+    "statement": "Capacity evidence leaves the demand window.",
+    "amplified_value": "The opportunity score and the adversarial cases are identical with or without a report, so the reader's effect is isolated and measurable (condition 3)."
+   },
+   {
+    "id": "A2",
+    "statement": "The report's own arithmetic, including its bottleneck, is checked against what certify_staffing guarantees.",
+    "amplified_value": "A self-contradictory report is an explicit unresolved observation, never 'arithmetic agrees' (condition 5)."
+   },
+   {
+    "id": "A3",
+    "statement": "Recognition matches the real producer path.",
+    "amplified_value": "Mid-item labels, merged sentences, Kernel indent=1 rendering and replays are read or named, never dropped (condition 4)."
+   }
+  ],
+  "disadvantages": [
+   {
+    "id": "D1",
+    "statement": "Excluding staffing reports from demand evidence lowers scores of packets that carry them, changing assessment numbers relative to #45.",
+    "severity": "medium",
+    "response_type": "evidence",
+    "redesigned_response": "Measured: the change only lowers or keeps the score; the 15-step packet keeps its verdict cap; recorded in README."
+   },
+   {
+    "id": "D2",
+    "statement": "Stricter consistency rules may reject an honest producer shape other than the Kernel's.",
+    "severity": "medium",
+    "response_type": "evidence",
+    "redesigned_response": "Rules are exactly certify_staffing's guarantees; a rejected report is unresolved (asks for the original plan), not discarded."
+   },
+   {
+    "id": "D3",
+    "statement": "Label-anywhere recognition flags prose that mentions the label.",
+    "severity": "low",
+    "response_type": "protective",
+    "redesigned_response": "Accepted: such prose asks for the plan (needs_more_evidence) instead of passing as demand; tested and recorded as dissent."
+   }
+  ],
+  "comparisons": {
+   "baseline": "#45 unchanged: correct on the one mission report, wrong on reproduced variants.",
+   "do_nothing": "Rejected: the 8/8 and 4/8 assessments stay identical on the current pin.",
+   "simplest_viable_alternative": "Adopt #45 and document the gaps; rejected because conditions 3-5 are founder acceptance conditions, not optional polish.",
+   "strongest_competing_architecture": "Recertification from original inputs in WMI; deferred until the packet carries an original-input reference.",
+   "reversible_experiment": "Selected: a child branch of #45 with failing-first tests, mutants and the Kernel real-organ contrast test; draft PR, no merge."
+  },
+  "rejected_alternatives": [
+   {
+    "name": "Structural-only recognition",
+    "rejection_reason": "Widens the trusted surface without a contract marker.",
+    "revival_evidence": "A canonical staffing marker in the wire contract."
+   },
+   {
+    "name": "Treat certified:false as a clean reading with a note",
+    "rejection_reason": "The producer's own uncertainty would leave go standing.",
+    "revival_evidence": "A producer that legitimately emits uncertified plans with a separate acceptance path."
+   }
+  ]
+ },
+ "pass_2": {
+  "attack_summary": "Re-attack the hardened reader: merged multi-report sentences, trailing text and terminators, typographic labels, unlabeled staffing JSON, replays in other renderings, same figures with other plans, same plan with other short orders, deep nesting and long numbers under different interpreter states, each guard isolated by a consistent input, and verdict monotonicity over urgency x confidence.",
+  "new_weaknesses": [
+   {
+    "id": "W1",
+    "category": "overfit",
+    "statement": "Recognition is still tied to one label family; a different producer wording is only caught when its JSON carries the staffing keys.",
+    "strengthening_response": "Unlabeled staffing-shaped JSON is an explicit unresolved review and leaves the demand window."
+   },
+   {
+    "id": "W2",
+    "category": "fragility",
+    "statement": "The Kernel's indent=1 rendering makes reports larger; a deep or long report hits the size bound before the depth bound.",
+    "strengthening_response": "Both are fixed messages; the Kernel's 2000-byte bind bound is stricter than WMI's 8192 and refuses before WMI sees anything (recorded)."
+   },
+   {
+    "id": "W3",
+    "category": "gaming",
+    "statement": "A replay rendered differently or two plans with equal figures could pass as corroboration.",
+    "strengthening_response": "Canonical-JSON replay detection and the plan and unfilled orders in the divergence key, each with an isolating test and mutant."
+   }
+  ],
+  "pass_1_disadvantage_dispositions": [
+   {
+    "disadvantage_id": "D1",
+    "outcome": "accepted",
+    "rationale": "Lowering a score that was inflated by capacity data is the intended effect.",
+    "owner": "WMI maintainer",
+    "review_trigger": "A packet whose only demand signal was the staffing report reaches a founder decision."
+   },
+   {
+    "disadvantage_id": "D2",
+    "outcome": "experiment",
+    "rationale": "Only the Kernel producer exists today; other producers would need their own contract.",
+    "owner": "WMI maintainer with the Kernel contract owner",
+    "review_trigger": "A second staffing producer or a Kernel answer-shape change."
+   },
+   {
+    "disadvantage_id": "D3",
+    "outcome": "accepted",
+    "rationale": "Conservative and explicit; the only producer of the phrase is GREG's seed template.",
+    "owner": "WMI maintainer",
+    "review_trigger": "A real operator thought that names the label in prose."
+   }
+  ],
+  "final_design": "WMI's reader checks every certify_staffing guarantee from the report alone, reads labelled reports wherever they appear (including several in one sentence), names replays and unlabeled staffing data, keeps staffing items out of demand signals and adversarial counts, ranks unresolved before shortage before complete, dedupes steps, and classifies deterministically. It still only lowers go; requires_human_approval stays true; no contract or authority changes.",
+  "residual_risks": [
+   {
+    "risk": "Consistent fabricated numbers remain consistent.",
+    "mitigation": "Unverified label; original-input validation and independent acceptance requested first.",
+    "owner": "WMI maintainer and mission operator",
+    "review_trigger": "Before relying on a staffing report for an external effect."
+   },
+   {
+    "risk": "Skeptic verification of the review findings was still running at commit time.",
+    "mitigation": "Verdicts are posted on the PR when complete; any refuted finding is re-examined and its fix reverted if unjustified.",
+    "owner": "session_01Kucyfoabgsg6W8H8xj4qea",
+    "review_trigger": "Workflow wf_c6f4f375-e60 completion."
+   },
+   {
+    "risk": "DALEOBANKS's offline mock evaluator does not read staffing figures and now disagrees with WMI on a shortage.",
+    "mitigation": "Recorded for the DALEOBANKS owner; not changed here.",
+    "owner": "DALEOBANKS maintainer",
+    "review_trigger": "Next DALEOBANKS mock-mode change."
+   }
+  ],
+  "recommendation": "EXPERIMENT"
+ },
+ "dissent": {
+  "present": true,
+  "handling": "Self-review dissent preserved; the five review lenses were separate agents but share this session's model, so this is not independent human review.",
+  "entries": [
+   {
+    "role": "Adversarial Reviewer",
+    "position": "Prose that names the label should stay prose (tests lens, mutant M27).",
+    "rationale": "Moving prose into an unresolved report could hold a verdict that ordinary prose would not.",
+    "evidence_threshold": "A real operator thought that names the label in prose and is wrongly held.",
+    "owner": "WMI maintainer",
+    "review_trigger": "First such observation."
+   },
+   {
+    "role": "Evidence and Welfare Guardian",
+    "position": "Do not call this verification or claim the machine closed.",
+    "rationale": "Only internal arithmetic is checked; no original inputs or real outcome.",
+    "evidence_threshold": "An original-input verifier and a real-use outcome.",
+    "owner": "Kernel contract owner",
+    "review_trigger": "Before treating staffing figures as verified input."
+   }
+  ]
+ },
+ "authority_impact": {
+  "level": "standard",
+  "changes_authority": false,
+  "requires_authorized_human": false,
+  "approval_status": "not_required",
+  "approver": null
+ },
+ "migration_plan": "Child draft PR into #45's branch (codex/wmi-staffing-evidence-20261023), never pushed to it. After exact-head review, the Kernel child branch claude/wmi-staffing-figures-step9-20261028 pins this head for the real-organ contrast test and step 9; integration into #196 is the integrator's, merges are the founder's.",
+ "rollback_plan": {
+  "possible": true,
+  "steps": [
+   "Close the child PR or revert its single commit; the Kernel child then pins #45's head b2c7f234 instead.",
+   "Preserve tests, logs, mutants and this record in Git history.",
+   "If adopted into the Kernel, restore the previous WMI pin and rerun the real-organ contrast test and the 15-step mission."
+  ],
+  "reason_impossible": null
+ },
+ "kill_criteria": [
+  "Any path can raise a verdict or remove human/legal review.",
+  "A report's certificate or certified flag becomes verification.",
+  "A Kernel-emitted answer is rejected as inconsistent.",
+  "The real 15-step mission regresses."
+ ],
+ "decision": "EXPERIMENT",
+ "decision_owner": "session_01Kucyfoabgsg6W8H8xj4qea (implementation, self-review); integrator session_01FBS4KNJR59nSbdGbxo8Mbx (intake); Alfonso (merge)",
+ "review_trigger": "Skeptic verdicts; exact-head review; Kernel combined-head CI."
+}

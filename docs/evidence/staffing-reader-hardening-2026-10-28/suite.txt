@@ -1,0 +1,7 @@
+# command (DALEOBANKS_SOURCE=/home/user/organs/daleobanks): python -m pytest -q -p no:cacheprovider tests -W ignore --deselect tests/test_packaged_startup.py::test_exact_packaged_command_protected_bridge --deselect tests/test_shared_consumer_integration.py::test_real_producer_consumer_restart_and_negative_controls
+# then each deselected port-5000 test alone, after TIME_WAIT sockets on :5000 clear (they bind without SO_REUSEADDR; pre-existing)
+# WMI working tree on b2c7f2347771e78ee5a6b250a4d2c0ca5b6abd50 + this branch; DALEOBANKS 664ac98c553759ce754bb684cb248225343edd7e; Python 3.11.17; date 2026-10-28T16:23:40Z
+211 passed, 2 deselected in 12.06s
+tests/test_packaged_startup.py::test_exact_packaged_command_protected_bridge: 1 passed in 2.05s
+tests/test_shared_consumer_integration.py::test_real_producer_consumer_restart_and_negative_controls: 1 passed in 3.50s
+# ruff (new and edited files): All checks passed!; intake diagnostics identical to b2c7f234 (27)

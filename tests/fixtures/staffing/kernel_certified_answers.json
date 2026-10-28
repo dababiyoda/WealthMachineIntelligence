@@ -1,0 +1,226 @@
+{
+ "full_8_of_8": {
+  "answer": {
+   "assignment": [
+    [
+     "Ana",
+     "Dock",
+     4
+    ],
+    [
+     "Ben",
+     "Line",
+     4
+    ]
+   ],
+   "bottleneck": null,
+   "certificate": {
+    "arithmetic": "exact integers",
+    "checked_by": "GREG, from the original problem; shares no code with the engine",
+    "kind": "deficiency set (generalized Hall/Koenig): staffed equals demand outside U plus capacity of U's eligible workers"
+   },
+   "certified": true,
+   "shortage": 0,
+   "staffed": 8,
+   "total_demand": 8,
+   "unfilled": {}
+  },
+  "problem": {
+   "orders": [
+    {
+     "demand": 4,
+     "id": "Dock",
+     "skill": "forklift"
+    },
+    {
+     "demand": 4,
+     "id": "Line",
+     "skill": "packing"
+    }
+   ],
+   "workers": [
+    {
+     "capacity": 4,
+     "id": "Ana",
+     "skills": [
+      "forklift"
+     ]
+    },
+    {
+     "capacity": 4,
+     "id": "Ben",
+     "skills": [
+      "packing"
+     ]
+    }
+   ]
+  }
+ },
+ "loop15_8_of_9": {
+  "answer": {
+   "assignment": [
+    [
+     "Ana",
+     "Dock2",
+     2
+    ],
+    [
+     "Ben",
+     "Dock1",
+     4
+    ],
+    [
+     "Cy",
+     "Line",
+     2
+    ]
+   ],
+   "bottleneck": {
+    "capacity": 6,
+    "demand": 7,
+    "eligible_workers": [
+     "Ana",
+     "Ben"
+    ],
+    "orders": [
+     "Dock1",
+     "Dock2"
+    ],
+    "why": "these orders can only be served by these workers, whose whole capacity is short of their demand; no assignment can do better without more capacity for exactly them"
+   },
+   "certificate": {
+    "arithmetic": "exact integers",
+    "checked_by": "GREG, from the original problem; shares no code with the engine",
+    "kind": "deficiency set (generalized Hall/Koenig): staffed equals demand outside U plus capacity of U's eligible workers"
+   },
+   "certified": true,
+   "shortage": 1,
+   "staffed": 8,
+   "total_demand": 9,
+   "unfilled": {
+    "Dock2": 1
+   }
+  },
+  "problem": {
+   "orders": [
+    {
+     "demand": 4,
+     "id": "Dock1",
+     "skill": "forklift"
+    },
+    {
+     "demand": 3,
+     "id": "Dock2",
+     "skill": "forklift"
+    },
+    {
+     "demand": 2,
+     "id": "Line",
+     "skill": "packing"
+    }
+   ],
+   "workers": [
+    {
+     "capacity": 2,
+     "id": "Ana",
+     "skills": [
+      "forklift"
+     ]
+    },
+    {
+     "capacity": 4,
+     "id": "Ben",
+     "skills": [
+      "packing",
+      "forklift"
+     ]
+    },
+    {
+     "capacity": 3,
+     "id": "Cy",
+     "skills": [
+      "packing"
+     ]
+    }
+   ]
+  }
+ },
+ "provenance": {
+  "generated_by": "tests/integration/test_organ_staffing_figures.py::certified on the Kernel child branch claude/wmi-staffing-figures-step9-20261028",
+  "kernel_revision": "4e970f2d490dd63676b38ee622c721b3169f9722",
+  "note": "exact certified answers as the constructed assignment.staffing capability returns them; data only",
+  "producer": "uniimente-kernel greg.recombine.certify_staffing over greg.cognition.network.certify_max_flow (networkx max flow)"
+ },
+ "short_4_of_8": {
+  "answer": {
+   "assignment": [
+    [
+     "Ana",
+     "Dock",
+     2
+    ],
+    [
+     "Ben",
+     "Line",
+     2
+    ]
+   ],
+   "bottleneck": {
+    "capacity": 4,
+    "demand": 8,
+    "eligible_workers": [
+     "Ana",
+     "Ben"
+    ],
+    "orders": [
+     "Dock",
+     "Line"
+    ],
+    "why": "these orders can only be served by these workers, whose whole capacity is short of their demand; no assignment can do better without more capacity for exactly them"
+   },
+   "certificate": {
+    "arithmetic": "exact integers",
+    "checked_by": "GREG, from the original problem; shares no code with the engine",
+    "kind": "deficiency set (generalized Hall/Koenig): staffed equals demand outside U plus capacity of U's eligible workers"
+   },
+   "certified": true,
+   "shortage": 4,
+   "staffed": 4,
+   "total_demand": 8,
+   "unfilled": {
+    "Dock": 2,
+    "Line": 2
+   }
+  },
+  "problem": {
+   "orders": [
+    {
+     "demand": 4,
+     "id": "Dock",
+     "skill": "forklift"
+    },
+    {
+     "demand": 4,
+     "id": "Line",
+     "skill": "packing"
+    }
+   ],
+   "workers": [
+    {
+     "capacity": 2,
+     "id": "Ana",
+     "skills": [
+      "forklift"
+     ]
+    },
+    {
+     "capacity": 2,
+     "id": "Ben",
+     "skills": [
+      "packing"
+     ]
+    }
+   ]
+  }
+ }
+}
