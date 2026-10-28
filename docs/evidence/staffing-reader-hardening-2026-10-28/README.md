@@ -42,13 +42,36 @@ The Kernel side is on draft child branch `claude/wmi-staffing-figures-step9-2026
 
 - `before.txt` there is fail-before evidence for an earlier 4-test draft, not for the committed 38 tests. Its line numbers and its warning counts do not match the documented command.
 - `ablation.txt` there hashes `opportunity_intake.py`, not the reader it ablated. Its three tests were hand-picked and their selection is not recorded. An empty reader actually fails most of the committed tests.
-- The size ceiling there is stated as DALEOBANKS's 2,000 characters. The real ceiling is earlier: the Kernel bind's `max_bytes` 2000 applies to the JSON-escaped seed, so the indentation newlines and quotes count twice. A larger plan is refused at the bind, and no assessment exists.
+- The size ceiling there is stated as DALEOBANKS's 2,000 characters. That holds on DALEOBANKS's own intake path. On the Kernel mission path an earlier ceiling applies: the bind's `max_bytes` 2000 counts the JSON-escaped seed, so the indentation newlines and quotes count twice, and a larger plan is refused at the bind before any assessment exists. (Corrected after skeptic verification; see "Review verdicts" below.)
 - The producer test there runs DALEOBANKS's `stated_evidence` and its HTTP client in WMI's interpreter, on a WMI-built packet. That packet has high urgency and no risk flags, unlike the real DALEOBANKS packet (medium urgency, `finance_education_only`). The Kernel child's contrast test runs the real `IdeaRefinery` on the mission's seed template.
 
 ## Limits and open items
 
 - A consistent fabrication still reads as consistent. Only internal arithmetic is checked. An original-input reference in the packet is the precondition for recertification, and it needs the Kernel contract owner.
 - Prose that names the label without carrying a report becomes an unresolved report. This is a deliberate, recorded dissent: the only producer of the phrase is GREG's seed template.
-- DALEOBANKS's offline mock evaluator does not read staffing figures, so it now disagrees with WMI on a shortage. This is recorded for the DALEOBANKS owner and not changed here.
-- Skeptic verification of the review findings was still running at commit time. Its verdicts are posted on the PR. A refuted finding is re-examined, and its fix is reverted if it is unjustified.
+- DALEOBANKS's offline mock evaluator does not read staffing figures, so it disagrees with WMI on a shortage. It already differed from WMI's verdicts before #45 (20 of 96 ordinary packets in the review's run), because it pins the wire shape, not WMI's scoring. This is recorded for the DALEOBANKS owner and not changed here.
+- Skeptic verification of the review findings finished after the first push; see "Review verdicts" below.
 - No hosted CI result yet, no independent human review, no integrator acknowledgment, no merge.
+
+## Review verdicts (skeptic verification of #45's review, 2026-10-28)
+
+Five lenses reviewed #45 (`b2c7f234`) and found 28 raw findings. The 15 strongest were taken forward, and the top 14 were each checked by two separate skeptics told to refute them. The skeptics were agents of the same model family as the implementer. Each finding's disposition at this head:
+
+| # | Finding on #45 (skeptics' severity) | Verdict | Disposition here |
+|---|---|---|---|
+| 1 | A recognized report still counts as demand evidence; it raises the score and can promote defer or needs_more_evidence to go (medium) | confirmed 2/2 | Fixed: `demand_evidence` excludes staffing items from signals and cases; the only-staffing branch; the urgency × confidence sweep |
+| 2 | The certified flag and the bottleneck are never checked, so self-contradictory reports keep go (high) | confirmed 2/2 | Fixed: `_check` enforces every `certify_staffing` guarantee; 10 contradiction cases |
+| 3 | A replay in a different serialisation counts as independent corroboration (high) | confirmed 2/2 | Fixed: canonical-JSON replay detection, counted once |
+| 4 | Tests use WMI-authored fixtures, not the Kernel's rendered report (medium) | confirmed 2/2 | Fixed: `kernel_certified_answers.json` from Kernel `4e970f2d`, indent=1 rendering; Kernel #212 runs the real organs |
+| 5 | Only an item that starts with the exact label is recognized (medium) | confirmed 2/2 | Fixed: the label is read anywhere, several reports per item; unlabeled staffing shape is reported, not read |
+| 6 | The real mission's shortage of 1 is never tested (low) | confirmed 2/2 | Fixed: the `loop15_8_of_9` fixture; Kernel step 9 asserts it |
+| 7 | Divergence is tested only on differing staffed totals (low) | confirmed 2/2 | Fixed: the divergence key includes the assignment; same-plan-different-orders and equal-staffed-different-shortage tests |
+| 8 | `before.txt` is for an earlier draft (low/medium) | confirmed 2/2 | Recorded in the errata above; #45's file is kept as written |
+| 9 | Classification depends on the interpreter (low) | confirmed 2/2 | Fixed: `_extent` bounds depth and digit runs before parsing; determinism tests |
+| 10 | An unparseable report does not rank above a parsed shortage (low) | **refuted 2/2** | Not a defect: wire order between two blocking steps breaks no condition. The error-first priority is kept as an order-independence improvement, not a defect fix |
+| 11 | DALEOBANKS's mock evaluator "now diverges" (low) | **refuted 2/2** | The mock never mirrored WMI's verdicts; the limit's wording is corrected above |
+| 12 | The evidence states the wrong size ceiling (low) | **refuted 2/2** | #45's statement holds on DALEOBANKS's intake path; this README's erratum is corrected above |
+| 13 | Some guards are tested only through inputs that also break the arithmetic (low) | confirmed 2/2 | Fixed: isolating tests (duplicate key, zero-unit row, >1e12, prose label) |
+| 14 | The ablation covers 3 hand-picked tests and hashes the wrong file (low) | confirmed 2/2 | Recorded in the errata above |
+
+The 15th finding, that #45's `after.txt` names no revision, environment or command, was not verified. This directory's `after.txt` and `suite.txt` name all three.
