@@ -1,0 +1,345 @@
+{
+  "decision_id": "DELIB-WMI-UAT-001",
+  "title": "Disposition of PR #43 (UAT swarm runtime) against the existing UAT specification in PR #15",
+  "problem": "PR #43 implements the founder's master plan as a runnable agent team inside WMI. Draft PR #15 already specifies a Universally Adaptive Team for WMI. Two designs for one intended effect must not become two parallel products, and PR #43 was built without first searching open PRs.",
+  "founder_intent_refs": [
+    "WMI-UAT-001",
+    "WMI-UAT-002",
+    "WMI-UAT-003",
+    "WMI-UAT-004",
+    "WMI-UAT-006",
+    "WMI-UAT-008",
+    "Kernel INTENT-0030",
+    "Kernel INTENT-20260930-open-source-first",
+    "Kernel INTENT-20261111-ABSOLUTE-OPUS-MAXIMUS (dispositions)",
+    "Kernel INTENT-20261112-CONVERGENCE-USEFUL-PATH"
+  ],
+  "baseline": "WMI main: deterministic venture assessment, no paid model calls, no runnable UAT. PR #15: 2,552-line normative UAT specification and JSON contracts, untouched since 2026-10-01, no runtime beyond a simulation skeleton.",
+  "alternatives": [
+    {
+      "name": "PR #43 as the first executable slice of PR #15",
+      "description": "Keep #43's governor, mission record, earned-standing ledger, local runtime and RailScout hand-off, and map each onto #15's planes (Evidence and Decision plane, Policy Decision Service, Model Assurance) instead of a parallel UAT.",
+      "advantages": [
+        "Executable mechanisms meet a reviewed specification",
+        "#43's lineage-graded review implements #15's correlated-model-failure requirement"
+      ],
+      "disadvantages": [
+        "Naming and contract mapping work",
+        "#15 assumes PostgreSQL and services that #43 does not provide"
+      ],
+      "revival_evidence": "Chosen candidate pending founder ruling."
+    },
+    {
+      "name": "PR #43 supersedes PR #15",
+      "description": "Treat the October master plan as the later, controlling founder statement and archive #15 as provenance.",
+      "advantages": [
+        "One smaller design",
+        "Later founder statement"
+      ],
+      "disadvantages": [
+        "Loses #15's threat model, approval matrix and acceptance gates",
+        "Silent narrowing of an earlier founder-reviewed design"
+      ],
+      "revival_evidence": "Founder states the master plan replaces the July specification."
+    },
+    {
+      "name": "PR #15 supersedes PR #43",
+      "description": "Close #43 and build #15's full enterprise system first.",
+      "advantages": [
+        "Single normative design",
+        "Strong security architecture"
+      ],
+      "disadvantages": [
+        "Months of services before any buyer test",
+        "Contradicts the founder's request to run live now"
+      ],
+      "revival_evidence": "Founder prefers the enterprise build before any live cycle."
+    },
+    {
+      "name": "Hosted agent platform",
+      "description": "Run the roles on a commercial multi-agent platform.",
+      "advantages": [
+        "Fast setup"
+      ],
+      "disadvantages": [
+        "Vendor lock-in",
+        "Same-lineage self-review",
+        "Conflicts with open-source-first intent"
+      ],
+      "revival_evidence": "A platform offering verifiable cross-vendor review and local models."
+    }
+  ],
+  "do_nothing_option": {
+    "expected_outcome": "The master plan stays prose; #15 stays an unimplemented draft; no buyer test happens.",
+    "advantages": [
+      "No new code to maintain",
+      "No duplication risk"
+    ],
+    "disadvantages": [
+      "The founder's explicit request to build and run it is unmet",
+      "Ideas found in two live runs are lost"
+    ]
+  },
+  "roles": [
+    {
+      "role": "Founder-Intent Steward",
+      "position": "Every master-plan intent is recorded with a lifecycle state; the human phase is deferred, not dropped; the July UAT design is preserved as a conflicting intent, not silently overridden.",
+      "material_concerns": [
+        "Canonical owner between #15 and #43 is the founder's call"
+      ],
+      "evidence_refs": [
+        "docs/governance/uat-intents.json"
+      ],
+      "recommendation": "NEEDS_FOUNDER_DECISION"
+    },
+    {
+      "role": "Systems Architect",
+      "position": "#43 is additive, owns no authority and consumes the Kernel opportunity-packet contract. Its modules map onto #15's planes without a second authority plane.",
+      "material_concerns": [
+        "Two UAT names in one repository confuse contributors until mapped"
+      ],
+      "evidence_refs": [
+        "src/swarm/railscout.py uses adapters.contract_validation"
+      ],
+      "recommendation": "EXPERIMENT"
+    },
+    {
+      "role": "Adversarial Reviewer",
+      "position": "#43 was built without the required search of open PRs, the same failure that produced a duplicate compiler in the Kernel. Its runtime also defaulted to a paid provider until dba2e66.",
+      "material_concerns": [
+        "Duplicate product risk",
+        "A small local model may fabricate sources",
+        "Agent standing could be gamed by same-lineage review"
+      ],
+      "evidence_refs": [
+        "Kernel docs/collaboration/START_HERE.md",
+        "commit dba2e66",
+        "tests/test_swarm_local_client.py"
+      ],
+      "recommendation": "NEEDS_FOUNDER_DECISION"
+    },
+    {
+      "role": "Operator and Maintainer",
+      "position": "Default route needs no secrets; kill switch, spend and call ceilings exist; the ledger must live on a private volume.",
+      "material_concerns": [
+        "Local model quality and hardware unmeasured"
+      ],
+      "evidence_refs": [
+        "docs/UAT_SWARM_RUNBOOK.md"
+      ],
+      "recommendation": "EXPERIMENT"
+    },
+    {
+      "role": "Evidence and Welfare Guardian",
+      "position": "No one was contacted and nothing was spent. Evidence so far is unit tests and model output; there is no buyer evidence.",
+      "material_concerns": [
+        "A completed internal workflow is not buyer demand (founder, 2026-11-12)",
+        "Run outputs may name real organizations and stay out of git"
+      ],
+      "evidence_refs": [
+        "runs/ is git-ignored"
+      ],
+      "recommendation": "EXPERIMENT"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "Governor, store, swarm and runtime behave as specified",
+      "tier": "unit_test",
+      "reference": "205 passed locally on dba2e66; CI green on 3326c24",
+      "finding": "Deterministic gates, ledger replay and refusals pass."
+    },
+    {
+      "claim": "Local route never reaches a hosted provider",
+      "tier": "unit_test",
+      "reference": "tests/test_swarm_local_client.py (real loopback HTTP server)",
+      "finding": "Hosted URLs, cloud tags, redirects and key presence are refused or ignored."
+    },
+    {
+      "claim": "The loop produces decision-ready dossiers",
+      "tier": "model_output",
+      "reference": "Two live runs, 64 agents (runs/uat, git-ignored)",
+      "finding": "1 VALIDATE, 6 PARK, 1 KILL; 13 ideas kept for RailScout."
+    }
+  ],
+  "counterevidence": [
+    {
+      "claim": "There is demand for the validated offer",
+      "tier": "model_output",
+      "reference": "top2-2026-10-23 governor output",
+      "finding": "Expected paid commitments 0.7 in 14 days; the market red team refuted the original offer."
+    },
+    {
+      "claim": "No overlapping UAT work exists",
+      "tier": "historical_artifact",
+      "reference": "PR #15, #16, #18",
+      "finding": "False: an earlier UAT specification and AG0 boundary exist as open drafts."
+    }
+  ],
+  "pass_1": {
+    "intended_outcome": "Verified net cash from paying customers, reached through one canonical, governed UAT in WMI.",
+    "advantages": [
+      {
+        "id": "A1",
+        "statement": "Executable, tested gates for a design that was only specified",
+        "amplified_value": "Becomes #15's first executable slice and the evidence base its acceptance gates lacked."
+      },
+      {
+        "id": "A2",
+        "statement": "Lineage-graded independent review",
+        "amplified_value": "Directly implements #15's correlated-model-failure requirement; reusable by other organs."
+      },
+      {
+        "id": "A3",
+        "statement": "No idea lost: Kernel-valid packets to RailScout",
+        "amplified_value": "Feeds the refinery loop that the organ map already routes."
+      }
+    ],
+    "disadvantages": [
+      {
+        "id": "D1",
+        "statement": "Duplicate UAT design alongside PR #15",
+        "severity": "high",
+        "response_type": "governance",
+        "redesigned_response": "Record the conflict, map #43 modules onto #15 planes, and hold #43 in draft until the founder names the canonical owner."
+      },
+      {
+        "id": "D2",
+        "statement": "Paid model route was the default",
+        "severity": "high",
+        "response_type": "protective",
+        "redesigned_response": "Fixed in dba2e66: local default, Claude opt-in only, key presence ignored."
+      },
+      {
+        "id": "D3",
+        "statement": "No buyer evidence; only model output",
+        "severity": "medium",
+        "response_type": "evidence",
+        "redesigned_response": "VALIDATE means a capped buyer test only; kill rules attached; no COMMIT without accepted external evidence."
+      },
+      {
+        "id": "D4",
+        "statement": "Built without posting a claim on the Kernel work board",
+        "severity": "medium",
+        "response_type": "governance",
+        "redesigned_response": "Collaboration receipt v2 added to the PR; board claim blocked by missing Kernel API access and reported to the founder."
+      }
+    ],
+    "comparisons": {
+      "baseline": "No runnable UAT; #15 unimplemented.",
+      "do_nothing": "No progress on the founder's request; duplication avoided.",
+      "simplest_viable_alternative": "Governor plus one workflow (the first commit of #43).",
+      "strongest_competing_architecture": "#15's full enterprise system before any live cycle.",
+      "reversible_experiment": "#43 as a draft, consequence-inert experiment mapped onto #15."
+    },
+    "rejected_alternatives": [
+      {
+        "name": "Hosted agent platform",
+        "rejection_reason": "Vendor lock-in, self-review bias, open-source-first conflict.",
+        "revival_evidence": "Verifiable cross-vendor review with local models."
+      }
+    ]
+  },
+  "pass_2": {
+    "attack_summary": "Assume #43 is mapped onto #15 and merged. It could still harden a second vocabulary, centralize trust in one ledger, and let thin local-model research pass gates.",
+    "new_weaknesses": [
+      {
+        "id": "W1",
+        "category": "comprehensibility",
+        "statement": "Two vocabularies (eight roles and thirteen bots vs twelve parent agents) survive the mapping.",
+        "strengthening_response": "One mapping table in the disposition doc; rename only after the founder rules."
+      },
+      {
+        "id": "W2",
+        "category": "gaming",
+        "statement": "With one model lineage, all review grades as internal, so standing never rises.",
+        "strengthening_response": "Accepted by design; standing rises only with a second lineage or external acceptance."
+      },
+      {
+        "id": "W3",
+        "category": "dependency",
+        "statement": "Live evidence on the local route depends on a SearXNG adapter that does not exist.",
+        "strengthening_response": "Uncited URLs are dropped and the governor kills unverified ideas; the adapter is a named residual deficit."
+      }
+    ],
+    "pass_1_disadvantage_dispositions": [
+      {
+        "disadvantage_id": "D1",
+        "outcome": "deferred",
+        "rationale": "Canonical ownership is a founder decision.",
+        "owner": "Alfonso Lopez",
+        "review_trigger": "Founder ruling on WMI-UAT-008."
+      },
+      {
+        "disadvantage_id": "D2",
+        "outcome": "resolved",
+        "rationale": "Commit dba2e66 with tests.",
+        "owner": "PR #43 author session",
+        "review_trigger": "Any new model route."
+      },
+      {
+        "disadvantage_id": "D3",
+        "outcome": "accepted",
+        "rationale": "Buyer evidence needs founder-authorized contact.",
+        "owner": "Alfonso Lopez",
+        "review_trigger": "Approval of the credentialing buyer test."
+      },
+      {
+        "disadvantage_id": "D4",
+        "outcome": "deferred",
+        "rationale": "This session cannot post to Kernel issue #96.",
+        "owner": "Alfonso Lopez or a session with Kernel access",
+        "review_trigger": "Kernel API access granted or a board relay posted."
+      }
+    ],
+    "final_design": "#43 stays a draft, consequence-inert experiment: local-first runtime, deterministic governor, Kernel-valid RailScout packets, and an explicit mapping onto #15's planes. No merge until the founder names the canonical UAT owner.",
+    "residual_risks": [
+      {
+        "risk": "Local model research quality is unmeasured",
+        "mitigation": "Benchmark one seeded cycle before scheduling",
+        "owner": "WMI maintainers",
+        "review_trigger": "Target hardware supplied"
+      }
+    ],
+    "recommendation": "NEEDS_FOUNDER_DECISION"
+  },
+  "dissent": {
+    "present": true,
+    "handling": "Preserved; the decision waits on the founder.",
+    "entries": [
+      {
+        "role": "Systems Architect",
+        "position": "Proceed as EXPERIMENT now; the overlap is resolvable by mapping alone.",
+        "rationale": "Files and interfaces do not collide; #15 has no runtime to conflict with.",
+        "evidence_threshold": "Founder silence for 14 days after the ruling request.",
+        "owner": "Integrator",
+        "review_trigger": "2026-11-27"
+      }
+    ]
+  },
+  "authority_impact": {
+    "level": "standard",
+    "changes_authority": false,
+    "requires_authorized_human": true,
+    "approval_status": "pending",
+    "approver": null
+  },
+  "migration_plan": "No migration: additive modules. On a ruling for alternative 1, add a mapping section to #15's specification and rename nothing until both PRs agree.",
+  "rollback_plan": {
+    "possible": true,
+    "steps": [
+      "Close or revert PR #43; no other module imports it",
+      "Keep runs/ and the ledger as evidence",
+      "Set UAT_SWARM_PAUSED=1 on any running host"
+    ],
+    "reason_impossible": null
+  },
+  "kill_criteria": [
+    "A normal run contacts a paid host or a key changes routing",
+    "A run sends, spends, signs or publishes without founder approval",
+    "Fewer than 2 paid pilots within 30 days of an approved buyer test"
+  ],
+  "decision": "NEEDS_FOUNDER_DECISION",
+  "decision_owner": "Alfonso Lopez",
+  "review_trigger": "Founder ruling on WMI-UAT-008, or 2026-11-27 if none"
+}
