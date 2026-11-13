@@ -54,6 +54,7 @@ class RuntimeConfig:
     min_gross_margin: float = 0.6
     max_opportunities: int = 4
     cycle_budget_usd: float = 25.0       # model + search spend per cycle
+    max_model_calls: int = 60            # local inference is free of fees, not of resources
     out_dir: str = "runs/uat"
 
 
@@ -70,6 +71,7 @@ class SwarmRuntime:
         self.clients = {c.lineage: c for c in clients}
         self.config = config or RuntimeConfig()
         self.spent_usd = 0.0
+        self.model_calls = 0
         self._ensure_agents()
 
     # -- setup ----------------------------------------------------------------
@@ -87,6 +89,9 @@ class SwarmRuntime:
               avoid_lineage: str | None = None) -> tuple[str, dict, float]:
         if self.spent_usd >= self.config.cycle_budget_usd:
             raise BudgetExceeded(f"cycle budget ${self.config.cycle_budget_usd:.2f} reached")
+        if self.model_calls >= self.config.max_model_calls:
+            raise BudgetExceeded(f"cycle ceiling of {self.config.max_model_calls} model calls reached")
+        self.model_calls += 1
         slot, _, _, schema, web = STAGES[stage]
         agent_id = self.store.swarm.route(f"{key}:{stage}", stage, slot, now)["agent_id"]
         lineage = self.store.swarm.agents[agent_id].lineage

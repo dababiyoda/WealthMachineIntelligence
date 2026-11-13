@@ -16,19 +16,32 @@ Every step lands in one durable ledger.
 |---|---|
 | Agent runtime (one cycle, guards, brief) | `src/swarm/runtime.py` |
 | Roles, prompts, strict output schemas | `src/swarm/roles.py` |
-| Model clients (Claude now; any provider by lineage) | `src/swarm/model.py` |
+| Model clients (local by default; any provider by lineage) | `src/swarm/model.py` |
 | Durable ledger (append-only, locked, replayed) | `src/services/uat_store.py` |
 | Mission rules / swarm standing / gates | `uat_missions.py`, `uat_swarm.py`, `uat_governor.py` |
 
 ## Run a cycle
 
+Model routing follows the Kernel's open-source-first intent
+(`uniimente-kernel/docs/OPEN_SOURCE_STACK.md`, INTENT-20260930-open-source-first).
+The default route is a loopback OpenAI-protocol server: Ollama, llama.cpp, vLLM or LocalAI.
+An API key in the environment never changes the route, and a local failure never falls back to a hosted provider.
+
 ```bash
-pip install -r requirements.txt            # includes anthropic>=2.1.0
-export ANTHROPIC_API_KEY=...               # or: ant auth login
+OLLAMA_NO_CLOUD=1 ollama serve             # in the server's own environment
+ollama pull qwen3.5:4b
+export LLM_BASE_URL=http://127.0.0.1:11434/v1 LLM_MODEL=qwen3.5:4b
 export UAT_LEDGER_PATH=/data/uat/ledger.jsonl   # private, persistent volume
-python -m src.swarm run --focus "capital-light digital businesses ..." --budget 25 --max-opps 4
+python -m src.swarm run --focus "capital-light digital businesses ..." --max-opps 4
 python -m src.swarm status
 ```
+
+The local model has no web access. On research stages, any URL it cites that does not appear in its input is removed.
+The governor's two-source rule then KILLs ideas the model could not verify.
+Live evidence therefore comes in through seeded opportunities, a workflow `ingest`, or a future SearXNG search adapter (a residual capability deficit, not yet built).
+
+The paid Claude route is an explicit legacy opt-in, never a default:
+`pip install "anthropic>=2.1.0"`, then `UAT_MODEL_PROVIDER=anthropic` with credentials from `ANTHROPIC_API_KEY` or `ant auth login`.
 
 Outputs:
 - **Ledger:** every mission, decision and graded outcome, written to `UAT_LEDGER_PATH`.
@@ -56,10 +69,12 @@ The ledger must sit on a private, persistent volume. **Never commit it to this p
 |---|---|---|
 | Kill switch | `UAT_SWARM_PAUSED=1` | No cycle starts |
 | Spend ceiling | `--budget` / `UAT_CYCLE_BUDGET_USD` (default $25) | The next model call is refused once reached; the in-flight mission is marked BLOCKED |
+| Call ceiling | `--max-calls` / `UAT_MAX_MODEL_CALLS` (default 60) | Bounds local inference too: zero fees are not unlimited resources |
 | Cash cap | `RuntimeConfig.cash_cap_usd` (default $0) | Offers whose worst-case loss exceeds it are RECONFIGURE, never GO |
 | Stage failure | refusal / truncation / invalid JSON | That mission is BLOCKED; the cycle continues |
 | Resume | rerun the same `--run-id` | Cached scout results, decided missions skipped; nothing is paid twice |
-| Refusal fallback | `fallbacks="default"` | A declined request is retried server-side on Anthropic's recommended model |
+| Refusal fallback (Claude opt-in only) | `fallbacks="default"` | A declined request is retried server-side on Anthropic's recommended model |
+| Hosted-route refusal | `LocalClient` | Non-loopback URLs, credentials in the URL, cloud model tags and redirects are refused |
 
 ## Authority
 
@@ -71,8 +86,9 @@ Implement `complete(system, task, schema, web) -> Completion` with a distinct `l
 
 ## Production checklist
 
-- [ ] `ANTHROPIC_API_KEY` stored as a secret, not in `.env` committed to git
+- [ ] Local model server bound to loopback with `OLLAMA_NO_CLOUD=1`; model weight license recorded
+- [ ] Local model quality benchmarked on one seeded cycle before scheduling (unmeasured so far)
 - [ ] `UAT_LEDGER_PATH` on a private persistent volume, backed up
-- [ ] Budget set per cycle and reviewed against the first invoice (cost estimates in `model.py` are estimates)
+- [ ] Call ceiling sized to the hardware; if the Claude opt-in is used, budget reviewed against the first invoice
 - [ ] Kill switch tested (`UAT_SWARM_PAUSED=1 python -m src.swarm run ...` returns `stopped`)
 - [ ] First cycle's brief reviewed by Alfonso before any queued action is approved

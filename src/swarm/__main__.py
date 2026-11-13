@@ -4,8 +4,10 @@
     python -m src.swarm status
     python -m src.swarm ingest runs/uat/<label>-dossier.json
 
-`run` needs Anthropic credentials (ANTHROPIC_API_KEY or an `ant auth login`
-profile). `ingest` brings a Claude Code workflow run into the same ledger.
+`run` uses a local OpenAI-protocol model server by default (LLM_BASE_URL,
+LLM_MODEL; Ollama + qwen3.5:4b). The paid Claude route runs only with
+UAT_MODEL_PROVIDER=anthropic; a key in the environment does not select it.
+`ingest` brings a Claude Code workflow run into the same ledger.
 """
 
 from __future__ import annotations
@@ -113,7 +115,10 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--run-id", default=datetime.now(timezone.utc).strftime("cycle-%Y%m%d-%H%M"))
     r.add_argument("--budget", type=float, default=float(os.getenv("UAT_CYCLE_BUDGET_USD", "25")))
     r.add_argument("--max-opps", type=int, default=4)
-    r.add_argument("--model", default=os.getenv("UAT_MODEL", "claude-opus-5-5"))
+    r.add_argument("--provider", default=os.getenv("UAT_MODEL_PROVIDER", "local"),
+                   choices=["local", "anthropic"])
+    r.add_argument("--model", default=os.getenv("UAT_MODEL"))
+    r.add_argument("--max-calls", type=int, default=int(os.getenv("UAT_MAX_MODEL_CALLS", "60")))
     r.add_argument("--out", default=os.getenv("UAT_OUT_DIR", "runs/uat"))
     sub.add_parser("status")
     i = sub.add_parser("ingest", help="dossier, workflow hand-off, or workflow output file")
@@ -129,10 +134,15 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(_ingest(store, ns.dossier, ns.out), indent=2))
         return 0
 
-    from .model import ClaudeClient
-    runtime = SwarmRuntime(store, [ClaudeClient(model=ns.model)],
+    from .model import ModelError, client_from_env
+    try:
+        client = client_from_env(ns.provider, ns.model)
+    except ModelError as exc:
+        print(json.dumps({"ok": False, "stopped": str(exc)}))
+        return 2
+    runtime = SwarmRuntime(store, [client],
                            RuntimeConfig(max_opportunities=ns.max_opps, cycle_budget_usd=ns.budget,
-                                         out_dir=ns.out))
+                                         max_model_calls=ns.max_calls, out_dir=ns.out))
     try:
         result = runtime.run_cycle(ns.run_id, ns.focus)
     except (SwarmPaused, BudgetExceeded) as exc:

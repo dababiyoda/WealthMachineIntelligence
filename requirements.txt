@@ -39,4 +39,3 @@ structlog
 tensorflow
 transformers
 uvicorn
-anthropic>=2.1.0  # UAT swarm runtime (src/swarm); imported lazily
