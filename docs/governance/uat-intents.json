@@ -1,0 +1,252 @@
+{
+  "intents": [
+    {
+      "intent_id": "WMI-UAT-001",
+      "title": "My network becomes my wealth-building machine",
+      "statement": "The founder's master plan: a Universally Adaptive Team of eight roles runs an Income Streams Loop and a Team Loop through Phases 1-3 so that the founder's network produces recurring income.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "docs/intent/MASTER_PLAN_UAT_SOURCE.md (verbatim)",
+      "source_date_or_version": "2026-10-22",
+      "status": "active",
+      "authority_level": "active_requirement",
+      "consequence_class": "material",
+      "intended_outcome": "Verified net cash collected from paying customers, trailing 30 days; leading indicator: paid pre-commitments within 14 days of first buyer contact.",
+      "affected_systems": [
+        "WealthMachineIntelligence"
+      ],
+      "rationale": "Kernel INTENT-0030: the wealth-machine language is an effect specification, compiled in docs/MASTER_PLAN_EFFECT_COMPILATION.md.",
+      "conflicts": [
+        "WMI-UAT-008: draft PR #15 already specifies a Universally Adaptive Team for WMI"
+      ],
+      "evidence_refs": [
+        "docs/intent/MASTER_PLAN_UAT_SOURCE.md",
+        "runs/uat briefs (git-ignored): 0 paid commitments so far"
+      ],
+      "implementation_refs": [
+        "docs/MASTER_PLAN_EFFECT_COMPILATION.md",
+        "src/services/uat_governor.py"
+      ],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "First paid commitment, or 30 days after the first approved buyer test with none.",
+      "unresolved_questions": [
+        "Which canonical UAT design owns this outcome (see WMI-UAT-008)?"
+      ],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    },
+    {
+      "intent_id": "WMI-UAT-002",
+      "title": "Run the plan as an all-agent workflow",
+      "statement": "Adapt the master plan into a workflow run entirely by agents.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "Founder chat, 2026-10-22",
+      "source_date_or_version": "2026-10-22",
+      "status": "implemented",
+      "authority_level": "active_requirement",
+      "consequence_class": "bounded",
+      "intended_outcome": "Each role is performed by an agent; a deterministic governor decides; humans authorize consequences.",
+      "affected_systems": [
+        "WealthMachineIntelligence"
+      ],
+      "rationale": "Agents propose; only the governor and the founder decide.",
+      "conflicts": [],
+      "evidence_refs": [
+        "tests/test_swarm_runtime.py",
+        "two live runs recorded in PR #43 (64 agents)"
+      ],
+      "implementation_refs": [
+        ".claude/workflows/uat-income-loop.js",
+        "src/swarm/runtime.py"
+      ],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "A role the agents cannot perform to acceptance.",
+      "unresolved_questions": [],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    },
+    {
+      "intent_id": "WMI-UAT-003",
+      "title": "Build it inside WealthMachine and run it live, production-ready",
+      "statement": "Do not simulate or use Grok: build the team inside WealthMachine, run it live and prepare it for production.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "Founder chat answer, 2026-10-23",
+      "source_date_or_version": "2026-10-23",
+      "status": "active",
+      "authority_level": "active_requirement",
+      "consequence_class": "material",
+      "intended_outcome": "A runnable, durable, guarded runtime inside WMI that completes real research cycles.",
+      "affected_systems": [
+        "WealthMachineIntelligence"
+      ],
+      "rationale": "Superseded the Grok group-chat implementation form; its mechanisms were extracted.",
+      "conflicts": [
+        "Production scheduling needs a private persistent ledger and benchmarked local model hardware, neither provided"
+      ],
+      "evidence_refs": [
+        "tests/test_uat_store.py",
+        "tests/test_swarm_local_client.py"
+      ],
+      "implementation_refs": [
+        "src/swarm/",
+        "src/services/uat_store.py",
+        "docs/UAT_SWARM_RUNBOOK.md"
+      ],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "Target hardware and private ledger path supplied.",
+      "unresolved_questions": [
+        "Which machine hosts the local model?"
+      ],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    },
+    {
+      "intent_id": "WMI-UAT-004",
+      "title": "Agent-only at first",
+      "statement": "In the beginning the team is agents only and WealthMachine achieves the stated intentions by itself.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "Founder chat answer, 2026-10-23",
+      "source_date_or_version": "2026-10-23",
+      "status": "active",
+      "authority_level": "active_requirement",
+      "consequence_class": "bounded",
+      "intended_outcome": "No human members until the founder opens the human phase.",
+      "affected_systems": [
+        "WealthMachineIntelligence"
+      ],
+      "rationale": "Keeps the first phase consequence-inert and cheap.",
+      "conflicts": [],
+      "evidence_refs": [
+        "src/swarm/runtime.py registers agent principals only"
+      ],
+      "implementation_refs": [
+        "src/services/uat_swarm.py"
+      ],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "Founder opens the human phase (WMI-UAT-005).",
+      "unresolved_questions": [],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    },
+    {
+      "intent_id": "WMI-UAT-005",
+      "title": "Later, humans from social media join",
+      "statement": "Eventually the team will include humans recruited from social media.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "Founder chat answer, 2026-10-23",
+      "source_date_or_version": "2026-10-23",
+      "status": "deferred",
+      "authority_level": "aspiration",
+      "consequence_class": "material",
+      "intended_outcome": "People earn standing and paid contribution plans in the same ledger as agents.",
+      "affected_systems": [
+        "WealthMachineIntelligence"
+      ],
+      "rationale": "Contribution plans already require ratification and pay human principals only.",
+      "conflicts": [],
+      "evidence_refs": [],
+      "implementation_refs": [
+        "src/services/uat_swarm.py contribution_plan"
+      ],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "Founder names the platforms and the members' role (buyer, partner, contributor).",
+      "unresolved_questions": [
+        "Which platforms, and what role do recruited people play?"
+      ],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    },
+    {
+      "intent_id": "WMI-UAT-006",
+      "title": "Keep every idea for RailScout and the Idea Refinery",
+      "statement": "Ideas that do not pass are kept and sent to RailScout so they go through the DALEOBANKS Idea Refinery.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "Founder chat, 2026-10-23",
+      "source_date_or_version": "2026-10-23",
+      "status": "active",
+      "authority_level": "active_requirement",
+      "consequence_class": "bounded",
+      "intended_outcome": "No idea is lost; each non-passing idea reaches the refinery with the research questions that would revive it.",
+      "affected_systems": [
+        "WealthMachineIntelligence",
+        "RAILSCOUT",
+        "DALEOBANKS"
+      ],
+      "rationale": "Kernel opportunity-packet contract is the shared wire.",
+      "conflicts": [],
+      "evidence_refs": [
+        "tests/test_swarm_runtime.py::test_non_go_ideas_kept_for_railscout",
+        "13 packets in the local outbox"
+      ],
+      "implementation_refs": [
+        "src/swarm/railscout.py"
+      ],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "Founder chooses a delivery destination: RAILSCOUT is public, so delivery publishes the ideas.",
+      "unresolved_questions": [
+        "Deliver to the public RAILSCOUT repository or a private destination?"
+      ],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    },
+    {
+      "intent_id": "WMI-UAT-007",
+      "title": "Run the two strongest ideas",
+      "statement": "Rerun the two strongest ideas through the full loop.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "Founder chat, 2026-10-23",
+      "source_date_or_version": "2026-10-23",
+      "status": "implemented",
+      "authority_level": "active_requirement",
+      "consequence_class": "bounded",
+      "intended_outcome": "A decision on each of the two ideas.",
+      "affected_systems": [
+        "WealthMachineIntelligence"
+      ],
+      "rationale": "Seeded workflow run.",
+      "conflicts": [],
+      "evidence_refs": [
+        "run top2-2026-10-23: 1 VALIDATE (credentialing deadline audit), 1 PARK kept for RailScout"
+      ],
+      "implementation_refs": [
+        ".claude/workflows/uat-income-loop.js (seeded opportunities)"
+      ],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "Founder approves or rejects the credentialing buyer test.",
+      "unresolved_questions": [
+        "Approve the buyer test, its outreach drafts and terms?"
+      ],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    },
+    {
+      "intent_id": "WMI-UAT-008",
+      "title": "Two UAT designs in WMI",
+      "statement": "Draft PR #15 (2026-07-18) specifies the Universally Adaptive Team as a twelve-parent-agent enterprise operating system for WMI; PR #43 (2026-10-22) implements the founder's later eight-role master plan as runnable code. Both claim the same intended effect.",
+      "source": "Founder chat in session session_012idQXWUrVAMHPo3iZpSfmv (summarized, not verbatim; chat text is intent evidence, not founder authentication)",
+      "source_location": "github.com/dababiyoda/WealthMachineIntelligence/pull/15 and /pull/43",
+      "source_date_or_version": "2026-11-13",
+      "status": "conflicted",
+      "authority_level": "unknown",
+      "consequence_class": "material",
+      "intended_outcome": "One canonical UAT owner, with the other's useful mechanisms integrated and the rest dispositioned.",
+      "affected_systems": [
+        "WealthMachineIntelligence"
+      ],
+      "rationale": "Kernel START_HERE: search open PRs for the same effect before implementing; founder 2026-11-11: every substantial component gets a documented disposition. PR #43 was built before this search.",
+      "conflicts": [
+        "PR #15 spec/uat/v1 vs PR #43 src/services/uat_*.py and src/swarm/"
+      ],
+      "evidence_refs": [
+        "docs/governance/DELIB-WMI-UAT-001.json"
+      ],
+      "implementation_refs": [],
+      "owner": "Alfonso Lopez decides; WMI maintainers implement",
+      "next_review_trigger": "Founder or integration owner rules on canonical ownership.",
+      "unresolved_questions": [
+        "Is #15's specification the canonical design with #43 as its first executable slice, or does the later master plan supersede #15?"
+      ],
+      "created_at": "2026-11-13T13:00:00Z",
+      "updated_at": "2026-11-13T13:00:00Z"
+    }
+  ]
+}
