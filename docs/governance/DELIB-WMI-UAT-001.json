@@ -122,8 +122,7 @@
       "role": "Operator and Maintainer",
       "position": "Default route needs no secrets; kill switch, spend and call ceilings exist; the ledger must live on a private volume.",
       "material_concerns": [
-        "Local model quality and hardware unmeasured",
-        "#46 also edits requirements.txt"
+        "Local model quality and hardware unmeasured"
       ],
       "evidence_refs": [
         "docs/UAT_SWARM_RUNBOOK.md"
@@ -300,12 +299,6 @@
         "mitigation": "Benchmark one seeded cycle before scheduling",
         "owner": "WMI maintainers",
         "review_trigger": "Target hardware supplied"
-      },
-      {
-        "risk": "requirements.txt conflicts with PR #46",
-        "mitigation": "Merge whichever lands second carefully; #43 only removes one line",
-        "owner": "Integrator",
-        "review_trigger": "#46 or #43 merges"
       }
     ],
     "recommendation": "NEEDS_FOUNDER_DECISION"
